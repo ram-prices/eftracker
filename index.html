@@ -489,6 +489,41 @@
             font-weight: bold;
         }
 
+        /* --- PITY COUNTER DASHBOARD BLOCKS --- */
+        .pity-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-tech);
+            border-radius: 4px;
+        }
+        .pity-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .pity-divider {
+            width: 1px;
+            background: var(--border-tech);
+        }
+        .pity-val {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: monospace;
+            line-height: 1;
+        }
+        .pity-max {
+            font-size: 10px;
+        }
+        .pity-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
         /* --- MOBILE RESPONSIVE LAYOUT --- */
         @media (max-width: 768px) {
             /* Reduce the heavy 40px body padding so content fits better */
@@ -778,7 +813,7 @@
         }
     }
 
-function handleFileUpload(event) {
+    function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
         // --- NEW: Dynamic Username from Filename (Flexible) ---
@@ -1240,20 +1275,20 @@ function handleFileUpload(event) {
                     let tokenEarnedColor = !hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : "var(--accent-blue)");
                     
                     pityHTML = `
-                        <div style="display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${pityValColor}; line-height: 1;">${displayVal} <span style="font-size: 10px; color: ${pityTextColor};">/ 80</span></div>
-                                <div style="font-size: 9px; color: ${pityTextColor}; text-transform: uppercase; margin-top: 4px;">${pityLabel}</div>
+                        <div class="pity-box">
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${pityValColor};">${displayVal} <span class="pity-max" style="color: ${pityTextColor};">/ 80</span></div>
+                                <div class="pity-label" style="color: ${pityTextColor};">${pityLabel}</div>
                             </div>
-                            <div style="width: 1px; background: var(--border-tech);"></div>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${guarValColor}; line-height: 1;">${rateUpVal} <span style="font-size: 10px; color: ${guarTextColor};">/ 120</span></div>
-                                <div style="font-size: 9px; color: ${guarTextColor}; text-transform: uppercase; margin-top: 4px;">${guarLabel}</div>
+                            <div class="pity-divider"></div>
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${guarValColor};">${rateUpVal} <span class="pity-max" style="color: ${guarTextColor};">/ 120</span></div>
+                                <div class="pity-label" style="color: ${guarTextColor};">${guarLabel}</div>
                             </div>
-                            <div style="width: 1px; background: var(--border-tech);"></div>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${tokenNumColor}; line-height: 1;">${!hasPulledRateUp ? '0' : tokenVal} <span style="font-size: 10px; color: ${tokenLabelColor};">/ 240</span></div>
-                                <div style="font-size: 9px; color: ${tokenLabelColor}; text-transform: uppercase; margin-top: 4px;">TOKEN <span style="color: ${tokenEarnedColor}; font-weight: bold;">${!hasPulledRateUp ? '0' : tokensEarned}</span></div>
+                            <div class="pity-divider"></div>
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${tokenNumColor};">${!hasPulledRateUp ? '0' : tokenVal} <span class="pity-max" style="color: ${tokenLabelColor};">/ 240</span></div>
+                                <div class="pity-label" style="color: ${tokenLabelColor};">TOKEN <span style="color: ${tokenEarnedColor}; font-weight: bold;">${!hasPulledRateUp ? '0' : tokensEarned}</span></div>
                             </div>
                         </div>
                     `;
@@ -1295,20 +1330,20 @@ function handleFileUpload(event) {
                     let ruStatColor = "var(--accent-orange)";
 
                     pityHTML = `
-                        <div style="display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${pity4Color}; line-height: 1;">${pity4Val} <span style="font-size: 10px; color: ${pity4TextColor};">/ 4</span></div>
-                                <div style="font-size: 9px; color: ${pity4TextColor}; text-transform: uppercase; margin-top: 4px;">PITY</div>
+                        <div class="pity-box">
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${pity4Color};">${pity4Val} <span class="pity-max" style="color: ${pity4TextColor};">/ 4</span></div>
+                                <div class="pity-label" style="color: ${pity4TextColor};">PITY</div>
                             </div>
-                            <div style="width: 1px; background: var(--border-tech);"></div>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${guarColor}; line-height: 1;">${guarVal} <span style="font-size: 10px; color: ${guarTextColor};">/ 8</span></div>
-                                <div style="font-size: 9px; color: ${guarTextColor}; text-transform: uppercase; margin-top: 4px;">GUARANTEE</div>
+                            <div class="pity-divider"></div>
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${guarColor};">${guarVal} <span class="pity-max" style="color: ${guarTextColor};">/ 8</span></div>
+                                <div class="pity-label" style="color: ${guarTextColor};">GUARANTEE</div>
                             </div>
-                            <div style="width: 1px; background: var(--border-tech);"></div>
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${progressNumColor}; line-height: 1;">${progressVal} <span style="font-size: 10px; color: ${progressTextColor};">/ ${progressMax}</span></div>
-                                <div style="font-size: 9px; color: ${progressTextColor}; text-transform: uppercase; margin-top: 4px; line-height: 1.2;">
+                            <div class="pity-divider"></div>
+                            <div class="pity-col">
+                                <div class="pity-val" style="color: ${progressNumColor};">${progressVal} <span class="pity-max" style="color: ${progressTextColor};">/ ${progressMax}</span></div>
+                                <div class="pity-label" style="color: ${progressTextColor}; line-height: 1.2;">
                                     SEL <span style="color: ${selColor}; font-weight: bold;">${selectors}</span> R-UP <span style="color: ${ruStatColor}; font-weight: bold;">${rateUps}</span>
                                 </div>
                             </div>
@@ -1323,10 +1358,10 @@ function handleFileUpload(event) {
                     let statusText = "PITY";
 
                     pityHTML = `
-                        <div style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px; display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${nhColor}; line-height: 1;">${rateUpVal} <span style="font-size: 10px; color: ${nhTextColor};">/ 40</span></div>
-                                <div style="font-size: 9px; color: ${nhTextColor}; text-transform: uppercase; margin-top: 4px;">${statusText}</div>
+                        <div class="pity-box" style="justify-content: space-between;">
+                            <div class="pity-col" style="flex: none;">
+                                <div class="pity-val" style="color: ${nhColor};">${rateUpVal} <span class="pity-max" style="color: ${nhTextColor};">/ 40</span></div>
+                                <div class="pity-label" style="color: ${nhTextColor};">${statusText}</div>
                             </div>
                         </div>
                     `;
@@ -1339,10 +1374,10 @@ function handleFileUpload(event) {
                     let pityTextColor = !isActiveBanner ? "#888888" : "var(--text-dim)";
                     
                     pityHTML = `
-                        <div style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px; display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <div style="font-size: 20px; font-weight: bold; font-family: monospace; color: ${pityValColor}; line-height: 1;">${displayVal} <span style="font-size: 10px; color: ${pityTextColor};">/ ${bannerMaxScale}</span></div>
-                                <div style="font-size: 9px; color: ${pityTextColor}; text-transform: uppercase; margin-top: 4px;">${pityTitle}</div>
+                        <div class="pity-box" style="justify-content: space-between;">
+                            <div class="pity-col" style="flex: none;">
+                                <div class="pity-val" style="color: ${pityValColor};">${displayVal} <span class="pity-max" style="color: ${pityTextColor};">/ ${bannerMaxScale}</span></div>
+                                <div class="pity-label" style="color: ${pityTextColor};">${pityTitle}</div>
                             </div>
                         </div>
                     `;
@@ -1433,9 +1468,7 @@ function handleFileUpload(event) {
                         <h3>${name}</h3>
                         ${rateUpHTML}
                         <img src="${bannerUrl}" class="banner-img" onerror="this.style.display='none';">
-                        <div>
-                            ${pityHTML}
-                        </div>
+                        ${pityHTML}
                         
                         <div class="banner-stats-row">
                             <div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div>
