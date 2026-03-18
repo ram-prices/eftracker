@@ -529,52 +529,14 @@
 
         /* --- MOBILE RESPONSIVE LAYOUT --- */
         @media (max-width: 768px) {
-            /* Reduce the heavy 40px body padding so content fits better */
-            body { 
-                padding: 15px; 
-            }
-
-            /* Stack the overview box items vertically */
-            .overview-box {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-                padding: 15px;
-            }
-
-            /* Allow the profile pill, upload button, and operators to wrap naturally */
-            .profile-wrapper {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .top-operators {
-                margin-left: 0;
-                flex-wrap: wrap;
-            }
-
-            /* Align stats to the left instead of the right */
-            .overview-stats-col {
-                text-align: left;
-            }
-
-            /* Convert the tabs into a 2x2 wrapping grid on small screens */
-            .tabs {
-                flex-wrap: wrap;
-                border-bottom: none; 
-            }
-            
-            .tab-btn {
-                flex: 1 1 45%; /* Forces buttons to take up roughly half the row */
-                border-bottom: 1px solid var(--border-tech);
-                padding: 10px 5px;
-                font-size: 12px;
-            }
-            
-            /* Override the inline style on the About tab so it doesn't break the grid */
-            #tab-about {
-                margin-left: 0 !important; 
-            }
+            body { padding: 15px; }
+            .overview-box { flex-direction: column; align-items: flex-start; gap: 15px; padding: 15px; }
+            .profile-wrapper { flex-wrap: wrap; gap: 10px; }
+            .top-operators { margin-left: 0; flex-wrap: wrap; }
+            .overview-stats-col { text-align: left; }
+            .tabs { flex-wrap: wrap; border-bottom: none; }
+            .tab-btn { flex: 1 1 45%; border-bottom: 1px solid var(--border-tech); padding: 10px 5px; font-size: 12px; }
+            #tab-about { margin-left: 0 !important; }
         }
     </style>
 </head>
@@ -673,30 +635,96 @@
     // ID-BASED BANNER & RATE UP CONFIGURATION
     // ==============================================================================
 
-    // Maps Pool IDs directly to their Rate-Up Item IDs.
     const BANNER_DB = {
         "beginner": { type: "New Horizons", rateUpIds: [], displayEn: "New Horizons" },
         "standard": { rateUpIds: [], displayEn: "Basic Headhunting" },
         
-        // Characters
         "special_1_0_1": { rateUpIds: ["chr_0016_laevat"], displayEn: "Scars of the Forge" },
         "special_1_0_2": { rateUpIds: ["chr_0017_yvonne"], displayEn: "Hues of Passion" },
         "special_1_0_3": { rateUpIds: ["chr_0013_aglina"], displayEn: "The Floaty Messenger" },
         "special_1_1_1": { rateUpIds: ["chr_0027_tangtang"], displayEn: "River's Daughter" },
         
-        // Weapons
         "weponbox_1_0_1": { rateUpIds: ["wpn_sword_0006"], displayEn: "Smelting Forge Issue" },
         "weponbox_1_0_2": { rateUpIds: ["wpn_pistol_0010"], displayEn: "Graffiti Issue" },
         "weponbox_1_0_3": { rateUpIds: ["wpn_funnel_0011"], displayEn: "Express Delivery Issue" },
         "weponbox_1_1_1": { rateUpIds: ["wpn_pistol_0011"], displayEn: "Budding Anew" },
         
-        // Constant Weapons
         "weaponbox_constant_1": { rateUpIds: ["wpn_claym_0013"], displayEn: "Constant Issue" },
         "weaponbox_constant_2": { rateUpIds: ["wpn_funnel_0013"], displayEn: "Constant Issue" },
         "weaponbox_constant_3": { rateUpIds: ["wpn_sword_0016"], displayEn: "Constant Issue" },
         "weaponbox_constant_4": { rateUpIds: ["wpn_lance_0012"], displayEn: "Constant Issue" },
         "weaponbox_constant_5": { rateUpIds: ["wpn_claym_0007"], displayEn: "Constant Issue" }
     };
+
+    // ==============================================================================
+    // ADVANCED CUMULATIVE PROBABILITY DP (Multi-Copy CDF Math)
+    // ==============================================================================
+
+    const MAX_PULLS = 1500; 
+    let pmf_char_any = [];
+    let pmf_weap_any = [];
+
+    // Calculates the exact Probability Mass Function (PMF) of getting a rate up on exactly pull 'N'
+    function buildPMF(maxPulls, hardPity6Star, softPityStart, baseRate, rateUpProb, hardGuaranteePull, startingPity) {
+        let pmf = new Array(maxPulls + 1).fill(0);
+        let dp = new Array(hardPity6Star + 1).fill(0);
+        
+        // DP starts distributing probabilities from the carried-over pity state
+        dp[startingPity] = 1.0;
+
+        for (let i = 1; i <= maxPulls; i++) {
+            let nextDp = new Array(hardPity6Star + 1).fill(0);
+            let rateUpThisPull = 0;
+
+            for (let pity = 0; pity < hardPity6Star; pity++) {
+                if (dp[pity] > 0) {
+                    let currentPity = pity + 1;
+                    let p6 = baseRate;
+                    if (currentPity > softPityStart) p6 = baseRate + 0.05 * (currentPity - softPityStart);
+                    if (currentPity >= hardPity6Star) p6 = 1.0;
+                    if (p6 > 1.0) p6 = 1.0;
+
+                    let pRU = p6 * rateUpProb;
+                    
+                    // If hitting the hard 120/80 safety net
+                    if (hardGuaranteePull !== null && i === hardGuaranteePull) {
+                        pRU = 1.0;
+                        p6 = 1.0;
+                    }
+
+                    let pLose6 = p6 - pRU;
+                    let pNone = 1.0 - p6;
+
+                    rateUpThisPull += dp[pity] * pRU;
+                    nextDp[0] += dp[pity] * pLose6; // Reset pity if we pull an off-rate 6-star
+                    if (currentPity < hardPity6Star) {
+                        nextDp[currentPity] += dp[pity] * pNone; // Increase pity if we pull garbage
+                    }
+                }
+            }
+            pmf[i] = rateUpThisPull;
+            dp = nextDp;
+        }
+        return pmf;
+    }
+
+    // Stacks (convolves) two PMFs together to find the probability of multiple successive events
+    function convolve(pmf1, pmf2) {
+        let maxLen = pmf1.length;
+        let res = new Array(maxLen).fill(0);
+        for (let i = 0; i < maxLen; i++) {
+            if (pmf1[i] === 0) continue;
+            for (let j = 0; j < maxLen - i; j++) {
+                if (pmf2[j] === 0) continue;
+                res[i + j] += pmf1[i] * pmf2[j];
+            }
+        }
+        return res;
+    }
+
+    // Pre-calculate the generic geometric curves for pulls after the 120/80 guarantee turns off
+    pmf_char_any = buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, null, 0);
+    pmf_weap_any = buildPMF(MAX_PULLS, 40, 30, 0.04, 0.25, null, 0);
 
     // ==============================================================================
     // UTILITY FUNCTIONS
@@ -822,7 +850,6 @@
         const file = event.target.files[0];
         if (!file) return;
         
-        // --- FIX: Declare finalName outside the IF block so the whole function can see it ---
         let fileName = file.name;
         let finalName = ""; 
         
@@ -833,14 +860,12 @@
             
             document.getElementById('display-username').innerText = finalName;
         }
-        // -------------------------------------------
+
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                // --- NEW: Save to Local Storage ---
                 localStorage.setItem('efTrackerData', e.target.result);
                 if (finalName) localStorage.setItem('efTrackerUser', finalName);
-                // ----------------------------------
 
                 const data = JSON.parse(e.target.result);
                 summaryChars = [];
@@ -870,7 +895,6 @@
                 uploadBtn.innerHTML = '&#10003;'; 
                 uploadBtn.classList.add('uploaded');
                 
-                // --- NEW: Show the clear button ---
                 document.getElementById('clearDataBtn').style.display = 'flex';
                 
                 switchTab('char');
@@ -941,6 +965,7 @@
                     category: category, 
                     isConstant: (category === "Constant Issue"),
                     totalPulls: 0, 
+                    currentWeaponPity: 0,
                     topPulls: [], 
                     allPulls: [], 
                     hasPulledRateUp: false, 
@@ -950,8 +975,29 @@
                     endPity: 0,
                     endRateUpPity: 0,
                     endTokenPulls: 0,
-                    endHasPulledRateUp: false
+                    endHasPulledRateUp: false,
+                    rateUpCount: 0,
+                    startingPityForMath: 0,
+                    pmfs: null
                 };
+            }
+
+            // --- INIT BANNER PROBABILITY ARRAYS (Includes Carry-Over Pity) ---
+            if (!bannerBoxes[bannerName].pmfs) {
+                // Grab the carried-over pity from the category tracker BEFORE any pulls are processed on this banner
+                // Explicitly lock weapons to 0 since they do not cross-over pity between banners
+                let startPity = 0;
+                if (prefix === 'char' && category === "Chartered Headhunting") {
+                    startPity = categoryStats[category].currentPity || 0;
+                }
+                
+                bannerBoxes[bannerName].startingPityForMath = startPity; // Save for the UI tooltip
+                
+                let pmf1 = (prefix === 'char') 
+                    ? buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, startPity) 
+                    : buildPMF(MAX_PULLS, 40, 30, 0.04, 0.25, 80, 0); // Always 0 for weapons
+                    
+                bannerBoxes[bannerName].pmfs = [null, pmf1]; 
             }
 
             let itemId = pull.charId || pull.weaponId || pull.itemId || "";
@@ -998,7 +1044,9 @@
 
                 let displayPity;
 
+                // Track Pity Increment
                 if (prefix === 'weap') {
+                    bannerBoxes[bannerName].currentWeaponPity++;
                     displayPity = Math.ceil(bannerBoxes[bannerName].totalPulls / 10) || 1;
                 } else {
                     categoryStats[category].currentPity++;
@@ -1030,22 +1078,48 @@
 
                         let wonRateUp = false;
                         let isRateUpBanner = BANNER_DB[poolId] && BANNER_DB[poolId].rateUpIds && BANNER_DB[poolId].rateUpIds.length > 0;
+                        let pullProbability = undefined; 
+                        let rateUpCopyNum = 0;
                         
                         if (isRateUpBanner) {
                             if (BANNER_DB[poolId].rateUpIds.includes(itemId)) {
                                 wonRateUp = true;
                             }
                             
-                            // Check if this pull was a forced guarantee rather than a true probability check
                             let isGuaranteed = false;
                             if (prefix === 'char' && category === "Chartered Headhunting") {
-                                // FIX: Only count as a guarantee if it's at 120 pulls AND the rate-up hasn't been pulled yet
                                 if (categoryStats[category].rateUpPity === 120 && !categoryStats[category].hasPulledRateUp) isGuaranteed = true;
                             } else if (prefix === 'weap') {
                                 if (bannerBoxes[bannerName].totalPulls === 80 && !bannerBoxes[bannerName].hasPulledRateUp) isGuaranteed = true;
-}
+                            }
                             
-                            // Only count the stat if it was an actual 50/50 or 25/75 check
+                            // --- EXECUTE DYNAMIC CUMULATIVE MATH ---
+                            if (wonRateUp) {
+                                bannerBoxes[bannerName].rateUpCount++;
+                                rateUpCopyNum = bannerBoxes[bannerName].rateUpCount;
+                                
+                                // Generate the necessary convolved PMF curves if this is a new copy tier
+                                while (bannerBoxes[bannerName].pmfs.length <= rateUpCopyNum) {
+                                    let prevPmf = bannerBoxes[bannerName].pmfs[bannerBoxes[bannerName].pmfs.length - 1];
+                                    let anyPmf = prefix === 'char' ? pmf_char_any : pmf_weap_any;
+                                    bannerBoxes[bannerName].pmfs.push(convolve(prevPmf, anyPmf));
+                                }
+                                
+                                let targetPmf = bannerBoxes[bannerName].pmfs[rateUpCopyNum];
+                                let cdfVal = 0;
+                                // Weapons are pulled in sets of 10, so round up to the end of the block
+                                let evaluatedPullNum = currentPullNum;
+                                if (prefix === 'weap') {
+                                    evaluatedPullNum = Math.ceil(currentPullNum / 10) * 10;
+                                }
+                                let limit = Math.min(evaluatedPullNum, MAX_PULLS);
+                                
+                                for (let i = 1; i <= limit; i++) {
+                                    cdfVal += targetPmf[i];
+                                }
+                                pullProbability = cdfVal * 100.0;
+                            }
+                            
                             if (wonRateUp) {
                                 if (!isGuaranteed) {
                                     advStats[prefix].rateUpWins++;
@@ -1070,12 +1144,15 @@
                             isRateUpItem: wonRateUp,
                             rarity: "6", 
                             pullNum: currentPullNum,
-                            isNew: isNewItem
+                            isNew: isNewItem,
+                            pullProb: pullProbability,
+                            rateUpCopyNum: rateUpCopyNum
                         });
                         pushedToAllPulls = true;
 
                         // RESET LOGIC
                         if (prefix === 'weap') {
+                            bannerBoxes[bannerName].currentWeaponPity = 0; // Local banner pity reset
                             if (wonRateUp) {
                                 if (!bannerBoxes[bannerName].hasPulledRateUp) {
                                     bannerBoxes[bannerName].hasPulledRateUp = true;
@@ -1092,7 +1169,7 @@
                                 }
                             }
                             if (category !== "New Horizons") {
-                                categoryStats[category].currentPity = 0; 
+                                categoryStats[category].currentPity = 0; // Global banner pity reset
                             }
                         }
 
@@ -1139,7 +1216,6 @@
             }
         });
 
-        // --- NEW: Calculate Earned Tokens as Virtual Pulls ---
         if (prefix === 'char') {
             Object.values(bannerBoxes).forEach(box => {
                 if (box.category === "Chartered Headhunting" && box.endTokenPulls >= 240) {
@@ -1151,7 +1227,6 @@
                         let fallbackEnName = parseIdToName(ruId);
                         let localizedName = uniqueChars.get(ruId) || fallbackEnName;
                         
-                        // Push a virtual entry for each token earned
                         for(let i = 0; i < tokens; i++) {
                             summaryChars.push({ 
                                 id: ruId, 
@@ -1164,7 +1239,6 @@
                 }
             });
         }
-        // -----------------------------------------------------
         
         renderDashboard(categoryStats, bannerBoxes, bannerTimeline, prefix);
     }
@@ -1266,15 +1340,13 @@
         sortedTimeline.forEach((name, index) => {
             const data = bannerBoxes[name];
             let bannerMaxScale = data.category === "New Horizons" ? 40 : maxScale;
-            let cStats = categoryStats[data.category]; // BUG FIX: Properly references the category stats object
+            let cStats = categoryStats[data.category]; 
             
-            // Determine if the banner is currently active (Only relevant for Characters)
             let isActiveBanner = (lastBannerByCategory[data.category] === name);
             let isChartered = (prefix === 'char' && data.category === "Chartered Headhunting");
             
             let pityHTML = '';
             
-            // Generate Pity/Stats Display Logic
             if (prefix === 'weap' || isChartered || isActiveBanner) {
                 if (isChartered) {
                     let displayVal = data.endPity || 0;
@@ -1290,17 +1362,12 @@
                     let pityLabel = !isActiveBanner ? "PITY (FINAL)" : "PITY";
                     let guarLabel = "GUARANTEE"; 
 
-                    // --- Multi-tiered Color Logic ---
-                    // Left Column (PITY)
                     let pityValColor = !isActiveBanner ? "#888888" : color;
                     let pityTextColor = !isActiveBanner ? "#888888" : "var(--text-dim)";
                     
-                    // Middle Column (GUARANTEE)
-                    // #454545 = Mechanically locked | #888888 = Expired
                     let guarValColor = hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : ruColor);
                     let guarTextColor = hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : "var(--text-dim)");
                     
-                    // Right Column (TOKEN)
                     let tokenNumColor = !hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : "#2196f3");
                     let tokenLabelColor = !hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : "var(--text-dim)");
                     let tokenEarnedColor = !hasPulledRateUp ? "#454545" : (!isActiveBanner ? "#888888" : "var(--accent-blue)");
@@ -1343,7 +1410,6 @@
                         progressMax = 8;
                     }
 
-                    // --- Direct Color Logic for Weapons (Never Expires) ---
                     let pity4Val = data.hasPulledSixStar ? data.firstSixStarBlock : totalBlocks;
                     let pity4Locked = data.hasPulledSixStar;
                     let pity4Color = pity4Locked ? "#454545" : (pity4Val >= 3 ? "#ff5252" : (pity4Val >= 2 ? "#ff9800" : "#4CAF50"));
@@ -1353,7 +1419,6 @@
                     let guarColor = guarLocked ? "#454545" : (guarVal >= 6 ? "#ff5252" : (guarVal >= 4 ? "#ff9800" : "#4CAF50"));
                     let guarTextColor = guarLocked ? "#454545" : "var(--text-dim)";
                     
-                    // Predicts if the player is currently building towards a Selector or a Rate-Up
                     let isNextSelector = (totalBlocks < 10) ? true : (1 + Math.floor((totalBlocks - 10) / 8)) % 2 === 0;
                     let progressNumColor = isNextSelector ? "#2196f3" : "#ff9800";
                     let progressTextColor = "var(--text-dim)";
@@ -1426,7 +1491,20 @@
                 if (pull.isRateUpItem) itemClass += ` is-rate-up-item`; 
 
                 if (pull.rarity === "6" && pull.isRateUpItem) {
-                    rateUpTag = `<span class="pity-count pity-yellow" style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px;">RATE-UP</span>`;
+                    let copyText = pull.rateUpCopyNum > 1 ? `${pull.rateUpCopyNum} copies` : `1 copy`;
+                    let carryText = data.startingPityForMath > 0 ? ` (Started with ${data.startingPityForMath} pity)` : '';
+                    
+                    let probText = '';
+                    if (pull.pullProb !== undefined) {
+                        if (prefix === 'weap') {
+                            let blockNum = Math.ceil(pull.pullNum / 10);
+                            probText = `title="Luck Check: You had a ${pull.pullProb.toFixed(2)}% chance to pull ${copyText} of the Rate-Up within ${blockNum} blocks (${blockNum * 10} pulls)."`;
+                        } else {
+                            probText = `title="Luck Check: You had a ${pull.pullProb.toFixed(2)}% chance to pull ${copyText} of the Rate-Up within ${pull.pullNum} pulls.${carryText}"`;
+                        }
+                    }
+                    
+                    rateUpTag = `<span class="pity-count pity-yellow" ${probText} style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px; cursor: help;">RATE-UP</span>`;
                 }
                 
                 if (pull.isNew) {
@@ -1526,10 +1604,8 @@
                 </div>`;
         });
 
-        // Set accumulated HTML once for performance
         bannerContainer.innerHTML = htmlBuilder;
 
-        // Initialize block header visibility upon rendering
         sortedTimeline.forEach((name, index) => {
             let bannerId = `banner-${prefix}-${index}`;
             let listContainer = document.getElementById(`list-${bannerId}`);
@@ -1547,7 +1623,6 @@
         let evCharProb = (1 / 54.3) * 100; 
         let evWeapProb = 4.97;
 
-        // Helper function to map percentages to 5-tier luck tags and CSS colors
         function getLuckTier(actual, ev) {
             if (actual >= ev * 1.25) return { text: "VERY LUCKY", css: "luck-very-good" };
             if (actual > ev * 1.05)  return { text: "LUCKY", css: "luck-good" };
@@ -1650,7 +1725,7 @@
             if (item.pity === "FREE") {
                 badgeColor = "color: #4CAF50;";
             } else if (item.pity === "TOKEN") {
-                badgeColor = "color: var(--accent-blue);"; // Custom color for tokens
+                badgeColor = "color: var(--accent-blue);";
             } else {
                 if (item.pity < 40) badgeColor = "color: #4CAF50;";
                 else if (item.pity <= 65) badgeColor = "color: #FFC107;";
@@ -1731,7 +1806,8 @@
         
         updateBlockHeaders(listContainer);
     }
-// ==============================================================================
+
+    // ==============================================================================
     // LOCAL STORAGE: AUTO-LOAD & CLEAR LOGIC
     // ==============================================================================
 
@@ -1739,7 +1815,7 @@
         if (confirm("Are you sure you want to clear your saved pull history from this browser?")) {
             localStorage.removeItem('efTrackerData');
             localStorage.removeItem('efTrackerUser');
-            location.reload(); // Refresh the page to reset the app
+            location.reload(); 
         }
     }
 
@@ -1755,7 +1831,6 @@
                     document.getElementById('display-username').innerText = savedUser;
                 }
 
-                // Reset stats before loading
                 summaryChars = []; summaryWeaps = []; uniqueChars.clear(); uniqueWeaps.clear();
                 advStats = { char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 }, weap: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 } };
                 
@@ -1777,7 +1852,6 @@
                 uploadBtn.innerHTML = '&#10003;'; 
                 uploadBtn.classList.add('uploaded');
                 
-                // Show the clear button since data is loaded
                 document.getElementById('clearDataBtn').style.display = 'flex';
                 
                 switchTab('char');
