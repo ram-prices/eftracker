@@ -593,6 +593,8 @@
             <label for="fileInput" class="upload-btn-mini" id="uploadLabel" title="Load .JSON Data">+</label>
             <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileUpload(event)">
             
+            <button class="upload-btn-mini" id="clearDataBtn" title="Clear Saved Data" onclick="clearSavedData()" style="display: none; background-color: rgba(244, 67, 54, 0.1); border-color: #F44336; color: #F44336; font-size: 16px;">🗑</button>
+
             <div id="top-operators-container" class="top-operators" style="display: none;"></div>
         </div>
         
@@ -819,24 +821,27 @@
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-        // --- NEW: Dynamic Username from Filename (Flexible) ---
+        
+        // --- FIX: Declare finalName outside the IF block so the whole function can see it ---
         let fileName = file.name;
-        // Check if the file starts with "endfield_pulls_" OR "endfield pulls "
+        let finalName = ""; 
+        
         if (fileName.match(/endfield_pulls_|endfield pulls /)) {
-            // Split the string at whichever version they used
             let namePart = fileName.split(/endfield_pulls_|endfield pulls /)[1]; 
-            // Remove the file extension
             namePart = namePart.replace('.json', ''); 
-            // Replace all underscores with spaces
-            let finalName = namePart.replace(/_/g, ' '); 
+            finalName = namePart.replace(/_/g, ' '); 
             
-            // Update the profile name on the page
             document.getElementById('display-username').innerText = finalName;
         }
         // -------------------------------------------
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
+                // --- NEW: Save to Local Storage ---
+                localStorage.setItem('efTrackerData', e.target.result);
+                if (finalName) localStorage.setItem('efTrackerUser', finalName);
+                // ----------------------------------
+
                 const data = JSON.parse(e.target.result);
                 summaryChars = [];
                 summaryWeaps = [];
@@ -864,6 +869,9 @@
                 const uploadBtn = document.getElementById('uploadLabel');
                 uploadBtn.innerHTML = '&#10003;'; 
                 uploadBtn.classList.add('uploaded');
+                
+                // --- NEW: Show the clear button ---
+                document.getElementById('clearDataBtn').style.display = 'flex';
                 
                 switchTab('char');
 
@@ -1723,6 +1731,62 @@
         
         updateBlockHeaders(listContainer);
     }
+// ==============================================================================
+    // LOCAL STORAGE: AUTO-LOAD & CLEAR LOGIC
+    // ==============================================================================
+
+    function clearSavedData() {
+        if (confirm("Are you sure you want to clear your saved pull history from this browser?")) {
+            localStorage.removeItem('efTrackerData');
+            localStorage.removeItem('efTrackerUser');
+            location.reload(); // Refresh the page to reset the app
+        }
+    }
+
+    window.onload = function() {
+        const savedData = localStorage.getItem('efTrackerData');
+        const savedUser = localStorage.getItem('efTrackerUser');
+
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                
+                if (savedUser) {
+                    document.getElementById('display-username').innerText = savedUser;
+                }
+
+                // Reset stats before loading
+                summaryChars = []; summaryWeaps = []; uniqueChars.clear(); uniqueWeaps.clear();
+                advStats = { char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 }, weap: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 } };
+                
+                if (data.characters) analyzeData(data.characters, 'char');
+                if (data.weapons) analyzeData(data.weapons, 'weap');
+                
+                document.getElementById('uniqueCharCount').innerText = uniqueChars.size + 1;
+                document.getElementById('uniqueWeapCount').innerText = uniqueWeaps.size + 5;
+                
+                renderSummary();
+                renderOverviews();
+                
+                document.getElementById('overviewStats').style.display = 'flex';
+                document.getElementById('top-operators-container').style.display = 'flex';
+
+                isDataLoaded = true;
+
+                const uploadBtn = document.getElementById('uploadLabel');
+                uploadBtn.innerHTML = '&#10003;'; 
+                uploadBtn.classList.add('uploaded');
+                
+                // Show the clear button since data is loaded
+                document.getElementById('clearDataBtn').style.display = 'flex';
+                
+                switchTab('char');
+            } catch (error) {
+                console.error("Error loading saved data, clearing corrupt cache:", error);
+                localStorage.removeItem('efTrackerData');
+            }
+        }
+    };
 </script>
 </body>
 </html>
