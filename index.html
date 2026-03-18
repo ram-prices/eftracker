@@ -1236,6 +1236,8 @@ function handleFileUpload(event) {
             const data = bannerBoxes[name];
             let bannerMaxScale = data.category === "New Horizons" ? 40 : maxScale;
             let cStats = categoryStats[data.category]; // BUG FIX: Properly references the category stats object
+            
+            // Determine if the banner is currently active (Only relevant for Characters)
             let isActiveBanner = (lastBannerByCategory[data.category] === name);
             let isChartered = (prefix === 'char' && data.category === "Chartered Headhunting");
             
@@ -1310,22 +1312,22 @@ function handleFileUpload(event) {
                         progressMax = 8;
                     }
 
-                    // --- Direct Color Logic for Weapons ---
+                    // --- Direct Color Logic for Weapons (Never Expires) ---
                     let pity4Val = data.hasPulledSixStar ? data.firstSixStarBlock : totalBlocks;
                     let pity4Locked = data.hasPulledSixStar;
-                    let pity4Color = pity4Locked ? "#454545" : (!isActiveBanner ? "#888888" : (pity4Val >= 3 ? "#ff5252" : (pity4Val >= 2 ? "#ff9800" : "#4CAF50")));
-                    let pity4TextColor = pity4Locked ? "#454545" : (!isActiveBanner ? "#888888" : "var(--text-dim)");
+                    let pity4Color = pity4Locked ? "#454545" : (pity4Val >= 3 ? "#ff5252" : (pity4Val >= 2 ? "#ff9800" : "#4CAF50"));
+                    let pity4TextColor = pity4Locked ? "#454545" : "var(--text-dim)";
 
                     let guarLocked = data.hasPulledRateUp;
-                    let guarColor = guarLocked ? "#454545" : (!isActiveBanner ? "#888888" : (guarVal >= 6 ? "#ff5252" : (guarVal >= 4 ? "#ff9800" : "#4CAF50")));
-                    let guarTextColor = guarLocked ? "#454545" : (!isActiveBanner ? "#888888" : "var(--text-dim)");
+                    let guarColor = guarLocked ? "#454545" : (guarVal >= 6 ? "#ff5252" : (guarVal >= 4 ? "#ff9800" : "#4CAF50"));
+                    let guarTextColor = guarLocked ? "#454545" : "var(--text-dim)";
                     
                     // Predicts if the player is currently building towards a Selector or a Rate-Up
                     let isNextSelector = (totalBlocks < 10) ? true : (1 + Math.floor((totalBlocks - 10) / 8)) % 2 === 0;
-                    let progressNumColor = !isActiveBanner ? "#888888" : (isNextSelector ? "#2196f3" : "#ff9800");
-                    let progressTextColor = !isActiveBanner ? "#888888" : "var(--text-dim)";
-                    let selColor = !isActiveBanner ? "#888888" : "var(--accent-blue)";
-                    let ruStatColor = !isActiveBanner ? "#888888" : "var(--accent-orange)";
+                    let progressNumColor = isNextSelector ? "#2196f3" : "#ff9800";
+                    let progressTextColor = "var(--text-dim)";
+                    let selColor = "var(--accent-blue)";
+                    let ruStatColor = "var(--accent-orange)";
 
                     pityHTML = `
                         <div style="display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px;">
