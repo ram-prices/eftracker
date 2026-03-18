@@ -229,10 +229,13 @@
             color: var(--text-dim);
             margin-top: 5px;
         }
-        /* Luck Colors */
-        .luck-good { color: #4CAF50 !important; }
-        .luck-avg { color: #ff9800 !important; }
-        .luck-bad { color: #f44336 !important; }
+        
+        /* 5-Tier Luck Colors */
+        .luck-very-good { color: #00E676 !important; } /* Bright Green */
+        .luck-good { color: #4CAF50 !important; }     /* Normal Green */
+        .luck-avg { color: #FFC107 !important; }      /* Yellow */
+        .luck-bad { color: #ff9800 !important; }      /* Orange */
+        .luck-very-bad { color: #f44336 !important; } /* Red */
         
         .stat-card-badge {
             position: absolute;
@@ -1020,8 +1023,23 @@
                         
                         if (isRateUpBanner) {
                             if (BANNER_DB[poolId].rateUpIds.includes(itemId)) {
-                                advStats[prefix].rateUpWins++;
                                 wonRateUp = true;
+                            }
+                            
+                            // Check if this pull was a forced guarantee rather than a true probability check
+                            let isGuaranteed = false;
+                            if (prefix === 'char' && category === "Chartered Headhunting") {
+                                // FIX: Only count as a guarantee if it's at 120 pulls AND the rate-up hasn't been pulled yet
+                                if (categoryStats[category].rateUpPity === 120 && !categoryStats[category].hasPulledRateUp) isGuaranteed = true;
+                            } else if (prefix === 'weap') {
+                                if (bannerBoxes[bannerName].totalPulls === 80 && !bannerBoxes[bannerName].hasPulledRateUp) isGuaranteed = true;
+}
+                            
+                            // Only count the stat if it was an actual 50/50 or 25/75 check
+                            if (wonRateUp) {
+                                if (!isGuaranteed) {
+                                    advStats[prefix].rateUpWins++;
+                                }
                             } else {
                                 advStats[prefix].rateUpLosses++;
                             }
@@ -1509,13 +1527,22 @@
         let weapHtmlBuilder = '';
 
         let evCharProb = (1 / 54.3) * 100; 
-        let evWeapProb = 4.0;
+        let evWeapProb = 4.97;
 
+        // Helper function to map percentages to 5-tier luck tags and CSS colors
+        function getLuckTier(actual, ev) {
+            if (actual >= ev * 1.25) return { text: "VERY LUCKY", css: "luck-very-good" };
+            if (actual > ev * 1.05)  return { text: "LUCKY", css: "luck-good" };
+            if (actual >= ev * 0.9)  return { text: "NORMAL", css: "luck-avg" };
+            if (actual >= ev * 0.7)  return { text: "UNLUCKY", css: "luck-bad" };
+            return { text: "VERY UNLUCKY", css: "luck-very-bad" };
+        }
+
+        // ---------------- OPERATOR OVERVIEW ----------------
         if (advStats.char.pulls > 0) {
             let actualCharAvg = advStats.char.s6 > 0 ? (advStats.char.pulls / advStats.char.s6) : advStats.char.pulls;
             let actualCharProb = advStats.char.s6 > 0 ? (advStats.char.s6 / advStats.char.pulls) * 100 : 0;
-            let charLuckClass = actualCharProb >= evCharProb ? 'luck-good' : (actualCharProb >= evCharProb * 0.8 ? 'luck-avg' : 'luck-bad');
-            let charBadge = actualCharProb >= evCharProb ? 'LUCKY' : 'UNLUCKY';
+            let charLuck = getLuckTier(actualCharProb, evCharProb);
 
             charHtmlBuilder += `
                 <div class="stat-card">
@@ -1524,22 +1551,23 @@
                     <div class="stat-card-sub">Total 6★ Acquired: ${advStats.char.s6}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-badge ${charLuckClass}">${charBadge}</div>
+                    <div class="stat-card-badge ${charLuck.css}">${charLuck.text}</div>
                     <div class="stat-card-title" style="color: var(--accent-orange)">OPERATOR 6★ DROP RATE</div>
-                    <div class="stat-card-value ${charLuckClass}">${actualCharProb.toFixed(2)}%</div>
-                    <div class="stat-card-sub">Expected: ${evCharProb.toFixed(2)}% | Actual Avg: 1 in ${actualCharAvg.toFixed(1)} pulls</div>
+                    <div class="stat-card-value ${charLuck.css}">${actualCharProb.toFixed(2)}%</div>
+                    <div class="stat-card-sub">Actual: 1 in ${actualCharAvg.toFixed(1)} pulls | Expected: ${evCharProb.toFixed(2)}%</div>
                 </div>
             `;
 
             let rateUpTotal = advStats.char.rateUpWins + advStats.char.rateUpLosses;
             if (rateUpTotal > 0) {
                 let winRate = (advStats.char.rateUpWins / rateUpTotal) * 100;
-                let wrClass = winRate >= 50 ? 'luck-good' : (winRate >= 40 ? 'luck-avg' : 'luck-bad');
+                let winLuck = getLuckTier(winRate, 50);
                 charHtmlBuilder += `
                     <div class="stat-card">
-                        <div class="stat-card-title" style="color: var(--accent-orange)">OPERATOR RATE-UP WINS</div>
-                        <div class="stat-card-value ${wrClass}">${winRate.toFixed(0)}%</div>
-                        <div class="stat-card-sub">Won ${advStats.char.rateUpWins} out of ${rateUpTotal} Rate-ups | Expected: ~52%</div>
+                        <div class="stat-card-badge ${winLuck.css}">${winLuck.text}</div>
+                        <div class="stat-card-title" style="color: var(--accent-orange)">OPERATOR 50/50 WINS</div>
+                        <div class="stat-card-value ${winLuck.css}">${winRate.toFixed(0)}%</div>
+                        <div class="stat-card-sub">Won ${advStats.char.rateUpWins} out of ${rateUpTotal} 50/50s | Expected: 50%</div>
                     </div>
                 `;
             }
@@ -1547,11 +1575,11 @@
             charHtmlBuilder = `<div style="color: var(--text-dim); font-size: 12px; font-style: italic;">NO DATA AVAILABLE</div>`;
         }
 
+        // ---------------- ARSENAL OVERVIEW ----------------
         if (advStats.weap.pulls > 0) {
             let actualWeapAvg = advStats.weap.s6 > 0 ? (advStats.weap.pulls / advStats.weap.s6) : advStats.weap.pulls;
             let actualWeapProb = advStats.weap.s6 > 0 ? (advStats.weap.s6 / advStats.weap.pulls) * 100 : 0;
-            let weapLuckClass = actualWeapProb >= evWeapProb ? 'luck-good' : (actualWeapProb >= evWeapProb * 0.8 ? 'luck-avg' : 'luck-bad');
-            let weapBadge = actualWeapProb >= evWeapProb ? 'LUCKY' : 'UNLUCKY';
+            let weapLuck = getLuckTier(actualWeapProb, evWeapProb);
 
             weapHtmlBuilder += `
                 <div class="stat-card">
@@ -1560,22 +1588,23 @@
                     <div class="stat-card-sub">Total 6★ Acquired: ${advStats.weap.s6}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-badge ${weapLuckClass}">${weapBadge}</div>
+                    <div class="stat-card-badge ${weapLuck.css}">${weapLuck.text}</div>
                     <div class="stat-card-title" style="color: var(--accent-blue)">ARSENAL 6★ DROP RATE</div>
-                    <div class="stat-card-value ${weapLuckClass}">${actualWeapProb.toFixed(2)}%</div>
-                    <div class="stat-card-sub">Expected: ${evWeapProb.toFixed(2)}% | Actual Avg: 1 in ${actualWeapAvg.toFixed(1)} pulls</div>
+                    <div class="stat-card-value ${weapLuck.css}">${actualWeapProb.toFixed(2)}%</div>
+                    <div class="stat-card-sub">Actual: 1 in ${actualWeapAvg.toFixed(1)} pulls | Expected: ${evWeapProb.toFixed(2)}%</div>
                 </div>
             `;
 
             let rateUpTotal = advStats.weap.rateUpWins + advStats.weap.rateUpLosses;
             if (rateUpTotal > 0) {
                 let winRate = (advStats.weap.rateUpWins / rateUpTotal) * 100;
-                let wrClass = winRate >= 25 ? 'luck-good' : (winRate >= 15 ? 'luck-avg' : 'luck-bad');
+                let winLuck = getLuckTier(winRate, 25);
                 weapHtmlBuilder += `
                     <div class="stat-card">
-                        <div class="stat-card-title" style="color: var(--accent-blue)">ARSENAL RATE-UP WINS</div>
-                        <div class="stat-card-value ${wrClass}">${winRate.toFixed(0)}%</div>
-                        <div class="stat-card-sub">Won ${advStats.weap.rateUpWins} out of ${rateUpTotal} Rate-ups | Expected: 25%</div>
+                        <div class="stat-card-badge ${winLuck.css}">${winLuck.text}</div>
+                        <div class="stat-card-title" style="color: var(--accent-blue)">ARSENAL 25/75 WINS</div>
+                        <div class="stat-card-value ${winLuck.css}">${winRate.toFixed(0)}%</div>
+                        <div class="stat-card-sub">Won ${advStats.weap.rateUpWins} out of ${rateUpTotal} 25/75s | Expected: 25%</div>
                     </div>
                 `;
             }
