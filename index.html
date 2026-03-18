@@ -958,6 +958,7 @@
 
             const rarity = pull.rarity ? pull.rarity.toString() : "3";
             const isFree = pull.isFree === true || pull.isFree === "true" || pull.isFree === 1 || pull.isFree === "1";
+            const isNewItem = pull.isNew === true || pull.isNew === "true";
 
             if (isFree) {
                 bannerBoxes[bannerName].allPulls.push({ 
@@ -966,7 +967,8 @@
                     itemId: itemId,
                     pityAtPull: "FREE", 
                     rarity: rarity, 
-                    pullNum: "FREE" 
+                    pullNum: "FREE",
+                    isNew: isNewItem
                 });
                 
                 if (rarity === "6" || (rarity === "5" && prefix === 'weap')) {
@@ -1059,7 +1061,8 @@
                             pityAtPull: displayPity, 
                             isRateUpItem: wonRateUp,
                             rarity: "6", 
-                            pullNum: currentPullNum 
+                            pullNum: currentPullNum,
+                            isNew: isNewItem
                         });
                         pushedToAllPulls = true;
 
@@ -1098,7 +1101,8 @@
                             itemId: itemId,
                             pityAtPull: blockIndex, 
                             rarity: "5", 
-                            pullNum: currentPullNum 
+                            pullNum: currentPullNum,
+                            isNew: isNewItem
                         });
                         pushedToAllPulls = true;
                         summaryWeaps.push({ id: itemId, name: itemName, enName: enName, rarity: "5" });
@@ -1113,7 +1117,8 @@
                         itemId: itemId,
                         pityAtPull: blockVal, 
                         rarity: rarity, 
-                        pullNum: currentPullNum 
+                        pullNum: currentPullNum,
+                        isNew: isNewItem
                     });
                 }
             }
@@ -1408,11 +1413,16 @@
                 let itemClass = `rarity-${pull.rarity}-item`;
                 let blockHeader = "";
                 let rateUpTag = "";
+                let newTag = "";
 
                 if (pull.isRateUpItem) itemClass += ` is-rate-up-item`; 
 
                 if (pull.rarity === "6" && pull.isRateUpItem) {
                     rateUpTag = `<span class="pity-count pity-yellow" style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px;">RATE-UP</span>`;
+                }
+                
+                if (pull.isNew) {
+                    newTag = `<span class="pity-count" style="color: #4CAF50; font-size: 9px; padding: 1px 4px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px;">NEW</span>`;
                 }
 
                 if (pull.pityAtPull !== null) {
@@ -1444,7 +1454,7 @@
                 <li class="pull-item ${itemClass}">
                     <span class="pull-name">
                         <img src="${iconUrl}" class="char-icon" onerror="${fallback}">
-                        <span>${pull.name} <span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag}</span>
+                        <span>${pull.name} <span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag}${newTag}</span>
                     </span>
                     ${badgeHTML}
                 </li>`;
