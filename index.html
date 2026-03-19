@@ -510,21 +510,25 @@
 
         /* --- ANIMATION LOGIC (HOVER / EXPAND / TOGGLE) --- */
         
-        /* 1. Default Hover (All items peek exactly enough to show the 18px timestamp) */
+        /* 1. Default Hover (Standard items peek Level 1: 25px) */
         .pull-item:not(.expanded):hover .extra-drawer {
-            max-height: 18px !important; 
-            min-height: 18px !important; 
+            max-height: 25px !important; 
+            min-height: 25px !important; 
             opacity: 1 !important;
         }
         
-        /* 2. Rate-Up Hover (Prevent luck box bleed to keep hover size uniform) */
+        /* 2. Rate-Up Hover (Rate-ups peek Level 2: 40px) */
+        .is-rate-up-item:not(.expanded):hover .extra-drawer {
+            max-height: 40px !important; 
+            min-height: 40px !important; 
+        }
         .is-rate-up-item:not(.expanded):hover .luck-content {
-            opacity: 0 !important; 
+            opacity: 0.5 !important; /* Show a bit of the luck check */
         }
 
         /* 3. Rate-Up Expanded (Clicked, full view) */
         .is-rate-up-item.expanded .extra-drawer {
-            max-height: 150px !important; 
+            max-height: 170px !important; 
             min-height: 60px !important; 
             opacity: 1 !important;
         }
@@ -535,23 +539,26 @@
 
         /* --- GLOBAL TOGGLE MODE (🕒 ACTIVE) --- */
         
-        /* 1. Static Timestamp Height for All entries */
+        /* 1. Static Timestamp Height for All entries (Level 1) */
         body.show-timestamps .extra-drawer {
-            max-height: 18px; 
-            min-height: 18px; 
+            max-height: 25px; 
+            min-height: 25px; 
             opacity: 1;
         }
         
-        /* 2. Disable further hover peek */
+        /* 2. Disable further hover peek for standard items */
         body.show-timestamps .pull-item:not(.expanded):hover .extra-drawer {
-            max-height: 18px !important; 
-            min-height: 18px !important;
+            max-height: 25px !important; 
+            min-height: 25px !important;
         }
         
-        /* 3. Ensure rate-up items stay uniform until clicked */
+        /* 3. Rate-Up items peek to Level 2 (40px) on hover when clock is ON */
         body.show-timestamps .is-rate-up-item:not(.expanded):hover .extra-drawer {
-            max-height: 18px !important; 
-            min-height: 18px !important;
+            max-height: 40px !important; 
+            min-height: 40px !important;
+        }
+        body.show-timestamps .is-rate-up-item:not(.expanded):hover .luck-content {
+            opacity: 0.5 !important;
         }
 
         /* --- MINI SVG GRAPH ANIMATIONS --- */
