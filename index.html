@@ -76,7 +76,7 @@
             margin-right: 5px;
         }
 
-        /* Mini Upload Button */
+        /* Mini Upload & Action Buttons */
         .upload-btn-mini {
             background-color: rgba(255, 152, 0, 0.1);
             border: 1px solid var(--accent-orange);
@@ -433,14 +433,24 @@
             align-self: flex-start;
             list-style: none;
         }
+
+        /* --- UPDATED PULL ITEM STRUCTURE FOR ANIMATED DRAWER --- */
         .pull-item { 
             display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            flex-direction: column; 
+            justify-content: center; 
             padding: 8px 12px; 
             border-left: 3px solid var(--rarity-6); 
             background: linear-gradient(90deg, rgba(255, 152, 0, 0.18) 0%, rgba(255, 255, 255, 0.02) 60%);
+            transition: background 0.2s ease;
         }
+        .pull-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
         .rarity-5-item { border-left-color: var(--rarity-5); background: rgba(255,255,255,0.02); }
         .rarity-4-item { border-left-color: #ba68c8; background: rgba(255,255,255,0.01); }
         .rarity-3-item { border-left-color: #2196F3; background: rgba(255,255,255,0.01); }
@@ -448,13 +458,126 @@
         .rarity-1-item { border-left-color: #9e9e9e; background: rgba(255,255,255,0.01); }
         
         .pull-name { font-weight: bold; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;}
-        .banner-pull-num { font-size: 10px; color: var(--text-dim); font-weight: normal; font-family: monospace; }
+        .banner-pull-num { font-size: 10px; color: var(--text-dim); font-weight: normal; font-family: monospace; margin-left: 4px; }
         .char-icon { width: 28px; height: 28px; border: 1px solid var(--border-tech); background-color: #000; object-fit: contain; }
         
-        .pity-count { font-size: 12px; font-weight: bold; font-family: monospace; }
+        .pity-count { font-size: 12px; font-weight: bold; font-family: monospace; line-height: 1;}
         .pity-green { color: #4CAF50; } 
         .pity-yellow { color: #FFC107; }
         .pity-red { color: #F44336; }
+
+        /* --- THE EXTRA DRAWER (Timestamp & Luck Box) --- */
+        .extra-drawer {
+            max-height: 0;
+            min-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        .timestamp-content {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: monospace;
+            padding: 8px 0 0 36px; /* 8px top padding + 10px font */
+            line-height: 1;
+        }
+
+        .luck-content {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 11px;
+            color: var(--text-dim);
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 152, 0, 0.2);
+            padding: 10px 12px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        .luck-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+        
+        /* Interactive Pointer Only For Rate Ups */
+        .is-rate-up-item { cursor: pointer; position: relative; }
+        .is-rate-up-item:hover { background: linear-gradient(90deg, rgba(255, 152, 0, 0.25) 0%, rgba(255, 255, 255, 0.05) 60%); }
+
+        /* --- ANIMATION LOGIC (HOVER / EXPAND / TOGGLE) --- */
+        
+        /* 1. Default Hover (All items peek exactly enough to show the 18px timestamp) */
+        .pull-item:not(.expanded):hover .extra-drawer {
+            max-height: 18px !important; 
+            min-height: 18px !important; 
+            opacity: 1 !important;
+        }
+        
+        /* 2. Rate-Up Hover (Prevent luck box bleed to keep hover size uniform) */
+        .is-rate-up-item:not(.expanded):hover .luck-content {
+            opacity: 0 !important; 
+        }
+
+        /* 3. Rate-Up Expanded (Clicked, full view) */
+        .is-rate-up-item.expanded .extra-drawer {
+            max-height: 150px !important; 
+            min-height: 60px !important; 
+            opacity: 1 !important;
+        }
+        .is-rate-up-item.expanded .luck-content {
+            opacity: 1 !important;
+            margin-top: 8px; 
+        }
+
+        /* --- GLOBAL TOGGLE MODE (🕒 ACTIVE) --- */
+        
+        /* 1. Static Timestamp Height for All entries */
+        body.show-timestamps .extra-drawer {
+            max-height: 18px; 
+            min-height: 18px; 
+            opacity: 1;
+        }
+        
+        /* 2. Disable further hover peek */
+        body.show-timestamps .pull-item:not(.expanded):hover .extra-drawer {
+            max-height: 18px !important; 
+            min-height: 18px !important;
+        }
+        
+        /* 3. Ensure rate-up items stay uniform until clicked */
+        body.show-timestamps .is-rate-up-item:not(.expanded):hover .extra-drawer {
+            max-height: 18px !important; 
+            min-height: 18px !important;
+        }
+
+        /* --- MINI SVG GRAPH ANIMATIONS --- */
+        .luck-graph {
+            flex-shrink: 0;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-tech);
+            border-radius: 2px;
+        }
+        .luck-graph-path {
+            stroke-dasharray: 250;
+            stroke-dashoffset: 250;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .is-rate-up-item.expanded .luck-graph-path {
+            stroke-dashoffset: 0;
+            transition-delay: 0.1s; 
+        }
+        .luck-graph-elements {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .is-rate-up-item.expanded .luck-graph-elements {
+            opacity: 1;
+            transition-delay: 0.7s; 
+        }
 
         /* Summary Tab Layout */
         .summary-grid {
@@ -555,6 +678,7 @@
             <label for="fileInput" class="upload-btn-mini" id="uploadLabel" title="Load .JSON Data">+</label>
             <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileUpload(event)">
             
+            <button class="upload-btn-mini" id="toggleTimeBtn" title="Toggle Timestamps" onclick="toggleTimestamps()" style="display: none; background-color: rgba(33, 150, 243, 0.1); border-color: var(--accent-blue); color: var(--accent-blue); font-size: 16px;">🕒</button>
             <button class="upload-btn-mini" id="clearDataBtn" title="Clear Saved Data" onclick="clearSavedData()" style="display: none; background-color: rgba(244, 67, 54, 0.1); border-color: #F44336; color: #F44336; font-size: 16px;">🗑</button>
 
             <div id="top-operators-container" class="top-operators" style="display: none;"></div>
@@ -664,12 +788,10 @@
     let pmf_char_any = [];
     let pmf_weap_any = [];
 
-    // Calculates the exact Probability Mass Function (PMF) of getting a rate up on exactly pull 'N'
     function buildPMF(maxPulls, hardPity6Star, softPityStart, baseRate, rateUpProb, hardGuaranteePull, startingPity) {
         let pmf = new Array(maxPulls + 1).fill(0);
         let dp = new Array(hardPity6Star + 1).fill(0);
         
-        // DP starts distributing probabilities from the carried-over pity state
         dp[startingPity] = 1.0;
 
         for (let i = 1; i <= maxPulls; i++) {
@@ -686,7 +808,6 @@
 
                     let pRU = p6 * rateUpProb;
                     
-                    // If hitting the hard 120/80 safety net
                     if (hardGuaranteePull !== null && i === hardGuaranteePull) {
                         pRU = 1.0;
                         p6 = 1.0;
@@ -696,9 +817,9 @@
                     let pNone = 1.0 - p6;
 
                     rateUpThisPull += dp[pity] * pRU;
-                    nextDp[0] += dp[pity] * pLose6; // Reset pity if we pull an off-rate 6-star
+                    nextDp[0] += dp[pity] * pLose6; 
                     if (currentPity < hardPity6Star) {
-                        nextDp[currentPity] += dp[pity] * pNone; // Increase pity if we pull garbage
+                        nextDp[currentPity] += dp[pity] * pNone; 
                     }
                 }
             }
@@ -708,7 +829,6 @@
         return pmf;
     }
 
-    // Stacks (convolves) two PMFs together to find the probability of multiple successive events
     function convolve(pmf1, pmf2) {
         let maxLen = pmf1.length;
         let res = new Array(maxLen).fill(0);
@@ -722,9 +842,7 @@
         return res;
     }
 
-    // Pre-calculate the generic geometric curves for pulls after the 120/80 guarantee turns off
     pmf_char_any = buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, null, 0);
-    // Weapon PMF Any: 40 hard pity, soft pity start set to 40 ensures flat 4% rate until hard limit
     pmf_weap_any = buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, null, 0); 
 
     // ==============================================================================
@@ -776,6 +894,85 @@
             btn.innerText = '▼ EXPAND ▼';
             btn.classList.remove('active');
         }
+    }
+
+    function toggleLuckDrawer(element) {
+        element.classList.toggle('expanded');
+        const container = element.closest('.pull-list-container');
+        if (container) {
+            if (element.classList.contains('expanded')) {
+                // Wait 310ms for the CSS expansion animation to completely finish.
+                // This ensures the container's maximum scroll height has fully updated!
+                setTimeout(() => {
+                    container.scrollTo({
+                        top: element.offsetTop - 15,
+                        behavior: 'smooth'
+                    });
+                }, 310); 
+            }
+            checkExpandButtonVisibility(container);
+            setTimeout(() => {
+                checkExpandButtonVisibility(container);
+            }, 320); 
+        }
+    }
+    
+    function toggleTimestamps() {
+        document.body.classList.toggle('show-timestamps');
+        const btn = document.getElementById('toggleTimeBtn');
+        if (document.body.classList.contains('show-timestamps')) {
+            btn.style.backgroundColor = 'var(--accent-blue)';
+            btn.style.color = 'var(--bg-deep)';
+        } else {
+            btn.style.backgroundColor = 'rgba(33, 150, 243, 0.1)';
+            btn.style.color = 'var(--accent-blue)';
+        }
+        
+        setTimeout(() => {
+            const containers = document.querySelectorAll('.pull-list-container');
+            containers.forEach(container => checkExpandButtonVisibility(container));
+        }, 320);
+    }
+
+    function generateCDFGraph(pmf, actualPull) {
+        let width = 120;
+        let height = 30;
+        let cdf = 0;
+        let maxX = 0;
+        
+        for(let i=0; i<pmf.length; i++) {
+            cdf += pmf[i];
+            if (cdf >= 0.999) { maxX = i; break; }
+        }
+        
+        maxX = Math.max(maxX, actualPull);
+        if (maxX === 0) maxX = 1; 
+
+        let points = [];
+        let currentCdf = 0;
+        let actualX = 0;
+        let actualY = 0;
+
+        for (let i = 0; i <= maxX; i++) {
+            if(i < pmf.length) currentCdf += pmf[i];
+            let x = (i / maxX) * width;
+            let y = height - (currentCdf * height);
+            points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+            
+            if (i === actualPull) {
+                actualX = x;
+                actualY = y;
+            }
+        }
+
+        return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" class="luck-graph">
+            <polyline points="${points.join(' ')}" fill="none" stroke="rgba(255, 152, 0, 0.2)" stroke-width="2" />
+            <polyline points="${points.join(' ')}" fill="none" stroke="var(--accent-orange)" stroke-width="2" class="luck-graph-path" />
+            <g class="luck-graph-elements">
+                <line x1="${actualX.toFixed(1)}" y1="${actualY.toFixed(1)}" x2="${actualX.toFixed(1)}" y2="${height}" stroke="rgba(255, 152, 0, 0.5)" stroke-width="1" stroke-dasharray="2,2" />
+                <circle cx="${actualX.toFixed(1)}" cy="${actualY.toFixed(1)}" r="3" fill="var(--bg-panel)" stroke="#fff" stroke-width="1.5" />
+            </g>
+        </svg>`;
     }
 
     // ==============================================================================
@@ -896,6 +1093,7 @@
                 uploadBtn.innerHTML = '&#10003;'; 
                 uploadBtn.classList.add('uploaded');
                 
+                document.getElementById('toggleTimeBtn').style.display = 'flex';
                 document.getElementById('clearDataBtn').style.display = 'flex';
                 
                 switchTab('char');
@@ -912,8 +1110,8 @@
         if (!pullData || pullData.length === 0) return;
         
         const pullsCopy = [...pullData].reverse().sort((a, b) => {
-            let valA = parseInt(a.ts || a.seqId || a.timestamp || 0);
-            let valB = parseInt(b.ts || b.seqId || b.timestamp || 0);
+            let valA = parseInt(a.gachaTs || a.ts || a.seqId || a.timestamp || 0);
+            let valB = parseInt(b.gachaTs || b.ts || b.seqId || b.timestamp || 0);
             if (valA !== 0 && valB !== 0) return valA - valB;
             return 0; 
         });
@@ -926,6 +1124,8 @@
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
             let poolId = pull.poolId || poolTypeRaw;
             let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
+
+            let tsRaw = pull.gachaTs || pull.ts || pull.timestamp || pull.gachaTime || pull.time || pull.createTime || "";
 
             if (!BANNER_DB[poolId] && prefix === 'char') {
                 console.warn(`[DEBUG] Unmapped Banner ID found: "${poolId}" (${bannerName}). Add this to BANNER_DB to enable rate-up tracking.`);
@@ -983,20 +1183,17 @@
                 };
             }
 
-            // --- INIT BANNER PROBABILITY ARRAYS (Includes Carry-Over Pity) ---
             if (!bannerBoxes[bannerName].pmfs) {
-                // Grab the carried-over pity from the category tracker BEFORE any pulls are processed on this banner
-                // Explicitly lock weapons to 0 since they do not cross-over pity between banners
                 let startPity = 0;
                 if (prefix === 'char' && category === "Chartered Headhunting") {
                     startPity = categoryStats[category].currentPity || 0;
                 }
                 
-                bannerBoxes[bannerName].startingPityForMath = startPity; // Save for the UI tooltip
+                bannerBoxes[bannerName].startingPityForMath = startPity;
                 
                 let pmf1 = (prefix === 'char') 
                     ? buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, startPity) 
-                    : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0); // Weapon: 40 soft/hard pity, 0 carry over
+                    : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0); 
                     
                 bannerBoxes[bannerName].pmfs = [null, pmf1]; 
             }
@@ -1023,7 +1220,8 @@
                     pityAtPull: "FREE", 
                     rarity: rarity, 
                     pullNum: "FREE",
-                    isNew: isNewItem
+                    isNew: isNewItem,
+                    timestamp: tsRaw
                 });
                 
                 if (rarity === "6" || (rarity === "5" && prefix === 'weap')) {
@@ -1045,7 +1243,6 @@
 
                 let displayPity;
 
-                // Track Pity Increment
                 if (prefix === 'weap') {
                     bannerBoxes[bannerName].currentWeaponPity++;
                     displayPity = Math.ceil(bannerBoxes[bannerName].totalPulls / 10) || 1;
@@ -1081,6 +1278,7 @@
                         let isRateUpBanner = BANNER_DB[poolId] && BANNER_DB[poolId].rateUpIds && BANNER_DB[poolId].rateUpIds.length > 0;
                         let pullProbability = undefined; 
                         let rateUpCopyNum = 0;
+                        let generatedGraphHTML = "";
                         
                         if (isRateUpBanner) {
                             if (BANNER_DB[poolId].rateUpIds.includes(itemId)) {
@@ -1094,12 +1292,10 @@
                                 if (bannerBoxes[bannerName].totalPulls === 80 && !bannerBoxes[bannerName].hasPulledRateUp) isGuaranteed = true;
                             }
                             
-                            // --- EXECUTE DYNAMIC CUMULATIVE MATH ---
                             if (wonRateUp) {
                                 bannerBoxes[bannerName].rateUpCount++;
                                 rateUpCopyNum = bannerBoxes[bannerName].rateUpCount;
                                 
-                                // Generate the necessary convolved PMF curves if this is a new copy tier
                                 while (bannerBoxes[bannerName].pmfs.length <= rateUpCopyNum) {
                                     let prevPmf = bannerBoxes[bannerName].pmfs[bannerBoxes[bannerName].pmfs.length - 1];
                                     let anyPmf = prefix === 'char' ? pmf_char_any : pmf_weap_any;
@@ -1109,7 +1305,6 @@
                                 let targetPmf = bannerBoxes[bannerName].pmfs[rateUpCopyNum];
                                 let cdfVal = 0;
                                 
-                                // BLOCK MATH FIX: Weapons are pulled in sets of 10, so round up to the end of the block
                                 let evaluatedPullNum = currentPullNum;
                                 if (prefix === 'weap') {
                                     evaluatedPullNum = Math.ceil(currentPullNum / 10) * 10;
@@ -1121,12 +1316,10 @@
                                 }
                                 
                                 pullProbability = cdfVal * 100.0;
-                            }
-                            
-                            if (wonRateUp) {
-                                if (!isGuaranteed) {
-                                    advStats[prefix].rateUpWins++;
-                                }
+                                generatedGraphHTML = generateCDFGraph(targetPmf, evaluatedPullNum);
+                                
+                                if (!isGuaranteed) advStats[prefix].rateUpWins++;
+                                
                             } else {
                                 advStats[prefix].rateUpLosses++;
                             }
@@ -1149,13 +1342,15 @@
                             pullNum: currentPullNum,
                             isNew: isNewItem,
                             pullProb: pullProbability,
-                            rateUpCopyNum: rateUpCopyNum
+                            rateUpCopyNum: rateUpCopyNum,
+                            graphHTML: generatedGraphHTML,
+                            timestamp: tsRaw
                         });
                         pushedToAllPulls = true;
 
                         // RESET LOGIC
                         if (prefix === 'weap') {
-                            bannerBoxes[bannerName].currentWeaponPity = 0; // Local banner pity reset
+                            bannerBoxes[bannerName].currentWeaponPity = 0; 
                             if (wonRateUp) {
                                 if (!bannerBoxes[bannerName].hasPulledRateUp) {
                                     bannerBoxes[bannerName].hasPulledRateUp = true;
@@ -1172,7 +1367,7 @@
                                 }
                             }
                             if (category !== "New Horizons") {
-                                categoryStats[category].currentPity = 0; // Global banner pity reset
+                                categoryStats[category].currentPity = 0; 
                             }
                         }
 
@@ -1190,7 +1385,8 @@
                             pityAtPull: blockIndex, 
                             rarity: "5", 
                             pullNum: currentPullNum,
-                            isNew: isNewItem
+                            isNew: isNewItem,
+                            timestamp: tsRaw
                         });
                         pushedToAllPulls = true;
                         summaryWeaps.push({ id: itemId, name: itemName, enName: enName, rarity: "5" });
@@ -1206,7 +1402,8 @@
                         pityAtPull: blockVal, 
                         rarity: rarity, 
                         pullNum: currentPullNum,
-                        isNew: isNewItem
+                        isNew: isNewItem,
+                        timestamp: tsRaw
                     });
                 }
             }
@@ -1490,28 +1687,71 @@
                 let blockHeader = "";
                 let rateUpTag = "";
                 let newTag = "";
+                let luckContentHTML = "";
+                let clickAction = "";
+
+                // --- FORMATTED TIMESTAMP ---
+                let timeString = "";
+                if (pull.timestamp) {
+                    let tsStr = pull.timestamp.toString();
+                    let d;
+                    if (tsStr.includes('-') || tsStr.includes('T')) {
+                        d = new Date(tsStr);
+                    } else {
+                        d = new Date(tsStr.length === 10 ? parseInt(tsStr) * 1000 : parseInt(tsStr));
+                    }
+                    if (!isNaN(d.getTime())) {
+                        let yr = d.getFullYear(); 
+                        let mo = String(d.getMonth() + 1).padStart(2, '0');
+                        let da = String(d.getDate()).padStart(2, '0');
+                        let timePart = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                        timeString = `${yr}-${mo}-${da} ${timePart}`; 
+                    }
+                }
 
                 if (pull.isRateUpItem) itemClass += ` is-rate-up-item`; 
 
+                // --- LUCK BOX (ONLY FOR RATE-UP 6-STARS) ---
                 if (pull.rarity === "6" && pull.isRateUpItem) {
                     let copyText = pull.rateUpCopyNum > 1 ? `${pull.rateUpCopyNum} copies` : `1 copy`;
                     let carryText = data.startingPityForMath > 0 ? ` (Started with ${data.startingPityForMath} pity)` : '';
                     
-                    let probText = '';
+                    let luckMessage = '';
                     if (pull.pullProb !== undefined) {
                         if (prefix === 'weap') {
                             let blockNum = Math.ceil(pull.pullNum / 10);
-                            probText = `title="Luck Check: You had a ${pull.pullProb.toFixed(2)}% chance to pull ${copyText} of the Rate-Up within ${blockNum} blocks (${blockNum * 10} pulls)."`;
+                            luckMessage = `You had a <span style="color: #fff; font-weight: bold;">${pull.pullProb.toFixed(2)}%</span> chance to pull ${copyText} of the Rate-Up within ${blockNum} blocks (${blockNum * 10} pulls).`;
                         } else {
-                            probText = `title="Luck Check: You had a ${pull.pullProb.toFixed(2)}% chance to pull ${copyText} of the Rate-Up within ${pull.pullNum} pulls.${carryText}"`;
+                            luckMessage = `You had a <span style="color: #fff; font-weight: bold;">${pull.pullProb.toFixed(2)}%</span> chance to pull ${copyText} of the Rate-Up within ${pull.pullNum} pulls.<br><span style="font-size: 9px; color: #666;">${carryText}</span>`;
                         }
                     }
                     
-                    rateUpTag = `<span class="pity-count pity-yellow" ${probText} style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px; cursor: help;">RATE-UP</span>`;
+                    rateUpTag = `<span class="pity-count pity-yellow" style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px; line-height: 1;">RATE-UP</span>`;
+                    
+                    if (luckMessage) {
+                        luckContentHTML = `
+                        <div class="luck-content">
+                            <div class="luck-text">
+                                <span style="color: var(--accent-orange); font-weight: bold;">[LUCK_CHECK]</span> ${luckMessage}
+                            </div>
+                            ${pull.graphHTML || ''}
+                        </div>`;
+                        clickAction = `onclick="toggleLuckDrawer(this)"`;
+                    }
                 }
                 
                 if (pull.isNew) {
-                    newTag = `<span class="pity-count" style="color: #4CAF50; font-size: 9px; padding: 1px 4px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 2px; line-height: 1; margin-left: 6px;">NEW</span>`;
+                    newTag = `<span class="pity-count" style="color: #4CAF50; font-size: 9px; padding: 1px 4px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 2px; line-height: 1;">NEW</span>`;
+                }
+
+                // --- RESTORED HORIZONTAL BADGE STACK ---
+                let tagStackHTML = "";
+                if (rateUpTag || newTag) {
+                    tagStackHTML = `
+                    <div style="display: flex; flex-direction: row; gap: 6px; margin-left: 8px; align-items: center;">
+                        ${rateUpTag}
+                        ${newTag}
+                    </div>`;
                 }
 
                 if (pull.pityAtPull !== null) {
@@ -1533,19 +1773,31 @@
                         }
                         showStandardBadge = false; 
                     }
-                    if (showStandardBadge) badgeHTML = `<span class="${badgeClass}">${pityText}</span>`;
+                    
+                    if (showStandardBadge) {
+                        badgeHTML = `<span class="${badgeClass}" style="line-height: 1;">${pityText}</span>`;
+                    }
                 }
 
                 let iconUrl = getItemIconUrl(prefix, pull.itemId, pull.enName);
                 let fallback = `this.onerror=null; this.style.display='none';`;
                 
                 return `${blockHeader}
-                <li class="pull-item ${itemClass}">
-                    <span class="pull-name">
-                        <img src="${iconUrl}" class="char-icon" onerror="${fallback}">
-                        <span>${pull.name} <span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag}${newTag}</span>
-                    </span>
-                    ${badgeHTML}
+                <li class="pull-item ${itemClass}" ${clickAction}>
+                    <div class="pull-item-top">
+                        <span class="pull-name">
+                            <img src="${iconUrl}" class="char-icon" onerror="${fallback}">
+                            <div style="display: flex; align-items: center;">
+                                <span>${pull.name} <span class="banner-pull-num" style="margin-left: 4px;">#${pull.pullNum}</span></span>
+                                ${tagStackHTML}
+                            </div>
+                        </span>
+                        ${badgeHTML}
+                    </div>
+                    <div class="extra-drawer">
+                        ${timeString ? `<div class="timestamp-content">${timeString}</div>` : ''}
+                        ${luckContentHTML}
+                    </div>
                 </li>`;
             }).join('');
 
@@ -1855,6 +2107,7 @@
                 uploadBtn.innerHTML = '&#10003;'; 
                 uploadBtn.classList.add('uploaded');
                 
+                document.getElementById('toggleTimeBtn').style.display = 'flex';
                 document.getElementById('clearDataBtn').style.display = 'flex';
                 
                 switchTab('char');
