@@ -21,7 +21,7 @@
             --rarity-6: #ff9800;
             --rarity-5: #FFD700; 
             --color-green: #4CAF50;
-            --color-yellow: #FFC107;
+            --color-yellow: #fffa00;
             --color-red: #F44336;
         }
 
@@ -33,6 +33,7 @@
             margin: 0;
             letter-spacing: 0.02em;
             overflow-y: scroll; 
+            overflow-x: hidden;
         }
 
         /* Container for the main grid (wide for up to 4 banners) */
@@ -43,12 +44,12 @@
             width: 100%; min-height: 120px; 
             background-color: var(--bg-deep); position: relative; z-index: 0;
             display: flex; align-items: center; justify-content: center;
-            background-size: cover; background-position: center var(--banner-pos-y, 34%);
+            background-size: cover; background-position: center var(--banner-pos-y, 50%);
             animation: rollerReveal 0.25s ease-out 0.2s both;
         }
         .hero-banner::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            backdrop-filter: blur(var(--banner-blur, 0px)); -webkit-backdrop-filter: blur(var(--banner-blur, 0px));
+            backdrop-filter: blur(var(--banner-blur, 12px)); -webkit-backdrop-filter: blur(var(--banner-blur, 12px));
             background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
             z-index: 1; pointer-events: none;
         }
@@ -66,13 +67,12 @@
         .profile-pill { display: flex; align-items: center; background: transparent; border: none; padding: 6px 0; gap: 15px; position: relative; }
         .profile-avatar { width: 80px; height: 80px; border-radius: 0; border: 2px solid #ffffff; background-color: #000000; padding: 2px; object-fit: cover; }
         .profile-name { font-size: 26px; font-family: 'Jost', sans-serif; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; margin-right: 5px; display: flex; align-items: center; gap: 15px; }
+        .profile-name[contenteditable="true"]:hover { text-decoration: underline; text-underline-offset: 4px; cursor: text; }
+        .profile-name[contenteditable="true"]:focus { outline: none; background: rgba(255,255,255,0.1); border-radius: 4px; }
         .profile-name::before { content: '['; color: #999999; }
         .profile-name::after { content: ']'; color: #999999; }
 
-        .top-operators { display: flex; gap: 10px; margin-left: 10px; align-items: center; }
-        .top-op-icon-wrapper { position: relative; display: flex; }
-        .top-op-icon { width: 36px; height: 36px; background-color: #000; border: 2px solid var(--rarity-6); object-fit: cover; border-radius: 4px; background-clip: content-box; }
-        .top-op-count { position: absolute; bottom: -6px; right: -6px; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-tech); font-size: 10px; font-family: monospace; padding: 1px 4px; border-radius: 4px; font-weight: bold; z-index: 2; }
+
 
         .overview-stats-col { 
             display: flex; flex-direction: column; gap: 6px; text-align: right; 
@@ -89,7 +89,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            background: var(--rarity-5);
+            background: var(--color-yellow);
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1), height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 0;
             pointer-events: none;
@@ -97,7 +97,7 @@
         }
         .tab-btn { position: relative; z-index: 1; background: transparent; color: var(--text-dim); border: none; border-radius: 0; width: 64px; height: 64px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: none; padding: 0; }
         .tab-btn svg { width: 32px; height: 32px; fill: currentColor; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
-        .tab-btn:hover { color: var(--text-main); transform: translateY(-3px); }
+        .tab-btn:hover { color: var(--text-main); }
         .tab-btn.active-tab { 
             color: var(--bg-deep); 
         }
@@ -112,7 +112,6 @@
             z-index: 2;
             margin-top: 0; 
             padding-bottom: 50px; 
-            overflow-x: hidden; 
             display: grid; /* Overlaps contents in a single cell cleanly */
         }
 #mainContent > div[id$="-section"] { 
@@ -130,6 +129,9 @@
         h2 { font-size: 20px; color: white; margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; }
         h2.main-title { 
             font-size: 36px; font-weight: 600; margin-top: 10px; 
+            opacity: 1;
+        }
+        .first-visit h2.main-title {
             animation: flickerIn 0.2s ease-out 0.6s both;
         }
 
@@ -142,12 +144,17 @@
             display: flex; justify-content: flex-end; align-items: flex-end; padding: 2px 4px; 
             margin-top: 30px; margin-bottom: 5px; box-sizing: border-box; 
             overflow: hidden;
+            opacity: 1;
+        }
+        .first-visit .arrow-box {
             animation: expandBox 0.25s ease-out 0.2s both;
         }
         .arrow-box svg { 
             width: 18px; height: 18px; display: block; 
             transform-origin: center;
-            transform: rotate(-45deg);
+            transform: rotate(0deg);
+        }
+        .first-visit .arrow-box svg {
             animation: rotateArrow 0.2s ease-out 0.4s both;
         }
 
@@ -176,7 +183,25 @@
         
         /* --- DASHBOARDS --- */
         .stats-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 40px; }
-        .stat-card { background: var(--bg-panel); padding: 20px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+        .stats-card-container.initial-animate .stat-card,
+        .overview-stats-col.initial-animate .overview-stat-line {
+            opacity: 0;
+            animation: statCardFadeIn 0.8s ease-out 0.6s both;
+        }
+        @keyframes statCardFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stat-card { 
+            background: var(--bg-panel); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            position: relative;
+            content-visibility: auto;
+            contain-intrinsic-size: auto 120px;
+        }
         .stat-card-title { font-size: 11px; color: var(--text-dim); font-family: monospace; text-transform: uppercase; }
         .stat-card-value { font-size: 32px; color: #fff; font-family: monospace; font-weight: bold; line-height: 1; }
         .stat-card-sub { font-size: 11px; color: var(--text-dim); margin-top: 5px; }
@@ -198,9 +223,41 @@
 
         /* --- BANNERS --- */
         .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; align-items: start; }
-        .banner-box { background-color: var(--bg-panel); padding: 20px; display: flex; flex-direction: column; height: 600px; box-sizing: border-box; position: relative; }
-        .banner-box.expanded { min-height: 600px; height: auto; z-index: 5; }
-        .banner-box.expanded .pull-list-container { overflow-y: visible; }
+        .banner-box { 
+            background-color: var(--bg-panel); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            height: 600px; 
+            min-height: 600px; 
+            box-sizing: border-box; 
+            position: relative; 
+            overflow: hidden; 
+            transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.5s ease; 
+            will-change: height; 
+            content-visibility: auto;
+            contain-intrinsic-size: auto 600px;
+        }
+        .banner-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle at 50% 40%, var(--banner-tint, transparent) 0%, transparent 60%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 1.2s ease, background 0.8s ease;
+            filter: blur(60px);
+        }
+        .banner-box.has-tint::before {
+            opacity: 0.5;
+        }
+        .banner-box > * { position: relative; z-index: 1; }
+        .banner-box.expanded { z-index: 5; }
+        .banner-box.expanded .pull-list-container { overflow-y: auto; }
         .banner-header-top-box { flex-shrink: 0; }
         .banner-box h3 { margin-top: 0; margin-bottom: 10px; color: #fff; font-size: 16px; text-transform: uppercase; font-weight: 200; }
 
@@ -210,12 +267,12 @@
         .banner-rate-up.lost { color: var(--text-dim); background: rgba(255, 255, 255, 0.04); border-left: 2px solid #444; }
         .banner-rate-up.lost span { color: #999; font-weight: normal; }
 
-        .banner-img { width: 100%; max-height: 110px; object-fit: cover; border: 1px solid var(--border-tech); margin-bottom: 12px; display: block;}
-        .banner-stats-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-tech); padding-bottom: 10px; margin-bottom: 10px; }
+        .banner-img { width: 100%; max-height: 110px; object-fit: cover; border: none; margin-bottom: 12px; display: block;}
+        .banner-stats-row { display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 10px; margin-bottom: 10px; }
         .banner-stats { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin: 0; padding: 0;}
 
         .banner-filters { display: flex; gap: 5px; }
-        .filter-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border-tech); color: var(--text-dim); padding: 4px 10px; font-size: 11px; font-family: monospace; cursor: pointer; border-radius: 3px; transition: all 0.2s; font-weight: bold; }
+        .filter-btn { background: rgba(255,255,255,0.05); border: none; color: var(--text-dim); padding: 4px 10px; font-size: 11px; font-family: monospace; cursor: pointer; border-radius: 3px; transition: all 0.2s; font-weight: bold; }
         .filter-btn:hover { background: rgba(255,255,255,0.1); }
         .filter-btn.active { background: rgba(255, 152, 0, 0.15); border-color: var(--accent-orange); color: var(--accent-orange); }
         .filter-btn.data-loaded { border-color: var(--color-green); color: var(--color-green); }
@@ -233,7 +290,7 @@
         .pull-list-container::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
         .pull-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
 
-        .pull-block-header { font-size: 10px; color: var(--text-dim); background: #1a1a1a; padding: 4px 10px; margin-top: 15px; border: 1px solid var(--border-tech); font-family: monospace; display: inline-block; align-self: flex-start; }
+        .pull-block-header { font-size: 10px; color: var(--text-dim); background: #1a1a1a; padding: 4px 10px; margin-top: 15px; border: none; font-family: monospace; display: inline-block; align-self: flex-start; }
 
         .pull-item { display: flex; flex-direction: column; justify-content: center; padding: 8px 12px; border-left: 3px solid var(--rarity-6); background: linear-gradient(90deg, rgba(255, 152, 0, 0.18) 0%, rgba(255, 255, 255, 0.02) 60%); transition: background 0.2s ease; }
         .pull-item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
@@ -245,7 +302,7 @@
         
         .pull-name { font-weight: bold; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;}
         .banner-pull-num { font-size: 10px; color: var(--text-dim); font-weight: normal; font-family: monospace; margin-left: 4px; }
-        .char-icon { width: 28px; height: 28px; border: 1px solid var(--border-tech); background-color: #000; object-fit: contain; }
+        .char-icon { width: 28px; height: 28px; border: none; background-color: #000; object-fit: contain; }
         
         .pity-count { font-size: 12px; font-weight: bold; font-family: monospace; line-height: 1;}
         .pity-green { color: var(--color-green); } 
@@ -255,7 +312,7 @@
         /* --- THE EXTRA DRAWER --- */
         .extra-drawer { max-height: 0; min-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; opacity: 0; }
         .timestamp-content { font-size: 10px; color: var(--text-dim); font-family: monospace; padding: 8px 0 0 36px; line-height: 1; }
-        .luck-content { opacity: 0; transition: opacity 0.3s ease; font-size: 11px; color: var(--text-dim); font-family: monospace; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 152, 0, 0.2); padding: 10px 12px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 8px; }
+        .luck-content { opacity: 0; transition: opacity 0.3s ease; font-size: 11px; color: var(--text-dim); font-family: monospace; background: rgba(0, 0, 0, 0.5); border: none; padding: 10px 12px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-top: 8px; }
         .luck-text { flex: 1; line-height: 1.4; }
         
         .is-rate-up-item { cursor: pointer; position: relative; }
@@ -275,22 +332,191 @@
         body.show-timestamps .is-rate-up-item.expanded .extra-drawer { max-height: 170px !important; }
 
         /* --- MINI SVG GRAPH ANIMATIONS --- */
-        .luck-graph { flex-shrink: 0; background-color: var(--bg-panel); border: 1px solid var(--border-tech); border-radius: 2px; }
+        .luck-graph { flex-shrink: 0; background-color: var(--bg-panel); border: none; border-radius: 2px; }
         .luck-graph-path { stroke-dasharray: 250; stroke-dashoffset: 250; transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .is-rate-up-item.expanded .luck-graph-path { stroke-dashoffset: 0; transition-delay: 0.1s; }
         .luck-graph-elements { opacity: 0; transition: opacity 0.3s ease-out; }
         .is-rate-up-item.expanded .luck-graph-elements { opacity: 1; transition-delay: 0.7s; }
 
         /* Summary Tab */
-        .summary-grid { display: flex; flex-wrap: wrap; gap: 15px; background: var(--bg-panel); padding: 20px; }
-        .summary-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .summary-icon { width: 56px; height: 56px; background-color: #000; object-fit: cover; background-clip: content-box; }
-        .summary-icon-6 { border: 3px solid var(--rarity-6); background: linear-gradient(135deg, rgba(255, 152, 0, 0.25) 0%, rgba(20, 20, 20, 1) 100%); }
-        .summary-icon-5 { border: 3px solid var(--rarity-5); background-color: #000; }
-        .summary-pity { font-size: 12px; font-family: monospace; font-weight: bold; }
+        .summary-grid { display: flex; flex-wrap: wrap; gap: 10px; background: var(--bg-panel); padding: 20px; }
+        .summary-grid.horizontal {
+            flex-wrap: wrap;
+            overflow: hidden;
+            background: transparent;
+            padding: 15px 0 15px calc(3.33rem + 24px);
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            align-content: flex-start;
+            width: 100%;
+            gap: 12px;
+            box-sizing: border-box;
+            max-height: 140px;
+            cursor: pointer;
+            transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+            isolation: isolate;
+        }
+        .summary-grid.horizontal::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3.33rem;
+            height: 100%;
+            background: var(--color-yellow);
+            z-index: 1;
+            transform-origin: top;
+        }
+        .summary-grid.horizontal.initial-animate::before {
+            animation: paintRollIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0.6s both;
+        }
+        .summary-label {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3.33rem;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            pointer-events: none;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            writing-mode: vertical-rl;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            overflow: hidden;
+            opacity: 1;
+        }
+        .summary-grid.horizontal.initial-animate .summary-label {
+            opacity: 0;
+            animation: flickerIn 0.4s ease-out 1.2s forwards;
+        }
+        .summary-grid.horizontal.no-expand {
+            cursor: default;
+        }
+        .summary-grid.horizontal:not(.expanded):not(.no-expand):hover {
+            max-height: 160px;
+        }
+        .summary-grid.horizontal.expanded {
+            height: auto;
+            max-height: none;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-orange) transparent;
+        }
+        .summary-grid.expanded::-webkit-scrollbar {
+            width: 4px;
+        }
+        .summary-grid.expanded::-webkit-scrollbar-thumb {
+            background: var(--accent-orange);
+        }
+        .summary-grid.horizontal::-webkit-scrollbar {
+            display: none;
+        }
+
+        .summary-item {
+            flex-shrink: 0;
+            position: relative;
+            width: 30px;
+            height: auto;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 1;
+        }
+        .summary-grid.horizontal.initial-animate .summary-item:not(.overflow-item) {
+            opacity: 0;
+            animation: summaryItemFadeIn 0.5s both 1.4s;
+        }
+        /* overflow-item visibility is driven entirely by JS — see revealOverflowItems() */
+        .summary-grid.horizontal.collapsing .summary-item.overflow-item {
+            animation: summaryItemFadeOut 0.3s both;
+        }
+
+        /* --- REVEAL ON SCROLL --- */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Base state: hidden. JS adds .reveal-overflow to trigger the fade-in animation. */
+        .summary-item.overflow-item {
+            opacity: 0;
+            animation: none;
+        }
+        .summary-item.overflow-item.reveal-overflow {
+            animation: summaryItemFadeIn 0.5s both;
+        }
+        .summary-item:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
+        }
+        .summary-char-item {
+            width: 67.5px;
+        }
+        @keyframes paintRollIn {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        @keyframes summaryItemFadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes summaryItemFadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(5px); }
+        }
+
+        .summary-char-pity {
+            margin-top: 4px;
+            font-size: 12px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            color: #ffffff !important;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .luck-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .summary-item:hover {
+            z-index: 3;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .summary-icon { width: 100%; height: 94.5px; background-color: #000; object-fit: cover; background-clip: content-box; display: block; }
+        .summary-char-item .summary-icon { border-radius: 12px; }
+        .summary-icon-6 { 
+            border: 2px solid var(--color-orange);
+            background: #141414; 
+        }
+        .summary-char-item .summary-icon-6 { border: none; }
+        .summary-icon-5 { border: 2px solid var(--color-yellow); background-color: #000; }
+        .summary-char-item .summary-icon-5 { border: none; }
 
         /* Pity Counter Dashboard Blocks */
-        .pity-box { display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-tech); border-radius: 4px; }
+        .pity-box { display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: none; border-radius: 4px; }
         .pity-col { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .pity-divider { width: 1px; background: var(--border-tech); }
         .pity-val { font-size: 20px; font-weight: bold; font-family: monospace; line-height: 1; }
@@ -330,9 +556,8 @@
         <div class="profile-wrapper">
             <div class="profile-pill">
                 <img src="profile.png" class="profile-avatar" id="display-avatar" alt="Avatar" onerror="if(this.src.endsWith('profile.png')){ this.src='profile.jpg'; } else { this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+PC9zdmc+'; }">
-                <span class="profile-name" id="display-username">EF Tracker</span>
+                <span class="profile-name" id="display-username" contenteditable="true" onblur="saveManualUsername(this.innerText)">EF Tracker</span>
             </div>
-            <div id="top-operators-container" class="top-operators" style="display: none;"></div>
         </div>
         
         <div class="overview-stats-col" id="overviewStats" style="display: none;">
@@ -356,9 +581,6 @@
             <button id="tab-weap" class="tab-btn" onclick="switchTab('weap')" title="Arsenals" style="display: none;">
                 <svg viewBox="0 0 24 24"><path d="M19.7 4.3c-.4-.4-1-.4-1.4 0L12 10.6 8.7 7.3c-.4-.4-1-.4-1.4 0l-3 3c-.4.4-.4 1 0 1.4l3.3 3.3-4.3 4.3c-.4.4-.4 1 0 1.4.4.4 1 .4 1.4 0l4.3-4.3 3.3 3.3c.4.4 1 .4 1.4 0l3-3c.4-.4.4-1 0-1.4L13.4 12l6.3-6.3c.4-.4.4-1 0-1.4z"/></svg>
             </button>
-            <button id="tab-summary" class="tab-btn" onclick="switchTab('summary')" title="Summary" style="display: none;">
-                <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-            </button>
             <button id="tab-settings" class="tab-btn" onclick="switchTab('settings')" title="Settings">
                 <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
             </button>
@@ -375,7 +597,9 @@
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Operators</h2>
             </div>
-            <div id="charOverviewDashboard" class="stats-card-container"></div>
+            <div id="charOverviewDashboard" class="stats-card-container" style="margin-bottom: 20px;"></div>
+            <div id="summary-char-container" class="summary-grid horizontal" style="margin-bottom: 20px;" onclick="toggleSummaryExpand(this)"></div>
+
             <h2>// Headhunting</h2>
             <div class="banner-grid" id="charBannerGrid"></div>
         </div>
@@ -385,23 +609,11 @@
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Arsenals</h2>
             </div>
-            <div id="weapOverviewDashboard" class="stats-card-container"></div>
-            <h2>Arsenal Issues</h2>
+            <div id="weapOverviewDashboard" class="stats-card-container" style="margin-bottom: 20px;"></div>
+            <div id="summary-weap-container" class="summary-grid horizontal" style="margin-bottom: 20px;" onclick="toggleSummaryExpand(this)"></div>
+
+            <h2 id="weap-title">// Arsenal Issues</h2>
             <div class="banner-grid" id="weapBannerGrid"></div>
-        </div>
-
-        <div id="summary-section" style="display: none;">
-            <div class="section-header">
-                <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
-                <h2 class="main-title">Summary / Operators</h2>
-            </div>
-            <div id="summary-char-container" class="summary-grid"></div>
-
-            <div class="section-header" style="margin-top: 40px;">
-                <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
-                <h2 class="main-title">Summary / Arsenals</h2>
-            </div>
-            <div id="summary-weap-container" class="summary-grid"></div>
         </div>
 
         <div id="settings-section" style="display: none;">
@@ -417,12 +629,36 @@
             </div>
 
             <h2>DISPLAY PREFERENCES</h2>
-            <div class="about-card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div>
-                    <h3 style="margin-bottom: 5px;">ALWAYS SHOW TIMESTAMPS</h3>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-dim);">Locks the pull entries to an expanded state to permanently display pull times without hovering.</p>
+            <div class="about-card" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin-bottom: 5px;">ALWAYS SHOW TIMESTAMPS</h3>
+                        <p style="margin: 0; font-size: 12px; color: var(--text-dim);">Locks the pull entries to an expanded state to permanently display pull times without hovering.</p>
+                    </div>
+                    <button id="toggleTimeBtn" class="filter-btn" onclick="toggleTimestamps()" style="padding: 10px 20px; font-size: 12px;">OFF</button>
                 </div>
-                <button id="toggleTimeBtn" class="filter-btn" onclick="toggleTimestamps()" style="padding: 10px 20px; font-size: 12px;">OFF</button>
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin-bottom: 5px;">EXPAND SUMMARIES BY DEFAULT</h3>
+                        <p style="margin: 0; font-size: 12px; color: var(--text-dim);">Keeps the Operator and Arsenal summary boxes expanded on load.</p>
+                    </div>
+                    <button id="toggleSummaryExpandBtn" class="filter-btn" onclick="toggleSummaryDefault()" style="padding: 10px 20px; font-size: 12px;">OFF</button>
+                </div>
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">MAX SUMMARY ROWS</h3>
+                        <span id="summaryRowsVal" style="font-family: monospace; color: var(--accent-orange);">3</span>
+                    </div>
+                    <input type="range" id="summaryRowsSlider" min="1" max="5" value="3" step="1" style="width: 100%; accent-color: var(--accent-orange);" oninput="updateSummaryRows(this.value)">
+                </div>
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">CONSIDERED RECENT BANNERS</h3>
+                        <span id="bannerLimitVal" style="font-family: monospace; color: var(--accent-orange);">ALL</span>
+                    </div>
+                    <input type="range" id="bannerLimitSlider" min="1" max="50" value="50" step="1" style="width: 100%; accent-color: var(--accent-orange);" oninput="updateBannerLimit(this.value)">
+                    <p style="margin: 5px 0 0 0; font-size: 11px; color: var(--text-dim);">Limits the summary to only show 6★ items from the last N banners.</p>
+                </div>
             </div>
 
             <h2>BANNER CUSTOMIZATION</h2>
@@ -441,6 +677,30 @@
                     </div>
                     <input type="range" id="posSlider" min="0" max="100" value="50" step="1" style="width: 100%; accent-color: var(--accent-orange);" oninput="updateBannerPos(this.value)">
                 </div>
+            </div>
+
+            <h2>PROFILE & BANNER IMAGES</h2>
+            <div class="about-card" style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <h3 style="margin-bottom: 10px;">UPLOAD AVATAR</h3>
+                    <input type="file" id="avatarUpload" accept="image/*" onchange="handleImageUpload(this, 'avatar')" style="display: none;">
+                    <button class="filter-btn" onclick="document.getElementById('avatarUpload').click()" style="width: 100%; padding: 12px;">SELECT AVATAR IMAGE</button>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">UPLOAD BANNER</h3>
+                    <input type="file" id="bannerUpload" accept="image/*" onchange="handleImageUpload(this, 'banner')" style="display: none;">
+                    <button class="filter-btn" onclick="document.getElementById('bannerUpload').click()" style="width: 100%; padding: 12px;">SELECT BANNER IMAGE</button>
+                </div>
+                <button class="filter-btn" onclick="resetImages()" style="width: 100%; padding: 12px; border-color: var(--rarity-5); color: var(--rarity-5);">RESET TO DEFAULT IMAGES</button>
+            </div>
+
+            <h2>DATA EXPORT</h2>
+            <div class="about-card" style="display: flex; flex-direction: column; gap: 15px;">
+                <p style="margin: 0; font-size: 12px; color: var(--text-dim);">Select which data you want to export from your browser's local storage.</p>
+                <div id="exportList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-tech);">
+                    <!-- Populated by JS -->
+                </div>
+                <button class="filter-btn" onclick="exportSelectedData()" style="width: 100%; padding: 12px; background: var(--accent-blue); color: #fff; border: none;">EXPORT SELECTED DATA (.JSON)</button>
             </div>
         </div>
 
@@ -470,10 +730,10 @@
                 <p>This tracker is a non-commercial, fan-made project created for the community and claims no ownership over the game's intellectual property or graphical assets.</p>
             </div>
         </div>
-        
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
     // ==============================================================================
     // CONFIGURATIONS & STATE
@@ -497,14 +757,65 @@
     };
 
     const MAX_PULLS = 1500;
-    const SECTION_ORDER = ['char', 'weap', 'summary', 'settings', 'about'];
+    const SECTION_ORDER = ['char', 'weap', 'settings', 'about'];
     
     let currentTab = 'settings';
     let isAnimating = false;
+    let visitedTabs = new Set();
     let isDataLoaded = false;
     
+    // Config management
+    function getEfConfig() {
+        try {
+            const config = localStorage.getItem('efConfig');
+            const parsed = config ? JSON.parse(config) : {};
+            // Defaults
+            if (parsed.summaryMaxRows === undefined) parsed.summaryMaxRows = 3;
+            if (parsed.summaryBannerLimit === undefined) parsed.summaryBannerLimit = 999;
+            if (parsed.summaryExpandedByDefault === undefined) parsed.summaryExpandedByDefault = false;
+            return parsed;
+        } catch (e) {
+            return { summaryMaxRows: 3, summaryBannerLimit: 999, summaryExpandedByDefault: false };
+        }
+    }
+
+    function updateEfConfig(key, value) {
+        const config = getEfConfig();
+        config[key] = value;
+        localStorage.setItem('efConfig', JSON.stringify(config));
+    }
+
+    function migrateOldConfig() {
+        const config = getEfConfig();
+        let migrated = false;
+        const keys = {
+            'efShowTimestamps': 'showTimestamps',
+            'efBannerBlur': 'bannerBlur',
+            'efBannerPos': 'bannerPos',
+            'efManualUser': 'manualUser',
+            'efTrackerUser': 'trackerUser',
+            'efCustomAvatar': 'customAvatar',
+            'efCustomBanner': 'customBanner'
+        };
+
+        for (const [oldKey, newKey] of Object.entries(keys)) {
+            const val = localStorage.getItem(oldKey);
+            if (val !== null) {
+                config[newKey] = (val === 'true' || val === 'false') ? (val === 'true') : val;
+                localStorage.removeItem(oldKey);
+                migrated = true;
+            }
+        }
+
+        if (migrated) {
+            localStorage.setItem('efConfig', JSON.stringify(config));
+        }
+    }
+    
     let summaryChars = [], summaryWeaps = [];
+    let charBannerTimeline = [], weapBannerTimeline = [];
     let uniqueChars = new Map(), uniqueWeaps = new Map();
+    let lastLoadedData = null;
     let pmf_char_any = [], pmf_weap_any = [];
     let advStats = {
         char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 },
@@ -590,6 +901,21 @@
         return `${yr}-${mo}-${da} ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`; 
     }
 
+    const scrollRevealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                scrollRevealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    function initScrollReveal() {
+        document.querySelectorAll('.reveal-on-scroll:not(.visible)').forEach(el => {
+            scrollRevealObserver.observe(el);
+        });
+    }
+
     function createPityCol(val, max, label, valColor, labelColor, extraHtml = '') {
         return `
             <div class="pity-col">
@@ -604,9 +930,9 @@
 
     function createStatCard(title, val, sub, badgeText, badgeCss, titleColor, valColorCss) {
         return `
-            <div class="stat-card">
+            <div class="stat-card reveal-on-scroll">
                 ${badgeText ? `<div class="stat-card-badge ${badgeCss}">${badgeText}</div>` : ''}
-                <div class="stat-card-title" style="color: ${titleColor}">${title}</div>
+                <div class="stat-card-title">${title}</div>
                 <div class="stat-card-value ${valColorCss || ''}">${val}</div>
                 <div class="stat-card-sub">${sub}</div>
             </div>`;
@@ -640,7 +966,7 @@
     function getTabIndex(t) { return SECTION_ORDER.indexOf(t); }
 
     function updateTabButtonStyles(activeTabId) {
-        ['char', 'weap', 'summary', 'settings', 'about'].forEach(t => {
+        ['char', 'weap', 'settings', 'about'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.classList.toggle('active-tab', t === activeTabId);
         });
@@ -668,9 +994,12 @@
     });
 
     function switchTab(tab) {
+        if (isAnimating) return;
         if (!isDataLoaded && !['settings', 'about'].includes(tab)) return;
         if (tab === currentTab) return;
 
+        if (tab === 'settings') populateExportList();
+        
         isAnimating = true;
         updateTabButtonStyles(tab);
 
@@ -680,6 +1009,32 @@
 
         let currSec = document.getElementById(`${oldTab}-section`);
         let newSec = document.getElementById(`${tab}-section`);
+
+        // Clean up any ongoing animations from the old tab
+        if (oldTab === 'char' || oldTab === 'weap') {
+            const oldSummaryId = oldTab === 'char' ? 'summary-char-container' : 'summary-weap-container';
+            const oldSummary = document.getElementById(oldSummaryId);
+            if (oldSummary) oldSummary.classList.remove('initial-animate');
+            
+            const oldDash = document.getElementById(`${oldTab}OverviewDashboard`);
+            if (oldDash) oldDash.classList.remove('initial-animate');
+        } else if (oldTab === 'overview') {
+            const overviewStats = document.getElementById('overviewStats');
+            if (overviewStats) overviewStats.classList.remove('initial-animate');
+        }
+        currSec.classList.remove('first-visit');
+
+        // Handle first visit animation
+        if (!visitedTabs.has(tab)) {
+            newSec.classList.add('first-visit');
+            visitedTabs.add(tab);
+            // Remove the class after animation finishes so it doesn't re-run on next switch
+            setTimeout(() => {
+                newSec.classList.remove('first-visit');
+            }, 1500);
+        } else {
+            newSec.classList.remove('first-visit');
+        }
 
         // Prep it slightly off-screen
         if (newSec.style.display !== 'block') {
@@ -692,6 +1047,22 @@
         newSec.style.zIndex = '3';
         currSec.style.zIndex = '1';
         void newSec.offsetWidth; // reflow
+
+        if (tab === 'char' || tab === 'weap') {
+            triggerSummaryAnimation(tab); // Must run first so summaryRow1Animating flag is set before checkSummaryOverflow reads it
+            checkSummaryOverflow();
+            
+            if (!animatedDashboards.has(tab)) {
+                const dash = document.getElementById(`${tab}OverviewDashboard`);
+                if (dash) {
+                    dash.classList.add('initial-animate');
+                    animatedDashboards.add(tab);
+                    setTimeout(() => {
+                        dash.classList.remove('initial-animate');
+                    }, 3000);
+                }
+            }
+        }
 
         let ease = 'cubic-bezier(0.25, 1, 0.5, 1)';
         currSec.style.transition = `transform 0.4s ${ease}, opacity 0.4s ${ease}`;
@@ -716,6 +1087,14 @@
             newSec.style.zIndex = '';
             
             isAnimating = false;
+            if (tab === 'char' || tab === 'weap') {
+                // Only re-check overflow if row-1 animation is already done (e.g. revisiting a tab).
+                // If it's still animating, triggerSummaryAnimation's timeout handles expansion.
+                const type = tab;
+                if (!summaryRow1Animating[type]) {
+                    checkSummaryOverflow();
+                }
+            }
             newSec.querySelectorAll('.pull-list-container').forEach(checkExpandButtonVisibility);
         }, 400);
     }
@@ -724,25 +1103,216 @@
     // EXPAND/TOGGLE/FILTER LOGIC
     // ==============================================================================
     function checkExpandButtonVisibility(container) {
-        const btn = container.parentElement.querySelector('.banner-expand-area');
+        const bannerBox = container.parentElement;
+        const btn = bannerBox.querySelector('.banner-expand-area');
         if (!btn || container.offsetParent === null) return; 
 
-        const wasExpanded = container.parentElement.classList.contains('expanded');
-        if (wasExpanded) container.parentElement.classList.remove('expanded');
+        const wasExpanded = bannerBox.classList.contains('expanded');
+        const wasActive = btn.classList.contains('active');
+
+        // Temporarily reset to measure natural overflow
+        bannerBox.classList.remove('expanded');
+        const originalHeight = bannerBox.style.height;
+        bannerBox.style.height = '600px';
         
-        if (container.scrollHeight > (container.clientHeight + 2)) {
+        const wouldOverflow = container.scrollHeight > (container.clientHeight + 2);
+        
+        if (wouldOverflow) {
             btn.style.display = 'flex';
-            if (wasExpanded) container.parentElement.classList.add('expanded'); 
+            // Restore state if it was expanded
+            if (wasExpanded) {
+                bannerBox.classList.add('expanded');
+                bannerBox.style.height = originalHeight || 'auto';
+            } else {
+                bannerBox.style.height = '';
+            }
         } else {
-            btn.style.display = 'none'; btn.innerText = '▼ EXPAND ▼'; btn.classList.remove('active');
+            // No overflow possible, so collapse and hide button
+            btn.style.display = 'none';
+            btn.innerText = '▼ EXPAND ▼';
+            btn.classList.remove('active');
+            bannerBox.classList.remove('expanded');
+            bannerBox.style.height = '';
+        }
+    }
+
+    function applyAmbientTint(bannerId, imgElement) {
+        const banner = document.getElementById(bannerId);
+        if (!banner || !imgElement) return;
+
+        // Use a small delay to ensure the image is actually ready for canvas drawing
+        setTimeout(() => {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 10;
+                canvas.height = 10;
+                
+                // Draw the image to a tiny canvas to get average color
+                ctx.drawImage(imgElement, 0, 0, 10, 10);
+                const data = ctx.getImageData(0, 0, 10, 10).data;
+                
+                let r = 0, g = 0, b = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    r += data[i];
+                    g += data[i+1];
+                    b += data[i+2];
+                }
+                const count = data.length / 4;
+                r = Math.floor(r / count);
+                g = Math.floor(g / count);
+                b = Math.floor(b / count);
+                
+                // Boost saturation and ensure minimum brightness for a more prominent effect
+                const avg = (r + g + b) / 3;
+                const satFactor = 2.2; // Increased saturation boost
+                r = Math.min(255, Math.max(0, Math.floor(avg + (r - avg) * satFactor)));
+                g = Math.min(255, Math.max(0, Math.floor(avg + (g - avg) * satFactor)));
+                b = Math.min(255, Math.max(0, Math.floor(avg + (b - avg) * satFactor)));
+                
+                // Ensure it's vibrant enough
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                if (brightness < 100) {
+                    const boost = 100 / (brightness || 1);
+                    r = Math.min(255, Math.floor(r * boost));
+                    g = Math.min(255, Math.floor(g * boost));
+                    b = Math.min(255, Math.floor(b * boost));
+                }
+
+                banner.style.setProperty('--banner-tint', `rgb(${r}, ${g}, ${b})`);
+                banner.classList.add('has-tint');
+            } catch (e) {
+                // If CORS fails, we can't extract color, but we'll set a default subtle glow
+                banner.style.setProperty('--banner-tint', 'rgba(255, 255, 255, 0.1)');
+                banner.classList.add('has-tint');
+                console.warn("Ambient mode color extraction failed (likely CORS). Using fallback.");
+            }
+        }, 100);
+    }
+
+    let summaryExpandedState = {};
+
+    function toggleSummaryExpand(element) {
+        if (element.classList.contains('no-expand')) return;
+        const isExpanding = !element.classList.contains('expanded');
+        const id = element.id;
+        summaryExpandedState[id] = isExpanding;
+
+        // Determine which type this container belongs to
+        const type = id.includes('char') ? 'char' : 'weap';
+
+        if (isExpanding) {
+            element.classList.add('manual-expand');
+            element.classList.add('expanding');
+            element.style.overflowY = 'hidden';
+            const startHeight = element.offsetHeight;
+            element.style.transition = 'none';
+            element.style.maxHeight = 'none';
+            element.classList.add('expanded');
+            const endHeight = element.offsetHeight;
+
+            element.style.maxHeight = startHeight + 'px';
+            void element.offsetHeight;
+
+            element.style.transition = 'max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+            element.style.maxHeight = endHeight + 'px';
+
+            setTimeout(() => {
+                if (element.classList.contains('expanded')) {
+                    element.style.maxHeight = 'none';
+                    element.classList.remove('expanding');
+                    element.style.overflowY = '';
+                }
+            }, 400);
+
+            // Reveal overflow items — but only if row-1 animation is done.
+            if (summaryRow1Animating[type]) {
+                // Row-1 is still playing; queue the reveal for when it finishes.
+                summaryPendingExpand[type] = true;
+            } else {
+                revealOverflowItems(element);
+            }
+        } else {
+            element.classList.add('collapsing');
+            element.classList.remove('manual-expand');
+            element.style.overflowY = 'hidden';
+
+            // Cancel any pending expand that was queued during row-1 animation
+            summaryPendingExpand[type] = false;
+
+            // Reset overflow items back to hidden so they animate in again on next expand
+            element.querySelectorAll('.summary-item.overflow-item').forEach(item => {
+                item.classList.remove('reveal-overflow');
+            });
+
+            setTimeout(() => {
+                const startHeight = element.offsetHeight;
+                element.style.maxHeight = startHeight + 'px';
+                void element.offsetHeight;
+
+                element.style.transition = 'max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+                element.style.maxHeight = element.matches(':hover') ? '160px' : '140px';
+
+                setTimeout(() => {
+                    if (!element.classList.contains('expanded')) {
+                        element.classList.remove('expanded');
+                        element.style.maxHeight = '';
+                        element.classList.remove('collapsing');
+                        element.style.overflowY = '';
+                    }
+                }, 400);
+                element.classList.remove('expanded');
+            }, 250);
         }
     }
 
     function toggleExpand(bannerId, btnElement) {
         const bannerBox = document.getElementById(bannerId);
-        bannerBox.classList.toggle('expanded');
-        btnElement.innerText = bannerBox.classList.contains('expanded') ? '▲ COLLAPSE ▲' : '▼ EXPAND ▼';
-        btnElement.classList.toggle('active', bannerBox.classList.contains('expanded'));
+        const isExpanding = !bannerBox.classList.contains('expanded');
+        
+        btnElement.innerText = isExpanding ? '▲ COLLAPSE ▲' : '▼ EXPAND ▼';
+        btnElement.classList.toggle('active', isExpanding);
+
+        if (isExpanding) {
+            const startHeight = bannerBox.offsetHeight;
+            
+            // Temporarily disable transition to measure target height
+            bannerBox.style.transition = 'none';
+            bannerBox.style.height = 'auto';
+            bannerBox.classList.add('expanded');
+            const endHeight = bannerBox.offsetHeight;
+            
+            // Reset to start height
+            bannerBox.style.height = startHeight + 'px';
+            
+            // Force a reflow to ensure the transition triggers
+            void bannerBox.offsetHeight;
+            
+            // Restore transition and set target height
+            bannerBox.style.transition = '';
+            bannerBox.style.height = endHeight + 'px';
+            
+            setTimeout(() => {
+                if (btnElement.classList.contains('active')) {
+                    bannerBox.style.height = 'auto';
+                }
+            }, 400);
+        } else {
+            const startHeight = bannerBox.offsetHeight;
+            bannerBox.style.height = startHeight + 'px';
+            
+            // Force a reflow
+            void bannerBox.offsetHeight;
+            
+            bannerBox.style.height = '600px';
+            
+            setTimeout(() => {
+                if (!btnElement.classList.contains('active')) {
+                    bannerBox.classList.remove('expanded');
+                    bannerBox.style.height = '';
+                }
+            }, 400);
+        }
     }
 
     function toggleLuckDrawer(element) {
@@ -797,7 +1367,7 @@
 
     function toggleTimestamps() {
         const isEnabled = document.body.classList.toggle('show-timestamps');
-        localStorage.setItem('efShowTimestamps', isEnabled);
+        updateEfConfig('showTimestamps', isEnabled);
         const btn = document.getElementById('toggleTimeBtn');
         if (btn) { btn.classList.toggle('active', isEnabled); btn.innerText = isEnabled ? 'ON' : 'OFF'; }
         setTimeout(() => document.querySelectorAll('.pull-list-container').forEach(checkExpandButtonVisibility), 320);
@@ -807,21 +1377,278 @@
         document.documentElement.style.setProperty('--banner-blur', `${val}px`);
         const valEl = document.getElementById('blurVal');
         if (valEl) valEl.innerText = `${val}px`;
-        localStorage.setItem('efBannerBlur', val);
+        updateEfConfig('bannerBlur', val);
     }
 
     function updateBannerPos(val) {
         document.documentElement.style.setProperty('--banner-pos-y', `${val}%`);
         const valEl = document.getElementById('posVal');
         if (valEl) valEl.innerText = `${val}%`;
-        localStorage.setItem('efBannerPos', val);
+        updateEfConfig('bannerPos', val);
+    }
+
+    function toggleSummaryDefault() {
+        const config = getEfConfig();
+        const newVal = !config.summaryExpandedByDefault;
+        updateEfConfig('summaryExpandedByDefault', newVal);
+        const btn = document.getElementById('toggleSummaryExpandBtn');
+        if (btn) {
+            btn.innerText = newVal ? 'ON' : 'OFF';
+            btn.classList.toggle('active', newVal);
+        }
+
+        // No need to re-render — just expand or collapse the existing containers directly.
+        const containers = [
+            document.getElementById('summary-char-container'),
+            document.getElementById('summary-weap-container')
+        ];
+        const maxHeightVal = ((getEfConfig().summaryMaxRows || 3) * 140) + 'px';
+
+        containers.forEach(container => {
+            if (!container || container.classList.contains('no-expand')) return;
+            const type = container.id.includes('char') ? 'char' : 'weap';
+
+            if (newVal) {
+                // Turning ON: expand and reveal overflow items (no animation — this is a settings toggle)
+                summaryExpandedState[container.id] = true;
+                container.classList.add('expanded');
+                container.style.maxHeight = 'none';
+                // Ensure overflow items are visible without animation
+                container.querySelectorAll('.summary-item.overflow-item').forEach(item => {
+                    item.classList.remove('reveal-overflow');
+                    item.style.opacity = '1';
+                    item.style.animation = 'none';
+                });
+            } else {
+                // Turning OFF: collapse and hide overflow items instantly
+                summaryExpandedState[container.id] = false;
+                summaryPendingExpand[type] = false;
+                container.classList.remove('expanded');
+                container.style.maxHeight = '';
+                container.style.transition = '';
+                container.querySelectorAll('.summary-item.overflow-item').forEach(item => {
+                    item.classList.remove('reveal-overflow');
+                    item.style.opacity = '';
+                    item.style.animation = '';
+                });
+            }
+        });
+    }
+
+    function updateSummaryRows(val) {
+        updateEfConfig('summaryMaxRows', parseInt(val));
+        document.getElementById('summaryRowsVal').innerText = val;
+        renderSummary();
+    }
+
+    function updateBannerLimit(val) {
+        const limit = parseInt(val);
+        updateEfConfig('summaryBannerLimit', limit);
+        document.getElementById('bannerLimitVal').innerText = limit >= 50 ? 'ALL' : limit;
+        if (lastLoadedData) processAndLoadData(lastLoadedData);
+    }
+
+    // ==============================================================================
+    // USER CUSTOMIZATION (MANUAL NAME & IMAGES)
+    // ==============================================================================
+    function saveManualUsername(name) {
+        updateEfConfig('manualUser', name);
+    }
+
+    function handleImageUpload(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        if (file.size > 1.5 * 1024 * 1024) {
+            alert("Image is too large. Please select an image smaller than 1.5MB.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            if (type === 'avatar') {
+                updateEfConfig('customAvatar', base64);
+                document.getElementById('display-avatar').src = base64;
+            } else if (type === 'banner') {
+                updateEfConfig('customBanner', base64);
+                document.querySelector('.hero-banner').style.backgroundImage = `url('${base64}')`;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function resetImages() {
+        const config = getEfConfig();
+        delete config.customAvatar;
+        delete config.customBanner;
+        localStorage.setItem('efConfig', JSON.stringify(config));
+        location.reload();
+    }
+
+    function loadCustomImages() {
+        const config = getEfConfig();
+        if (config.customAvatar) document.getElementById('display-avatar').src = config.customAvatar;
+        if (config.customBanner) document.querySelector('.hero-banner').style.backgroundImage = `url('${config.customBanner}')`;
+    }
+
+    // ==============================================================================
+    // DATA EXPORT LOGIC
+    // ==============================================================================
+    function populateExportList() {
+        const list = document.getElementById('exportList');
+        if (!list) return;
+        list.innerHTML = '';
+
+        const items = [];
+        if (localStorage.getItem('efTrackerData')) items.push({ id: 'data', label: 'PULL HISTORY DATA' });
+        
+        const config = getEfConfig();
+        if (Object.keys(config).length > 0) {
+            // Split config into settings and images for selective export
+            const settingsKeys = ['showTimestamps', 'bannerBlur', 'bannerPos', 'manualUser', 'trackerUser'];
+            if (settingsKeys.some(k => k in config)) items.push({ id: 'settings', label: 'APP SETTINGS (BLUR, POS, NAME, ETC)' });
+            if (config.customAvatar) items.push({ id: 'avatar', label: 'PROFILE AVATAR IMAGE' });
+            if (config.customBanner) items.push({ id: 'banner', label: 'HERO BANNER IMAGE' });
+        }
+
+        if (items.length === 0) {
+            list.innerHTML = '<div style="color: var(--text-dim); font-size: 11px;">NO TRACKER DATA FOUND IN STORAGE.</div>';
+            return;
+        }
+
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '10px';
+            div.style.padding = '4px 0';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `export-${item.id}`;
+            checkbox.checked = true;
+            checkbox.style.accentColor = 'var(--accent-blue)';
+            
+            const label = document.createElement('label');
+            label.htmlFor = `export-${item.id}`;
+            label.innerText = item.label;
+            label.style.fontSize = '12px';
+            label.style.cursor = 'pointer';
+            
+            div.appendChild(checkbox);
+            div.appendChild(label);
+            list.appendChild(div);
+        });
+    }
+
+    async function exportSelectedData() {
+        const config = getEfConfig();
+        const zip = new JSZip();
+        let filesToDownload = [];
+        
+        // 1. Prepare Pull History Data
+        if (document.getElementById('export-data')?.checked) {
+            const data = localStorage.getItem('efTrackerData');
+            if (data) {
+                try {
+                    const parsedData = JSON.parse(data);
+                    // Reorganize to match user's requested format: weapons first, then characters at root
+                    const cleanData = {
+                        weapons: parsedData.weapons || [],
+                        characters: parsedData.characters || []
+                    };
+                    filesToDownload.push({
+                        name: 'pull_history.json',
+                        content: JSON.stringify(cleanData, null, 4), // Use 4 spaces for exact match to user's sample
+                        type: 'text'
+                    });
+                } catch (e) { console.error("Export parse error:", e); }
+            }
+        }
+
+        // 2. Prepare App Settings
+        if (document.getElementById('export-settings')?.checked) {
+            const settings = {};
+            ['showTimestamps', 'bannerBlur', 'bannerPos', 'manualUser', 'trackerUser'].forEach(k => {
+                if (k in config) settings[k] = config[k];
+            });
+            filesToDownload.push({
+                name: 'app_settings.json',
+                content: JSON.stringify({ efConfig: settings }, null, 4),
+                type: 'text'
+            });
+        }
+
+        // 3. Prepare Images
+        const addImage = (base64, filename) => {
+            const match = base64.match(/^data:(image\/\w+);base64,/);
+            if (!match) return;
+            const extension = match[1].split('/')[1];
+            filesToDownload.push({
+                name: `${filename}.${extension}`,
+                content: base64.split(',')[1],
+                type: 'base64'
+            });
+        };
+
+        if (document.getElementById('export-avatar')?.checked && config.customAvatar) {
+            addImage(config.customAvatar, 'avatar');
+        }
+
+        if (document.getElementById('export-banner')?.checked && config.customBanner) {
+            addImage(config.customBanner, 'banner');
+        }
+
+        if (filesToDownload.length === 0) {
+            alert("No data selected for export.");
+            return;
+        }
+
+        // 4. Execute Download
+        if (filesToDownload.length === 1 && filesToDownload[0].type === 'text') {
+            // If only one text file (like pull history), download directly as JSON
+            const blob = new Blob([filesToDownload[0].content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filesToDownload[0].name === 'pull_history.json' ? 
+                `endfield_pulls_${new Date().toISOString().split('T')[0]}.json` : filesToDownload[0].name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } else {
+            // Multiple files or images: Bundle into ZIP
+            filesToDownload.forEach(f => {
+                if (f.type === 'base64') zip.file(f.name, f.content, { base64: true });
+                else zip.file(f.name, f.content);
+            });
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ef_tracker_backup_${new Date().toISOString().split('T')[0]}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     }
 
     // ==============================================================================
     // DATA PROCESSING & RENDERING
     // ==============================================================================
     function processAndLoadData(data, username) {
-        if (username) document.getElementById('display-username').innerText = username;
+        lastLoadedData = data;
+        if (username) {
+            document.getElementById('display-username').innerText = username;
+            updateEfConfig('trackerUser', username);
+        } else {
+            const config = getEfConfig();
+            if (config.manualUser) document.getElementById('display-username').innerText = config.manualUser;
+        }
         
         summaryChars = []; summaryWeaps = []; uniqueChars.clear(); uniqueWeaps.clear();
         advStats = { char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 }, weap: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 } };
@@ -832,15 +1659,23 @@
         document.getElementById('uniqueCharCount').innerText = uniqueChars.size + 1;
         document.getElementById('uniqueWeapCount').innerText = uniqueWeaps.size + 5;
         
+        const overviewStats = document.getElementById('overviewStats');
+        overviewStats.style.display = 'flex';
+        
+        if (!hasAnimatedStats) {
+            overviewStats.classList.add('initial-animate');
+            hasAnimatedStats = true;
+            setTimeout(() => {
+                overviewStats.classList.remove('initial-animate');
+            }, 3000);
+        }
+        
         renderSummary(); renderOverviews();
         
-        document.getElementById('overviewStats').style.display = 'flex';
-        document.getElementById('top-operators-container').style.display = 'flex';
-
         isDataLoaded = true;
         
         // Show hidden tabs
-        ['char', 'weap', 'summary'].forEach(t => {
+        ['char', 'weap'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.style.display = 'flex';
         });
@@ -857,6 +1692,9 @@
         const pullsCopy = [...pullData].reverse().sort((a, b) => (parseInt(a.gachaTs || a.ts || a.seqId || a.timestamp || 0) || 0) - (parseInt(b.gachaTs || b.ts || b.seqId || b.timestamp || 0) || 0));
         
         let categoryStats = {}, bannerBoxes = {}, bannerTimeline = [];
+
+        if (prefix === 'char') charBannerTimeline = bannerTimeline;
+        else weapBannerTimeline = bannerTimeline;
 
         pullsCopy.forEach(pull => {
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
@@ -887,7 +1725,7 @@
 
             if (isFree) {
                 bannerBoxes[bannerName].allPulls.push({ name: itemName, enName, itemId, pityAtPull: "FREE", rarity, pullNum: "FREE", isNew: isNewItem, timestamp: pull.gachaTs || pull.ts || pull.timestamp });
-                if (rarity === "6" || (rarity === "5" && prefix === 'weap')) (prefix === 'char' ? summaryChars : summaryWeaps).push({ id: itemId, name: itemName, enName, rarity, pity: rarity === "6" ? "FREE" : undefined });
+                if (rarity === "6") (prefix === 'char' ? summaryChars : summaryWeaps).push({ id: itemId, name: itemName, enName, rarity, pity: "FREE", bannerName });
             } else {
                 bannerBoxes[bannerName].totalPulls++; categoryStats[category].totalPulls++; advStats[prefix].pulls++; 
                 if (rarity === "5") advStats[prefix].s5++;
@@ -936,6 +1774,8 @@
                         bannerBoxes[bannerName].allPulls.push({ name: itemName, enName, itemId, pityAtPull: displayPity, isRateUpItem: wonRateUp, rarity: "6", pullNum: currentPullNum, isNew: isNewItem, pullProb: pullProbability, rateUpCopyNum, graphHTML: generatedGraphHTML, timestamp: pull.gachaTs || pull.ts || pull.timestamp });
                         pushedToAllPulls = true;
 
+                        let weaponBlocksTaken = prefix === 'weap' ? Math.ceil(bannerBoxes[bannerName].currentWeaponPity / 10) || 1 : null;
+
                         if (prefix === 'weap') {
                             bannerBoxes[bannerName].currentWeaponPity = 0; 
                             if (wonRateUp && !bannerBoxes[bannerName].hasPulledRateUp) { bannerBoxes[bannerName].hasPulledRateUp = true; bannerBoxes[bannerName].rateUpBlock = displayPity; }
@@ -944,11 +1784,10 @@
                             if (category !== "New Horizons") categoryStats[category].currentPity = 0; 
                         }
 
-                        (prefix === 'char' ? summaryChars : summaryWeaps).push({ id: itemId, name: itemName, enName, rarity: "6", pity: prefix === 'char' ? displayPity : undefined });
+                        (prefix === 'char' ? summaryChars : summaryWeaps).push({ id: itemId, name: itemName, enName, rarity: "6", pity: prefix === 'char' ? displayPity : weaponBlocksTaken, bannerName });
                     } else if (rarity === "5" && prefix === 'weap') {
                         bannerBoxes[bannerName].allPulls.push({ name: itemName, enName, itemId, pityAtPull: Math.ceil(currentPullNum / 10) || 1, rarity: "5", pullNum: currentPullNum, isNew: isNewItem, timestamp: pull.gachaTs || pull.ts || pull.timestamp });
                         pushedToAllPulls = true;
-                        summaryWeaps.push({ id: itemId, name: itemName, enName, rarity: "5" });
                     }
                 }
                 
@@ -964,7 +1803,7 @@
                     let tokens = Math.floor(box.endTokenPulls / 240), poolInfo = BANNER_DB[box.poolId];
                     if (poolInfo && poolInfo.rateUpIds.length) {
                         let ruId = poolInfo.rateUpIds[0], fallback = parseIdToName(ruId), locName = uniqueChars.get(ruId) || fallback;
-                        for(let i = 0; i < tokens; i++) summaryChars.push({ id: ruId, name: locName, enName: fallback, pity: "TOKEN" });
+                        for(let i = 0; i < tokens; i++) summaryChars.push({ id: ruId, name: locName, enName: fallback, pity: "TOKEN", bannerName });
                     }
                 }
             });
@@ -1013,11 +1852,11 @@
 
             let lastBlock = -1;
             let pullsHTML = data.allPulls.slice().reverse().map(pull => {
-                let timeStr = formatTimestamp(pull.timestamp), rateUpTag = "", newTag = pull.isNew ? `<span class="pity-count pity-green" style="font-size: 9px; padding: 1px 4px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 2px;">NEW</span>` : "";
+                let timeStr = formatTimestamp(pull.timestamp), rateUpTag = "", newTag = pull.isNew ? `<span class="pity-count pity-green" style="font-size: 9px; padding: 1px 4px; background: rgba(76, 175, 80, 0.1); border: none; border-radius: 2px;">NEW</span>` : "";
                 let luckHTML = "", blockHeader = "", badgeHTML = "", clickAction = "";
 
                 if (pull.rarity === "6" && pull.isRateUpItem) {
-                    rateUpTag = `<span class="pity-count pity-yellow" style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 2px;">RATE-UP</span>`;
+                    rateUpTag = `<span class="pity-count pity-yellow" style="font-size: 9px; padding: 1px 4px; background: rgba(255, 152, 0, 0.1); border: none; border-radius: 2px;">RATE-UP</span>`;
                     if (pull.pullProb !== undefined) {
                         let msg = prefix === 'weap' ? `chance to pull ${pull.rateUpCopyNum > 1 ? pull.rateUpCopyNum + ' copies' : '1 copy'} of the Rate-Up within ${Math.ceil(pull.pullNum / 10)} blocks.` : `chance to pull ${pull.rateUpCopyNum > 1 ? pull.rateUpCopyNum + ' copies' : '1 copy'} of the Rate-Up within ${pull.pullNum} pulls.<br><span style="font-size: 9px; color: #666;">${data.startingPityForMath > 0 ? `(Started with ${data.startingPityForMath} pity)` : ''}</span>`;
                         luckHTML = `<div class="luck-content"><div class="luck-text">You had a <span style="color: #fff; font-weight: bold;">${pull.pullProb.toFixed(2)}%</span> ${msg}</div>${pull.graphHTML || ''}</div>`;
@@ -1044,11 +1883,12 @@
                 ruBtn = `<button class="filter-btn" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
             }
 
-            htmlBuilder += `<div class="banner-box" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}<img src="${bUrl}" class="banner-img" onerror="this.style.display='none';">${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
+            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="if(this.hasAttribute('crossorigin')) { this.removeAttribute('crossorigin'); this.src=this.src; } else { this.style.display='none'; }">${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;
         sortedTimeline.forEach((_, i) => { let l = document.getElementById(`list-banner-${prefix}-${i}`); if (l) updateBlockHeaders(l); });
+        initScrollReveal();
     }
 
     function renderOverviews() {
@@ -1066,51 +1906,339 @@
             }
             document.getElementById(`${type}OverviewDashboard`).innerHTML = html;
         });
+        initScrollReveal();
+    }
+
+    function checkSummaryOverflow() {
+        const charContainer = document.getElementById('summary-char-container');
+        const weapContainer = document.getElementById('summary-weap-container');
+        if (!charContainer || !weapContainer) return;
+
+        const config = getEfConfig();
+        const maxRows = config.summaryMaxRows || 3;
+        const expandedByDefault = config.summaryExpandedByDefault || false;
+        const maxHeightVal = (maxRows * 140) + 'px';
+
+        [charContainer, weapContainer].forEach(container => {
+            if (container.offsetParent === null) return;
+
+            const type = container.id.includes('char') ? 'char' : 'weap';
+            const items = container.querySelectorAll('.summary-item');
+            if (items.length <= 1) {
+                container.classList.add('no-expand');
+                container.classList.remove('expanded');
+                container.style.maxHeight = '';
+                summaryExpandedState[container.id] = false;
+                return;
+            }
+
+            const firstTop = items[0].offsetTop;
+            const lastTop = items[items.length - 1].offsetTop;
+            const isOverflowing = Math.abs(lastTop - firstTop) > 10;
+
+            items.forEach(item => {
+                if (Math.abs(item.offsetTop - firstTop) > 10) {
+                    item.classList.add('overflow-item');
+                } else {
+                    item.classList.remove('overflow-item');
+                }
+            });
+
+            if (!isOverflowing) {
+                container.classList.add('no-expand');
+                container.classList.remove('expanded');
+                container.style.maxHeight = '';
+                summaryExpandedState[container.id] = false;
+            } else {
+                container.classList.remove('no-expand');
+
+                if (expandedByDefault && !summaryExpandedState.hasOwnProperty(container.id)) {
+                    summaryExpandedState[container.id] = true;
+                }
+
+                if (summaryExpandedState[container.id]) {
+                    if (summaryRow1Animating[type]) {
+                        // Row-1 is still playing. Keep the container collapsed so overflow
+                        // items stay hidden. triggerSummaryAnimation's timeout will open
+                        // it and reveal the items once row-1 is done.
+                    } else {
+                        container.classList.add('expanded');
+                        container.style.maxHeight = maxHeightVal;
+                        revealOverflowItems(container);
+                    }
+                }
+            }
+        });
+    }
+
+    let animatedSummaries = new Set();
+    let hasAnimatedStats = false;
+    let animatedDashboards = new Set();
+
+    // Tracks whether row-1 animation is still running for each summary type.
+    // While true, overflow items must not be revealed yet.
+    let summaryRow1Animating = { char: false, weap: false };
+    // If the user tries to expand while row-1 is still animating, we queue it here.
+    let summaryPendingExpand = { char: false, weap: false };
+
+    // Called by toggleSummaryExpand / checkSummaryOverflow to reveal overflow items
+    // with the correct animation after row-1 has finished.
+    function revealOverflowItems(container) {
+        const items = container.querySelectorAll('.summary-item.overflow-item');
+        items.forEach(item => {
+            // Force a reflow so the animation re-triggers even if class was already present
+            item.classList.remove('reveal-overflow');
+            void item.offsetWidth;
+            item.classList.add('reveal-overflow');
+        });
+    }
+
+    function triggerSummaryAnimation(type) {
+        if (animatedSummaries.has(type)) return;
+
+        const containerId = type === 'char' ? 'summary-char-container' : 'summary-weap-container';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const config = getEfConfig();
+        const expandedByDefault = config.summaryExpandedByDefault || false;
+
+        animatedSummaries.add(type);
+        summaryRow1Animating[type] = true;
+        summaryPendingExpand[type] = false;
+
+        // When expand-by-default is on, pre-expand the container to its full height
+        // BEFORE adding initial-animate, so the yellow stripe paints all the way down
+        // in one seamless motion rather than stopping at row-1 then jumping open.
+        if (expandedByDefault) {
+            // Ensure the state is marked — checkSummaryOverflow is blocked during row-1
+            // so we must set it here ourselves.
+            if (!summaryExpandedState.hasOwnProperty(container.id)) {
+                summaryExpandedState[container.id] = true;
+            }
+            if (summaryExpandedState[container.id]) {
+                container.style.transition = 'none';
+                container.style.maxHeight = 'none';
+                container.classList.add('expanded');
+                const fullHeight = container.offsetHeight;
+                // Lock to pixel value so the stripe has a stable target to grow into
+                container.style.maxHeight = fullHeight + 'px';
+                void container.offsetHeight;
+            }
+        }
+
+        container.classList.add('initial-animate');
+
+        // Row-1 items animate in at delay 1.4s + 0.5s duration = done by ~1.9s
+        // We add a small buffer and then handle row-2+.
+        const ROW1_DONE_MS = 1950; // 1.4s delay + 0.5s duration + ~50ms buffer
+
+        setTimeout(() => {
+            summaryRow1Animating[type] = false;
+            container.classList.remove('initial-animate');
+
+            // Release the pixel-height lock set during pre-expansion, then reveal overflow items.
+            if (expandedByDefault && container.classList.contains('expanded')) {
+                container.style.maxHeight = 'none';
+                container.style.transition = '';
+                revealOverflowItems(container);
+            }
+
+            // If the user clicked expand while row-1 was still running, honour it now.
+            if (summaryPendingExpand[type]) {
+                summaryPendingExpand[type] = false;
+                revealOverflowItems(container);
+            }
+        }, ROW1_DONE_MS);
     }
 
     function renderSummary() {
-        let processItems = (items, prefix, isWeap) => items.map(i => {
-            let color = isWeap ? "" : (i.pity === "FREE" ? "color: var(--color-green);" : (i.pity === "TOKEN" ? "color: var(--accent-blue);" : (i.pity < 40 ? "color: var(--color-green);" : (i.pity <= 65 ? "color: var(--color-yellow);" : "color: var(--color-red);"))));
-            return `<div class="summary-item" title="${i.name}"><img src="${getItemIconUrl(prefix, i.id, i.enName)}" class="summary-icon ${isWeap && i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" onerror="this.onerror=null; this.style.display='none';">${isWeap ? '' : `<div class="summary-pity" style="${color}">${i.pity}</div>`}</div>`;
-        }).join('');
+        const config = getEfConfig();
+        const bannerLimit = config.summaryBannerLimit || 999;
         
-        document.getElementById('summary-char-container').innerHTML = processItems(summaryChars, 'char', false);
-        document.getElementById('summary-weap-container').innerHTML = processItems(summaryWeaps, 'weap', true);
+        let processItems = (items, prefix, isWeap) => {
+            const timeline = isWeap ? weapBannerTimeline : charBannerTimeline;
+            const recentBanners = timeline.slice(-bannerLimit);
+            
+            return items
+                .filter(i => recentBanners.includes(i.bannerName))
+                .map(i => {
+                    let colorVal = (i.pity === "FREE" ? "var(--color-green)" : (i.pity === "TOKEN" ? "var(--accent-blue)" : (i.pity < (isWeap ? 4 : 40) ? "var(--color-green)" : (i.pity <= (isWeap ? 6 : 65) ? "var(--color-yellow)" : "var(--color-red)"))));
+                    let pityClass = 'summary-char-pity';
+                    let itemClass = 'summary-item summary-char-item';
+                    let pityDisplay = i.pity;
+                    return `<div class="${itemClass}" title="${i.name}"><img src="${getItemIconUrl(prefix, i.id, i.enName)}" class="summary-icon ${isWeap && i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" loading="lazy" onerror="this.onerror=null; this.style.display='none';"><div class="${pityClass}"><span class="luck-dot" style="background-color: ${colorVal};"></span>${pityDisplay}</div></div>`;
+                }).join('');
+        };
+        
+        const charContainer = document.getElementById('summary-char-container');
+        const weapContainer = document.getElementById('summary-weap-container');
+        
+        charContainer.innerHTML = `<div class="summary-label">OPERATORS</div>` + processItems([...summaryChars].reverse(), 'char', false);
+        weapContainer.innerHTML = `<div class="summary-label">ARSENALS</div>` + processItems([...summaryWeaps].reverse(), 'weap', true);
 
-        let cCounts = {}, idMap = {};
-        summaryChars.forEach(i => { cCounts[i.id] = (cCounts[i.id] || 0) + 1; idMap[i.id] = { name: i.name, enName: i.enName }; });
-        
-        document.getElementById('top-operators-container').innerHTML = Object.keys(cCounts).sort((a,b) => cCounts[b] - cCounts[a]).slice(0, 5).map(id => `<div class="top-op-icon-wrapper" title="${idMap[id].name} x${cCounts[id]}"><img src="${getItemIconUrl('char', id, idMap[id].enName)}" class="top-op-icon" onerror="this.onerror=null; this.style.display='none';">${cCounts[id] > 1 ? `<div class="top-op-count">x${cCounts[id]}</div>` : ''}</div>`).join('');
+        // Check for overflow to disable expansion if everything fits in one row
+        setTimeout(checkSummaryOverflow, 500);
     }
+
+    // Add resize listener for dynamic overflow detection
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(checkSummaryOverflow, 100);
+    });
 
     // ==============================================================================
     // INITIALIZATION & FILE HANDLING
     // ==============================================================================
-    function handleFileUpload(event) {
+    async function handleFileUpload(event) {
         const file = event.target.files[0]; if (!file) return;
         let fn = file.name.match(/endfield_pulls_|endfield pulls /) ? file.name.split(/endfield_pulls_|endfield pulls /)[1].replace('.json', '').replace(/_/g, ' ') : "";
         
-        const reader = new FileReader();
-        reader.onload = e => {
+        const processJson = (jsonText) => {
             try {
-                localStorage.setItem('efTrackerData', e.target.result);
-                if (fn) localStorage.setItem('efTrackerUser', fn);
-                processAndLoadData(JSON.parse(e.target.result), fn);
-            } catch (err) { console.error("Error loading file:", err); alert("Error reading file! Check the developer console for details."); }
+                const parsed = JSON.parse(jsonText);
+                let dataToProcess = null;
+                let configToProcess = null;
+
+                // 1. Check for "Clean" format (weapons/characters at root)
+                if (parsed.weapons || parsed.characters) {
+                    dataToProcess = {
+                        weapons: parsed.weapons || [],
+                        characters: parsed.characters || []
+                    };
+                    localStorage.setItem('efTrackerData', JSON.stringify(dataToProcess));
+                } 
+                
+                // 2. Check for "Wrapped" format (efTrackerData/efConfig)
+                if (parsed.efTrackerData || parsed.efConfig) {
+                    if (parsed.efTrackerData) {
+                        const trackerData = typeof parsed.efTrackerData === 'string' ? JSON.parse(parsed.efTrackerData) : parsed.efTrackerData;
+                        localStorage.setItem('efTrackerData', JSON.stringify(trackerData));
+                        dataToProcess = trackerData;
+                    }
+                    if (parsed.efConfig) configToProcess = parsed.efConfig;
+                }
+
+                // 3. Fallback for legacy flat array
+                if (!dataToProcess && Array.isArray(parsed)) {
+                    localStorage.setItem('efTrackerData', jsonText);
+                    dataToProcess = parsed;
+                }
+
+                if (configToProcess) {
+                    const currentConfig = getEfConfig();
+                    const mergedConfig = { ...currentConfig, ...configToProcess };
+                    localStorage.setItem('efConfig', JSON.stringify(mergedConfig));
+                }
+
+                if (fn) updateEfConfig('trackerUser', fn);
+                location.reload();
+            } catch (err) {
+                console.error("Error processing JSON:", err);
+                alert("Error reading file! Check the developer console for details.");
+            }
         };
-        reader.readAsText(file);
+
+        if (file.name.endsWith('.zip')) {
+            try {
+                const zip = await JSZip.loadAsync(file);
+                let combinedData = {};
+                
+                // Check for all possible JSON files in ZIP
+                const pullFile = zip.file('pull_history.json') || zip.file('backup_data.json');
+                const settingsFile = zip.file('app_settings.json') || zip.file('settings.json');
+
+                if (pullFile) {
+                    const text = await pullFile.async('string');
+                    const parsed = JSON.parse(text);
+                    // Merge based on structure
+                    if (parsed.weapons || parsed.characters) {
+                        combinedData.weapons = parsed.weapons;
+                        combinedData.characters = parsed.characters;
+                    } else if (parsed.efTrackerData) {
+                        combinedData.efTrackerData = parsed.efTrackerData;
+                    }
+                }
+
+                if (settingsFile) {
+                    const text = await settingsFile.async('string');
+                    const parsed = JSON.parse(text);
+                    combinedData.efConfig = parsed.efConfig || parsed;
+                }
+
+                // Images
+                const avatarFile = zip.file(/avatar\.(png|jpg|jpeg|webp|gif)$/i)[0];
+                const bannerFile = zip.file(/banner\.(png|jpg|jpeg|webp|gif)$/i)[0];
+                
+                if (avatarFile || bannerFile) combinedData.efConfig = combinedData.efConfig || {};
+                
+                if (avatarFile) {
+                    const base64 = await avatarFile.async('base64');
+                    const ext = avatarFile.name.split('.').pop();
+                    combinedData.efConfig.customAvatar = `data:image/${ext};base64,${base64}`;
+                }
+                if (bannerFile) {
+                    const base64 = await bannerFile.async('base64');
+                    const ext = bannerFile.name.split('.').pop();
+                    combinedData.efConfig.customBanner = `data:image/${ext};base64,${base64}`;
+                }
+                
+                if (Object.keys(combinedData).length > 0) {
+                    processJson(JSON.stringify(combinedData));
+                } else {
+                    alert("Invalid ZIP file: No recognizable tracker data found.");
+                }
+            } catch (err) {
+                console.error("Error loading ZIP:", err);
+                alert("Error reading ZIP file!");
+            }
+        } else {
+            const reader = new FileReader();
+            reader.onload = e => processJson(e.target.result);
+            reader.readAsText(file);
+        }
     }
 
     function clearSavedData() {
         if (confirm("Are you sure you want to clear your saved pull history from this browser?")) {
-            localStorage.removeItem('efTrackerData'); localStorage.removeItem('efTrackerUser'); location.reload(); 
+            localStorage.removeItem('efTrackerData'); 
+            const config = getEfConfig();
+            delete config.trackerUser;
+            localStorage.setItem('efConfig', JSON.stringify(config));
+            location.reload(); 
         }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Load custom banner if available
+        // Migrate old config keys
+        migrateOldConfig();
+        const config = getEfConfig();
+
+        // Initialize settings UI
+        const summaryExpandBtn = document.getElementById('toggleSummaryExpandBtn');
+        if (summaryExpandBtn) {
+            summaryExpandBtn.innerText = config.summaryExpandedByDefault ? 'ON' : 'OFF';
+            summaryExpandBtn.classList.toggle('active', config.summaryExpandedByDefault);
+        }
+        const summaryRowsSlider = document.getElementById('summaryRowsSlider');
+        if (summaryRowsSlider) {
+            summaryRowsSlider.value = config.summaryMaxRows;
+            document.getElementById('summaryRowsVal').innerText = config.summaryMaxRows;
+        }
+        const bannerLimitSlider = document.getElementById('bannerLimitSlider');
+        if (bannerLimitSlider) {
+            bannerLimitSlider.value = config.summaryBannerLimit >= 50 ? 50 : config.summaryBannerLimit;
+            document.getElementById('bannerLimitVal').innerText = config.summaryBannerLimit >= 50 ? 'ALL' : config.summaryBannerLimit;
+        }
+
+        // Load custom images and manual username
+        loadCustomImages();
+        if (config.manualUser) document.getElementById('display-username').innerText = config.manualUser;
+
+        // Load default banner if no custom banner is available
         const bannerEl = document.querySelector('.hero-banner');
-        if (bannerEl) {
+        if (bannerEl && !config.customBanner) {
             const extensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
             let currentIndex = 0;
 
@@ -1118,7 +2246,10 @@
                 if (currentIndex >= extensions.length) return;
                 const img = new Image();
                 img.onload = () => {
-                    bannerEl.style.backgroundImage = `url('banner.${extensions[currentIndex]}')`;
+                    // Re-check if a custom banner was added in the meantime (unlikely but safe)
+                    if (!getEfConfig().customBanner) {
+                        bannerEl.style.backgroundImage = `url('banner.${extensions[currentIndex]}')`;
+                    }
                 };
                 img.onerror = () => {
                     currentIndex++;
@@ -1131,11 +2262,15 @@
 
         // Initialize tab slider position
         updateTabSlider(currentTab);
+        
+        // Populate export list
+        populateExportList();
 
         // Add parallax hover anticipation for tabs
         const tabsContainer = document.getElementById('mainTabs');
         if (tabsContainer) {
             tabsContainer.addEventListener('mousemove', (e) => {
+                if (isAnimating) return;
                 const slider = document.getElementById('tabSlider');
                 const activeBtn = document.getElementById(`tab-${currentTab}`);
                 if (slider && activeBtn) {
@@ -1154,6 +2289,7 @@
             });
             
             tabsContainer.addEventListener('mouseleave', () => {
+                if (isAnimating) return;
                 const slider = document.getElementById('tabSlider');
                 if (slider && currentSliderTransform) {
                     slider.style.transform = currentSliderTransform;
@@ -1161,21 +2297,21 @@
             });
         }
 
-        if (localStorage.getItem('efShowTimestamps') === 'true') {
+        if (config.showTimestamps === true) {
             document.body.classList.add('show-timestamps');
             const btn = document.getElementById('toggleTimeBtn');
             if (btn) { btn.classList.add('active'); btn.innerText = 'ON'; }
         }
 
-        const savedBlur = localStorage.getItem('efBannerBlur');
-        if (savedBlur !== null) {
+        const savedBlur = config.bannerBlur;
+        if (savedBlur !== undefined && savedBlur !== null) {
             updateBannerBlur(savedBlur);
             const slider = document.getElementById('blurSlider');
             if (slider) slider.value = savedBlur;
         }
 
-        const savedPos = localStorage.getItem('efBannerPos');
-        if (savedPos !== null) {
+        const savedPos = config.bannerPos;
+        if (savedPos !== undefined && savedPos !== null) {
             updateBannerPos(savedPos);
             const slider = document.getElementById('posSlider');
             if (slider) slider.value = savedPos;
@@ -1183,11 +2319,22 @@
 
         const savedData = localStorage.getItem('efTrackerData');
         if (savedData) {
-            try { processAndLoadData(JSON.parse(savedData), localStorage.getItem('efTrackerUser')); } 
+            try { 
+                const data = JSON.parse(savedData);
+                processAndLoadData(data, config.trackerUser); 
+            } 
             catch (err) { console.error("Cache corrupt:", err); localStorage.removeItem('efTrackerData'); }
         } else {
             // No data, show settings by default
-            document.getElementById('settings-section').style.display = 'block';
+            const settingsSec = document.getElementById('settings-section');
+            settingsSec.style.display = 'block';
+            settingsSec.classList.add('first-visit');
+            visitedTabs.add('settings');
+            
+            setTimeout(() => {
+                settingsSec.classList.remove('first-visit');
+            }, 1500);
+            
             updateTabButtonStyles('settings');
             updateTabSlider('settings');
         }
