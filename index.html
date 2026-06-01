@@ -765,6 +765,7 @@
         "special_1_1_1": { rateUpIds: ["chr_0027_tangtang"], displayEn: "River's Daughter" },
         "special_1_1_2": { rateUpIds: ["chr_0028_wulfa"], displayEn: "Wolf Pearl" },
         "special_1_2_1": { rateUpIds: ["chr_0030_zhuangfy"], displayEn: "Thunder of Renewal" },
+        "joint_1_0_1": { rateUpIds: ["chr_0016_laevat", "chr_0017_yvonne", "chr_0013_aglina", "chr_0027_tangtang"], displayEn: "Joint Operation 1" },
         "weponbox_1_0_1": { rateUpIds: ["wpn_sword_0006"], displayEn: "Smelting Forge Issue" },
         "weponbox_1_0_2": { rateUpIds: ["wpn_pistol_0010"], displayEn: "Graffiti Issue" },
         "weponbox_1_0_3": { rateUpIds: ["wpn_funnel_0011"], displayEn: "Express Delivery Issue" },
@@ -838,7 +839,7 @@
     let charBannerTimeline = [], weapBannerTimeline = [];
     let uniqueChars = new Map(), uniqueWeaps = new Map();
     let lastLoadedData = null;
-    let pmf_char_any = [], pmf_weap_any = [];
+    let pmf_char_any = [], pmf_weap_any = [], pmf_joint_any = [];
     let advStats = {
         char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 },
         weap: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 }
@@ -895,6 +896,7 @@
 
     pmf_char_any = buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, null, 0);
     pmf_weap_any = buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, null, 0); 
+    pmf_joint_any = buildPMF(MAX_PULLS, 80, 65, 0.008, 1.0, null, 0);
 
     // ==============================================================================
     // STRING & HTML GENERATION UTILS
@@ -1750,10 +1752,23 @@
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
             let poolId = pull.poolId || poolTypeRaw;
             let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
+            let isJoint = false;
             let category = "Chartered Headhunting";
 
-            if (prefix === 'char') category = (poolTypeRaw.includes("basic") || poolTypeRaw.includes("standard") || poolId === "standard") ? "Basic Headhunting" : (poolTypeRaw.includes("new") || poolTypeRaw.includes("horizon") || poolTypeRaw.includes("beginner") || poolId === "beginner") ? "New Horizons" : "Chartered Headhunting";
-            else category = (poolTypeRaw.includes("constant") || bannerName.toLowerCase().includes("constant") || poolTypeRaw.includes("standard") || poolId === "standard") ? "Constant Issue" : bannerName;
+            if (prefix === 'char') {
+                if (poolTypeRaw.includes("joint") || poolId === "joint" || bannerName.toLowerCase().includes("joint")) {
+                    isJoint = true;
+                    category = "Joint Headhunting: " + bannerName;
+                } else if (poolTypeRaw.includes("basic") || poolTypeRaw.includes("standard") || poolId === "standard") {
+                    category = "Basic Headhunting";
+                } else if (poolTypeRaw.includes("new") || poolTypeRaw.includes("horizon") || poolTypeRaw.includes("beginner") || poolId === "beginner") {
+                    category = "New Horizons";
+                } else {
+                    category = "Chartered Headhunting";
+                }
+            } else {
+                category = (poolTypeRaw.includes("constant") || bannerName.toLowerCase().includes("constant") || poolTypeRaw.includes("standard") || poolId === "standard") ? "Constant Issue" : bannerName;
+            }
 
             if (!categoryStats[category]) categoryStats[category] = { currentPity: 0, rateUpPity: 0, totalPulls: 0, lastBannerName: "", firstSixStarPity: null, hasPulledRateUp: false, tokenPulls: 0 };
             if (!bannerBoxes[bannerName]) {
@@ -1761,7 +1776,7 @@
                 bannerBoxes[bannerName] = { poolId, category, isConstant: category === "Constant Issue", totalPulls: 0, currentWeaponPity: 0, allPulls: [], hasPulledRateUp: false, rateUpBlock: null, hasPulledSixStar: false, firstSixStarBlock: null, endPity: 0, endRateUpPity: 0, endTokenPulls: 0, endHasPulledRateUp: false, rateUpCount: 0, startingPityForMath: prefix === 'char' && category === "Chartered Headhunting" ? categoryStats[category].currentPity || 0 : 0, pmfs: null };
             }
 
-            if (!bannerBoxes[bannerName].pmfs) bannerBoxes[bannerName].pmfs = [null, prefix === 'char' ? buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, bannerBoxes[bannerName].startingPityForMath) : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0)];
+            if (!bannerBoxes[bannerName].pmfs) bannerBoxes[bannerName].pmfs = [null, prefix === 'char' ? (isJoint ? buildPMF(MAX_PULLS, 80, 65, 0.008, 1.0, null, 0) : buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, bannerBoxes[bannerName].startingPityForMath)) : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0)];
 
             let itemId = pull.charId || pull.weaponId || pull.itemId || "";
             let itemName = pull.name || pull.itemName || pull.charName || pull.weaponName || (pull.weapon ? pull.weapon.name || pull.weapon.weaponName : "Unknown Item");
@@ -1808,6 +1823,11 @@
                                 summaryChars.push({ id: ruId, name: locName, enName: fallback, rarity: "6", pity: "TOKEN", bannerName });
                             }
                         }
+                    } else if (isJoint) {
+                        categoryStats[category].tokenPulls++;
+                        if (categoryStats[category].tokenPulls > 0 && categoryStats[category].tokenPulls % 120 === 0) {
+                            summaryChars.push({ id: '', name: 'JOINT SELECTOR', enName: 'Joint_Selector', rarity: "6", pity: "TOKEN", bannerName });
+                        }
                     }
                     displayPity = categoryStats[category].currentPity;
                 }
@@ -1826,7 +1846,10 @@
                             
                             if (wonRateUp) {
                                 rateUpCopyNum = ++bannerBoxes[bannerName].rateUpCount;
-                                while (bannerBoxes[bannerName].pmfs.length <= rateUpCopyNum) bannerBoxes[bannerName].pmfs.push(convolve(bannerBoxes[bannerName].pmfs[bannerBoxes[bannerName].pmfs.length - 1], prefix === 'char' ? pmf_char_any : pmf_weap_any));
+                                while (bannerBoxes[bannerName].pmfs.length <= rateUpCopyNum) {
+                                    let basePmf = prefix === 'weap' ? pmf_weap_any : (isJoint ? pmf_joint_any : pmf_char_any);
+                                    bannerBoxes[bannerName].pmfs.push(convolve(bannerBoxes[bannerName].pmfs[bannerBoxes[bannerName].pmfs.length - 1], basePmf));
+                                }
                                 
                                 let targetPmf = bannerBoxes[bannerName].pmfs[rateUpCopyNum], cdfVal = 0, evalPull = Math.min(prefix === 'weap' ? Math.ceil(currentPullNum / 10) * 10 : currentPullNum, MAX_PULLS);
                                 for (let i = 1; i <= evalPull; i++) cdfVal += targetPmf[i];
@@ -1867,7 +1890,7 @@
                 if (!pushedToAllPulls) bannerBoxes[bannerName].allPulls.push({ name: itemName, enName, itemId, pityAtPull: prefix === 'weap' ? (Math.ceil(currentPullNum / 10) || 1) : null, rarity, pullNum: currentPullNum, isNew: isNewItem, timestamp: pull.gachaTs || pull.ts || pull.timestamp });
             }
 
-            if (category === "Chartered Headhunting") Object.assign(bannerBoxes[bannerName], { endPity: categoryStats[category].currentPity, endRateUpPity: categoryStats[category].rateUpPity, endTokenPulls: categoryStats[category].tokenPulls, endHasPulledRateUp: categoryStats[category].hasPulledRateUp });
+            if (category === "Chartered Headhunting" || category.startsWith("Joint Headhunting")) Object.assign(bannerBoxes[bannerName], { endPity: categoryStats[category].currentPity, endRateUpPity: categoryStats[category].rateUpPity, endTokenPulls: categoryStats[category].tokenPulls, endHasPulledRateUp: categoryStats[category].hasPulledRateUp });
         });
 
         if (prefix === 'char') {
@@ -1911,7 +1934,17 @@
                     let limit = data.category === "New Horizons" ? 40 : 80;
                     let val = data.category === "New Horizons" ? (cStats.firstSixStarPity !== null ? cStats.firstSixStarPity : data.totalPulls) : cStats.currentPity;
                     let color = (data.category === "New Horizons" && (cStats.firstSixStarPity !== null || data.totalPulls >= 40)) ? "#666666" : (val >= limit * 0.8 ? "var(--color-red)" : (val >= limit * 0.5 ? "var(--accent-orange)" : "var(--color-green)"));
-                    pityHTML = createPityBox([createPityCol(val, limit, data.category === "Basic Headhunting" || data.category === "New Horizons" ? "PITY" : `PITY (${data.category})`, isActive ? color : "#888888", isActive ? "var(--text-dim)" : "#888888")]);
+                    
+                    let label = "PITY";
+                    if (data.category !== "Basic Headhunting" && data.category !== "New Horizons") {
+                        label = data.category.startsWith("Joint Headhunting") ? "PITY (JOINT)" : `PITY (${data.category})`;
+                    }
+                    
+                    let columns = [createPityCol(val, limit, label, isActive ? color : "#888888", isActive ? "var(--text-dim)" : "#888888")];
+                    if (data.category.startsWith("Joint Headhunting")) {
+                        columns.push(createPityCol((data.endTokenPulls || 0) % 120, 120, "TOKEN", isActive ? "var(--accent-blue)" : "#888888", isActive ? "var(--text-dim)" : "#888888", `<span style="color: ${isActive ? 'var(--accent-blue)' : '#888888'}; font-weight: bold;">${Math.floor((data.endTokenPulls || 0) / 120)}</span>`));
+                    }
+                    pityHTML = createPityBox(columns);
                 }
             }
 
@@ -1943,8 +1976,16 @@
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
 
             if (BANNER_DB[data.poolId]?.rateUpIds?.length) {
-                let ruId = BANNER_DB[data.poolId].rateUpIds[0], fallback = parseIdToName(ruId);
-                ruHTML = `<div class="banner-rate-up ${data.hasPulledRateUp ? 'won' : 'lost'}">RATE-UP: <span>${(prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item"}${data.hasPulledRateUp ? ' <span style="color: var(--color-green); margin-left: 4px;">&#10004;</span>' : ''}</span></div>`;
+                let isJointCat = data.category.startsWith("Joint Headhunting");
+                let ruText = "";
+                if (isJointCat && BANNER_DB[data.poolId].rateUpIds.length > 1) {
+                    ruText = BANNER_DB[data.poolId].rateUpIds.length + " RATE-UPS";
+                } else {
+                    let ruId = BANNER_DB[data.poolId].rateUpIds[0], fallback = parseIdToName(ruId);
+                    ruText = (prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item";
+                }
+                
+                ruHTML = `<div class="banner-rate-up ${data.hasPulledRateUp ? 'won' : 'lost'}">RATE-UP: <span>${ruText}${data.hasPulledRateUp ? ' <span style="color: var(--color-green); margin-left: 4px;">&#10004;</span>' : ''}</span></div>`;
                 ruBtn = `<button class="filter-btn" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
             }
 
