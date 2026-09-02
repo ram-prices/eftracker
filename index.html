@@ -2273,7 +2273,7 @@
     }
 
     function renderOverviews() {
-        let getLuck = (act, ev) => act >= ev * 1.25 ? { t: "VERY LUCKY", c: "luck-very-good" } : act > ev * 1.05 ? { t: "LUCKY", c: "luck-good" } : act >= ev * 0.9 ? { t: "NORMAL", c: "luck-avg" } : act >= ev * 0.7 ? { t: "UNLUCKY", c: "luck-bad" } : { t: "VERY UNLUCKY", c: "luck-very-bad" };
+        let getLuck = (act, ev) => act >= ev * 1.25 ? { t: "VERY LUCKY", c: "luck-very-good" } : act > ev * 1.05 ? { t: "LUCKY", c: "luck-good" } : act >= ev * 0.9 ? { t: "AVERAGE", c: "luck-avg" } : act >= ev * 0.7 ? { t: "UNLUCKY", c: "luck-bad" } : { t: "VERY UNLUCKY", c: "luck-very-bad" };
         
         ['char', 'weap'].forEach(type => {
             let s = advStats[type], evProb = type === 'char' ? (1/54.3)*100 : 4.97, html = `<div style="color: var(--text-dim); font-size: 12px; font-style: italic;">NO DATA AVAILABLE</div>`;
