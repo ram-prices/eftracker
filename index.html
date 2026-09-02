@@ -754,38 +754,106 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
     // ==============================================================================
-    // CONFIGURATIONS & STATE
+    // CONFIGURATIONS & ASSET DATABASE
     // ==============================================================================
+    const EF_ASSETS_BASE = "https://raw.githubusercontent.com/ram-prices/ef-assets/main";
+    const EF_ASSETS_CDN = "https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main";
+
     const BANNER_DB = {
-        "beginner": { type: "New Horizons", rateUpIds: [], displayEn: "New Horizons" },
-        "standard": { rateUpIds: [], displayEn: "Basic Headhunting" },
-        "special_1_0_1": { rateUpIds: ["chr_0016_laevat"], displayEn: "Scars of the Forge" },
-        "special_1_0_2": { rateUpIds: ["chr_0017_yvonne"], displayEn: "Hues of Passion" },
-        "special_1_0_3": { rateUpIds: ["chr_0013_aglina"], displayEn: "The Floaty Messenger" },
-        "special_1_1_1": { rateUpIds: ["chr_0027_tangtang"], displayEn: "River's Daughter" },
-        "special_1_1_2": { rateUpIds: ["chr_0028_wulfa"], displayEn: "Wolf Pearl" },
-        "special_1_2_1": { rateUpIds: ["chr_0030_zhuangfy"], displayEn: "Thunder of Renewal" },
-        "joint_1_0_1": { rateUpIds: ["chr_0016_laevat", "chr_0017_yvonne", "chr_0013_aglina", "chr_0027_tangtang"], displayEn: "Joint Operation 1" },
-        "special_1_3_1": { rateUpIds: ["chr_0031_mifu"], displayEn: "Fists of No Regrets" },
-        "special_1_3_2": { rateUpIds: ["chr_0033_camille"], displayEn: "Expunger of Sin" },
-        "special_1_4_1": { rateUpIds: ["chr_0032_lizhiyan"], displayEn: "North Yearns The Rift Vigile" },
-        "special_1_4_2": { rateUpIds: ["chr_0035_liino"], displayEn: "Good Morning from Your Dawnstar" },
-        "weponbox_1_0_1": { rateUpIds: ["wpn_sword_0006"], displayEn: "Smelting Forge Issue" },
-        "weponbox_1_0_2": { rateUpIds: ["wpn_pistol_0010"], displayEn: "Graffiti Issue" },
-        "weponbox_1_0_3": { rateUpIds: ["wpn_funnel_0011"], displayEn: "Express Delivery Issue" },
-        "weponbox_1_1_1": { rateUpIds: ["wpn_pistol_0011"], displayEn: "Budding Anew" },
-        "weponbox_1_1_2": { rateUpIds: ["wpn_sword_0022"], displayEn: "Scarlet Pearl" },
-        "weponbox_1_2_1": { rateUpIds: ["wpn_funnel_0015"], displayEn: "Drifting Raft" },
-        "weponbox_1_3_1": { rateUpIds: ["wpn_claym_0017"], displayEn: "Scarlet Knot Issue" },
-        "weponbox_1_3_2": { rateUpIds: ["wpn_lance_0015"], displayEn: "Crimson Hued Issue" },
-        "weponbox_1_4_1": { rateUpIds: ["wpn_funnel_0016"], displayEn: "Military Grade Issue" },
-        "weponbox_1_4_2": { rateUpIds: ["wpn_lance_0014"], displayEn: "Bedazzled Issue" },
-        "weaponbox_constant_1": { rateUpIds: ["wpn_claym_0013"], displayEn: "Constant Issue" },
-        "weaponbox_constant_2": { rateUpIds: ["wpn_funnel_0013"], displayEn: "Constant Issue" },
-        "weaponbox_constant_3": { rateUpIds: ["wpn_sword_0016"], displayEn: "Constant Issue" },
-        "weaponbox_constant_4": { rateUpIds: ["wpn_lance_0012"], displayEn: "Constant Issue" },
-        "weaponbox_constant_5": { rateUpIds: ["wpn_claym_0007"], displayEn: "Constant Issue" }
+        "beginner": { name: "New Horizons", displayEn: "New Horizons", rateUpIds: [], type: "New Horizons" },
+        "standard": { name: "Basic Headhunting", displayEn: "Basic Headhunting", rateUpIds: [], type: "Standard" },
+        "special_1_0_1": { name: "Scars of the Forge", displayEn: "Scars of the Forge", rateUpIds: ["chr_0016_laevat"], type: "Special" },
+        "special_1_0_2": { name: "Hues of Passion", displayEn: "Hues of Passion", rateUpIds: ["chr_0017_yvonne"], type: "Special" },
+        "special_1_0_3": { name: "The Floaty Messenger", displayEn: "The Floaty Messenger", rateUpIds: ["chr_0013_aglina"], type: "Special" },
+        "special_1_1_1": { name: "River's Daughter", displayEn: "River's Daughter", rateUpIds: ["chr_0027_tangtang"], type: "Special" },
+        "special_1_1_2": { name: "Wolf Pearl", displayEn: "Wolf Pearl", rateUpIds: ["chr_0028_wulfa"], type: "Special" },
+        "special_1_2_1": { name: "Thunder of Renewal", displayEn: "Thunder of Renewal", rateUpIds: ["chr_0030_zhuangfy"], type: "Special" },
+        "joint_1_0_1": { name: "Joint Operation 1", displayEn: "Joint Operation 1", rateUpIds: ["chr_0016_laevat", "chr_0017_yvonne", "chr_0013_aglina", "chr_0027_tangtang"], type: "Special" },
+        "special_1_3_1": { name: "Fists of No Regrets", displayEn: "Fists of No Regrets", rateUpIds: ["chr_0031_mifu"], type: "Special" },
+        "special_1_3_2": { name: "Expunger of Sin", displayEn: "Expunger of Sin", rateUpIds: ["chr_0033_camille"], type: "Special" },
+        "special_1_4_1": { name: "North Yearns The Rift Vigile", displayEn: "North Yearns The Rift Vigile", rateUpIds: ["chr_0032_lizhiyan"], type: "Special" },
+        "special_1_4_2": { name: "Good Morning from Your Dawnstar", displayEn: "Good Morning from Your Dawnstar", rateUpIds: ["chr_0035_liino"], type: "Special" },
+        "special_1_5_1": { name: "Winter Hunt", displayEn: "Winter Hunt", rateUpIds: ["chr_0034_typhoea", "chr_0034_typhoeus"], type: "Special" },
+        "weponbox_1_0_1": { name: "Smelting Forge Issue", displayEn: "Smelting Forge Issue", rateUpIds: ["wpn_sword_0006"], type: "Weapon" },
+        "weponbox_1_0_2": { name: "Graffiti Issue", displayEn: "Graffiti Issue", rateUpIds: ["wpn_pistol_0010"], type: "Weapon" },
+        "weponbox_1_0_3": { name: "Express Delivery Issue", displayEn: "Express Delivery Issue", rateUpIds: ["wpn_funnel_0011"], type: "Weapon" },
+        "weponbox_1_1_1": { name: "Budding Anew", displayEn: "Budding Anew", rateUpIds: ["wpn_pistol_0011"], type: "Weapon" },
+        "weponbox_1_1_2": { name: "Scarlet Pearl", displayEn: "Scarlet Pearl", rateUpIds: ["wpn_sword_0022"], type: "Weapon" },
+        "weponbox_1_2_1": { name: "Drifting Raft", displayEn: "Drifting Raft", rateUpIds: ["wpn_funnel_0015"], type: "Weapon" },
+        "weponbox_1_3_1": { name: "Scarlet Knot Issue", displayEn: "Scarlet Knot Issue", rateUpIds: ["wpn_claym_0017"], type: "Weapon" },
+        "weponbox_1_3_2": { name: "Crimson Hued Issue", displayEn: "Crimson Hued Issue", rateUpIds: ["wpn_lance_0015"], type: "Weapon" },
+        "weponbox_1_4_1": { name: "Military Grade Issue", displayEn: "Military Grade Issue", rateUpIds: ["wpn_funnel_0016"], type: "Weapon" },
+        "weponbox_1_4_2": { name: "Bedazzled Issue", displayEn: "Bedazzled Issue", rateUpIds: ["wpn_lance_0014"], type: "Weapon" },
+        "weponbox_1_5_1": { name: "Deep Cold Issue", displayEn: "Deep Cold Issue", rateUpIds: ["wpn_funnel_0019"], type: "Weapon" },
+        "weaponbox_constant_1": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_claym_0013"], type: "Weapon" },
+        "weaponbox_constant_2": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_funnel_0013"], type: "Weapon" },
+        "weaponbox_constant_3": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_sword_0016"], type: "Weapon" },
+        "weaponbox_constant_4": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_lance_0012"], type: "Weapon" },
+        "weaponbox_constant_5": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_claym_0007"], type: "Weapon" }
     };
+
+    function getBannerInfo(poolId, bannerName = '') {
+        if (!poolId && !bannerName) return null;
+        if (poolId) {
+            if (BANNER_DB[poolId]) return BANNER_DB[poolId];
+            let lower = poolId.toLowerCase().trim();
+            if (BANNER_DB[lower]) return BANNER_DB[lower];
+            let norm = lower.replace(/^weaponbox_/, 'weponbox_');
+            if (BANNER_DB[norm]) return BANNER_DB[norm];
+            norm = lower.replace(/^weponbox_/, 'weaponbox_');
+            if (BANNER_DB[norm]) return BANNER_DB[norm];
+            if (lower.startsWith('joint_')) {
+                return BANNER_DB['joint_1_0_1'] || BANNER_DB['joint_1_2_2'] || null;
+            }
+        }
+        if (bannerName) {
+            let bLower = bannerName.toLowerCase().trim();
+            for (const key of Object.keys(BANNER_DB)) {
+                const b = BANNER_DB[key];
+                if (b.name && b.name.toLowerCase() === bLower) return b;
+                if (b.displayEn && b.displayEn.toLowerCase() === bLower) return b;
+            }
+            for (const key of Object.keys(BANNER_DB)) {
+                const b = BANNER_DB[key];
+                if (b.name && (bLower.includes(b.name.toLowerCase()) || b.name.toLowerCase().includes(bLower))) return b;
+                if (b.displayEn && (bLower.includes(b.displayEn.toLowerCase()) || b.displayEn.toLowerCase().includes(bLower))) return b;
+            }
+            if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) return BANNER_DB['special_1_5_1'];
+            if (bLower.includes('dawnstar') || bLower.includes('liino')) return BANNER_DB['special_1_4_2'];
+            if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) return BANNER_DB['special_1_4_1'];
+            if (bLower.includes('deep cold')) return BANNER_DB['weponbox_1_5_1'];
+        }
+        return null;
+    }
+
+    async function syncRemoteBannersJson() {
+        try {
+            let res = await fetch(`${EF_ASSETS_BASE}/banners.json`);
+            if (!res.ok) res = await fetch(`${EF_ASSETS_CDN}/banners.json`);
+            if (!res.ok) return;
+            const remoteDb = await res.json();
+            if (remoteDb && typeof remoteDb === 'object') {
+                for (const [k, val] of Object.entries(remoteDb)) {
+                    if (!val) continue;
+                    let existingRateUps = BANNER_DB[k]?.rateUpIds || [];
+                    let newRateUps = val.rateUpIds || [];
+                    let mergedRateUps = Array.from(new Set([...existingRateUps, ...newRateUps]));
+                    BANNER_DB[k] = {
+                        ...(BANNER_DB[k] || {}),
+                        ...val,
+                        rateUpIds: mergedRateUps.length ? mergedRateUps : (BANNER_DB[k]?.rateUpIds || []),
+                        displayEn: val.displayEn || val.name || BANNER_DB[k]?.displayEn,
+                        name: val.name || BANNER_DB[k]?.name || val.displayEn
+                    };
+                }
+                if (isDataLoaded && lastLoadedData) {
+                    processAndLoadData(lastLoadedData);
+                }
+            }
+        } catch (err) {
+            console.warn("Could not sync remote banners.json:", err);
+        }
+    }
 
     const MAX_PULLS = 1500;
     const SECTION_ORDER = ['char', 'weap', 'settings', 'about'];
@@ -911,18 +979,120 @@
     // ==============================================================================
     function parseIdToName(idStr) {
         if (!idStr) return "";
+        if (idStr === 'chr_0034_typhoea' || idStr === 'chr_0034_typhoeus') return "Typhoeus";
         let parts = idStr.split('_');
         if (idStr.startsWith('wpn_') && parts.length >= 3) return parts.slice(1).join('_');
         if (idStr.startsWith('chr_') && parts.length >= 3) return parts.slice(2).join('_').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         return idStr;
     }
 
+    function checkRateUpWon(bannerInfo, itemId, itemName, enName, pull) {
+        if (!bannerInfo || !bannerInfo.rateUpIds || !bannerInfo.rateUpIds.length) return false;
+        
+        const clean = (s) => (s || '').toString().toLowerCase().replace(/[\s_\-]/g, '');
+        const curId = clean(itemId);
+        const curName = clean(itemName);
+        const curEnName = clean(enName);
+
+        for (let rId of bannerInfo.rateUpIds) {
+            let cleanRId = clean(rId);
+            if (curId && (curId === cleanRId || curId.endsWith(cleanRId) || cleanRId.endsWith(curId))) return true;
+            
+            let rParts = rId.toLowerCase().split('_');
+            let rCore = rParts[rParts.length - 1];
+            let curParts = (itemId || '').toLowerCase().split('_');
+            let curCore = curParts[curParts.length - 1];
+            
+            if (rCore && curCore && (rCore === curCore || (rCore.startsWith('typho') && curCore.startsWith('typho')))) return true;
+            
+            let parsedRName = clean(parseIdToName(rId));
+            if (curName && (curName.includes(parsedRName) || parsedRName.includes(curName))) return true;
+            if (curEnName && (curEnName.includes(parsedRName) || parsedRName.includes(curEnName))) return true;
+            
+            if ((cleanRId.includes('typhoe') || parsedRName.includes('typho')) &&
+                (curId.includes('typho') || curName.includes('typho') || curEnName.includes('typho') || curName.includes('提丰'))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function getItemIconUrl(prefix, itemId, fallbackEnName) {
         if (itemId) {
-            if (prefix === 'char') return `https://www.akedata.top/public/images/character/charremoteicon/icon_${itemId}.png`;
-            if (prefix === 'weap') return `https://www.akedata.top/public/images/weapon/iconbig/${itemId}.png`;
+            if (prefix === 'char') {
+                let id = itemId;
+                if (id === 'chr_0034_typhoeus') id = 'chr_0034_typhoea';
+                return `${EF_ASSETS_BASE}/operators/${id}.webp`;
+            }
+            if (prefix === 'weap') return `${EF_ASSETS_BASE}/arsenals/${itemId}.webp`;
         }
         return `https://endfield.wiki.gg/images/${encodeURIComponent((fallbackEnName || "").replace(/ /g, '_'))}_icon.png`;
+    }
+
+    function handleIconError(img, prefix, itemId, fallbackEnName) {
+        if (!img) return;
+        if (img.src.includes('raw.githubusercontent.com/ram-prices/ef-assets/main/')) {
+            img.src = img.src.replace('https://raw.githubusercontent.com/ram-prices/ef-assets/main/', 'https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main/');
+            return;
+        }
+        if (img.src.includes('ram-prices/ef-assets')) {
+            if (itemId) {
+                if (prefix === 'char') {
+                    img.src = `https://www.akedata.top/public/images/character/charremoteicon/icon_${itemId}.png`;
+                    return;
+                }
+                if (prefix === 'weap') {
+                    img.src = `https://www.akedata.top/public/images/weapon/iconbig/${itemId}.png`;
+                    return;
+                }
+            }
+            if (fallbackEnName) {
+                img.src = `https://endfield.wiki.gg/images/${encodeURIComponent(fallbackEnName.replace(/ /g, '_'))}_icon.png`;
+                return;
+            }
+        }
+        img.onerror = null;
+        img.style.display = 'none';
+    }
+
+    function getBannerImageUrl(poolId, fallbackName, prefix) {
+        if (poolId) {
+            let cleanId = poolId.toLowerCase().trim();
+            let filename = cleanId.replace(/^weaponbox_/, 'weponbox_');
+            if (filename === 'joint_1_0_1' || (filename.startsWith('joint_') && filename !== 'joint_1_2_2')) {
+                filename = 'joint_1_2_2';
+            }
+            return `${EF_ASSETS_BASE}/banners/${filename}.webp`;
+        }
+        let bName = fallbackName || "";
+        if (prefix === 'char') {
+            return `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png/1024px-${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png`;
+        } else {
+            let wName = bName.replace(/ /g, '_');
+            let issueName = wName.toLowerCase().includes('issue') ? wName : wName + '_Issue';
+            return `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(issueName.replace(/_Issue/g, '_issue'))}.png/1024px-${encodeURIComponent(issueName.replace(/_Issue/g, '_issue'))}.png`;
+        }
+    }
+
+    function handleBannerImgError(img, poolId, bName, prefix) {
+        if (!img) return;
+        if (img.src.includes('raw.githubusercontent.com/ram-prices/ef-assets/main/banners/')) {
+            img.src = img.src.replace('https://raw.githubusercontent.com/ram-prices/ef-assets/main/banners/', 'https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main/banners/');
+            return;
+        }
+        if (img.src.includes('ram-prices/ef-assets')) {
+            let fallbackUrl = prefix === 'char'
+                ? `https://endfield.wiki.gg/images/thumb/${encodeURIComponent((bName || '').replace(/ /g, '_'))}_banner.png/1024px-${encodeURIComponent((bName || '').replace(/ /g, '_'))}_banner.png`
+                : `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(((bName || '').replace(/ /g, '_').toLowerCase().includes('issue') ? (bName || '').replace(/ /g, '_') : (bName || '').replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png/1024px-${encodeURIComponent(((bName || '').replace(/ /g, '_').toLowerCase().includes('issue') ? (bName || '').replace(/ /g, '_') : (bName || '').replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png`;
+            img.src = fallbackUrl;
+            return;
+        }
+        if (img.hasAttribute('crossorigin')) {
+            img.removeAttribute('crossorigin');
+            img.src = img.src;
+            return;
+        }
+        img.style.display = 'none';
     }
 
     function formatTimestamp(tsRaw) {
@@ -1080,6 +1250,7 @@
         if (tab === 'char' || tab === 'weap') {
             triggerSummaryAnimation(tab); // Must run first so summaryRow1Animating flag is set before checkSummaryOverflow reads it
             checkSummaryOverflow();
+            document.querySelectorAll(`#${tab}BannerGrid .pull-list-container`).forEach(updateBlockHeaders);
             
             if (!animatedDashboards.has(tab)) {
                 const dash = document.getElementById(`${tab}OverviewDashboard`);
@@ -1384,25 +1555,38 @@
 
     function toggleFilter(bannerId, filterType) {
         const listContainer = document.getElementById(`list-${bannerId}`);
-        const btn = Array.from(document.getElementById(`filters-${bannerId}`).querySelectorAll('.filter-btn')).find(b => b.innerText.includes(filterType === 'RU' ? 'RATE-UP' : `${filterType}★`));
+        const filterBox = document.getElementById(`filters-${bannerId}`);
+        if (!filterBox) return;
+        const btn = Array.from(filterBox.querySelectorAll('.filter-btn')).find(b => {
+            const dataF = b.getAttribute('data-filter');
+            const txt = (b.textContent || '').trim();
+            return dataF === filterType || txt.includes(filterType === 'RU' ? 'RATE-UP' : `${filterType}★`);
+        });
         if (btn) btn.classList.toggle('active');
-        updateBlockHeaders(listContainer);
+        if (listContainer) updateBlockHeaders(listContainer);
     }
 
     function updateBlockHeaders(container) {
-        const buttons = document.getElementById(`filters-${container.id.replace('list-', '')}`).querySelectorAll('.filter-btn');
+        if (!container) return;
+        const filterBox = document.getElementById(`filters-${container.id.replace('list-', '')}`);
+        if (!filterBox) return;
+        const buttons = filterBox.querySelectorAll('.filter-btn');
         let filters = { show6: false, show5: false, show4: false, showRU: false };
         buttons.forEach(b => {
             if (b.classList.contains('active')) {
-                if (b.innerText.includes('6★')) filters.show6 = true;
-                if (b.innerText.includes('5★')) filters.show5 = true;
-                if (b.innerText.includes('4★')) filters.show4 = true;
-                if (b.innerText.includes('RATE-UP')) filters.showRU = true;
+                const dataF = b.getAttribute('data-filter');
+                const txt = (b.textContent || '').trim();
+                if (dataF === '6' || txt.includes('6★')) filters.show6 = true;
+                if (dataF === '5' || txt.includes('5★')) filters.show5 = true;
+                if (dataF === '4' || txt.includes('4★')) filters.show4 = true;
+                if (dataF === 'RU' || txt.includes('RATE-UP')) filters.showRU = true;
             }
         });
 
         let currentHeader = null, hasVisibleItems = false, totalVisibleItems = 0;
-        Array.from(container.querySelector('.pull-list').children).forEach(node => {
+        const pullList = container.querySelector('.pull-list');
+        if (!pullList) return;
+        Array.from(pullList.children).forEach(node => {
             if (node.classList.contains('pull-block-header')) {
                 if (currentHeader) currentHeader.style.display = hasVisibleItems ? 'inline-block' : 'none';
                 currentHeader = node; hasVisibleItems = false; 
@@ -1747,9 +1931,63 @@
         switchTab('char');
     }
 
+    function isHuntingDossier(pull) {
+        if (!pull) return false;
+        return pull.kind === 'gift_intel_book' ||
+               pull.id === 'gift_intel_book' ||
+               pull.itemId === 'gift_intel_book' ||
+               pull.kindId === 'gift_intel_book' ||
+               pull.itemKind === 'gift_intel_book';
+    }
+
+    function sortPullsChronologically(pullData) {
+        if (!Array.isArray(pullData) || !pullData.length) return [];
+        const filtered = pullData.filter(p => !isHuntingDossier(p));
+        if (!filtered.length) return [];
+        
+        const getTs = (p) => {
+            let raw = p.gachaTs || p.ts || p.timestamp || p.time;
+            if (!raw) return 0;
+            let n = parseInt(raw);
+            if (!isNaN(n) && n > 0) return n;
+            let d = Date.parse(raw);
+            return isNaN(d) ? 0 : d;
+        };
+        const getSeq = (p) => parseInt(p.seqId || p.id || p.order || 0) || 0;
+
+        let isDesc = false;
+        if (filtered.length >= 2) {
+            let firstTs = getTs(filtered[0]);
+            let lastTs = getTs(filtered[filtered.length - 1]);
+            if (firstTs > lastTs) {
+                isDesc = true;
+            } else if (firstTs === lastTs) {
+                let firstSeq = getSeq(filtered[0]);
+                let lastSeq = getSeq(filtered[filtered.length - 1]);
+                if (firstSeq > lastSeq) isDesc = true;
+            }
+        }
+
+        const indexed = filtered.map((p, idx) => ({ ...p, _origIdx: idx }));
+
+        indexed.sort((a, b) => {
+            let tsA = getTs(a), tsB = getTs(b);
+            if (tsA !== tsB) return tsA - tsB;
+
+            let seqA = getSeq(a), seqB = getSeq(b);
+            if (seqA && seqB && seqA !== seqB) return seqA - seqB;
+
+            return isDesc ? (b._origIdx - a._origIdx) : (a._origIdx - b._origIdx);
+        });
+
+        return indexed;
+    }
+
     function analyzeData(pullData, prefix) {
         if (!pullData || !pullData.length) return;
-        const pullsCopy = [...pullData].reverse().sort((a, b) => (parseInt(a.gachaTs || a.ts || a.seqId || a.timestamp || 0) || 0) - (parseInt(b.gachaTs || b.ts || b.seqId || b.timestamp || 0) || 0));
+        const validPulls = pullData.filter(p => !isHuntingDossier(p));
+        if (!validPulls.length) return;
+        const pullsCopy = sortPullsChronologically(validPulls);
         
         let categoryStats = {}, bannerBoxes = {}, bannerTimeline = [];
 
@@ -1757,6 +1995,7 @@
         else weapBannerTimeline = bannerTimeline;
 
         pullsCopy.forEach(pull => {
+            if (isHuntingDossier(pull)) return;
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
             let poolId = pull.poolId || poolTypeRaw;
             let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
@@ -1781,7 +2020,7 @@
             if (!categoryStats[category]) categoryStats[category] = { currentPity: 0, rateUpPity: 0, totalPulls: 0, lastBannerName: "", firstSixStarPity: null, hasPulledRateUp: false, tokenPulls: 0 };
             if (!bannerBoxes[bannerName]) {
                 bannerTimeline.push(bannerName);
-                bannerBoxes[bannerName] = { poolId, category, isConstant: category === "Constant Issue", totalPulls: 0, currentWeaponPity: 0, allPulls: [], hasPulledRateUp: false, rateUpBlock: null, hasPulledSixStar: false, firstSixStarBlock: null, endPity: 0, endRateUpPity: 0, endTokenPulls: 0, endHasPulledRateUp: false, rateUpCount: 0, startingPityForMath: prefix === 'char' && category === "Chartered Headhunting" ? categoryStats[category].currentPity || 0 : 0, pmfs: null };
+                bannerBoxes[bannerName] = { poolId, category, isConstant: category === "Constant Issue", totalPulls: 0, currentWeaponPity: 0, allPulls: [], hasPulledRateUp: false, rateUpBlock: null, hasPulledSixStar: false, firstSixStarBlock: null, endPity: 0, endRateUpPity: 0, rateUpPity: 0, tokenPulls: 0, endTokenPulls: 0, endHasPulledRateUp: false, rateUpCount: 0, startingPityForMath: prefix === 'char' && category === "Chartered Headhunting" ? categoryStats[category].currentPity || 0 : 0, pmfs: null };
             }
 
             if (!bannerBoxes[bannerName].pmfs) bannerBoxes[bannerName].pmfs = [null, prefix === 'char' ? (isJoint ? buildPMF(MAX_PULLS, 80, 65, 0.008, 1.0, null, 0) : buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, bannerBoxes[bannerName].startingPityForMath)) : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0)];
@@ -1811,7 +2050,7 @@
                     if (currentPullNum > 0 && currentPullNum % 10 === 0) {
                         let tB = currentPullNum / 10;
                         if (tB >= 18 && (tB - 18) % 16 === 0) {
-                            let poolInfo = BANNER_DB[poolId];
+                            let poolInfo = getBannerInfo(poolId, bannerName);
                             if (poolInfo && poolInfo.rateUpIds && poolInfo.rateUpIds.length) {
                                 let ruId = poolInfo.rateUpIds[0], fallback = parseIdToName(ruId), locName = uniqueWeaps.get(ruId) || fallback;
                                 summaryWeaps.push({ id: ruId, name: locName, enName: fallback, rarity: "6", pity: "TOKEN", bannerName });
@@ -1821,12 +2060,13 @@
                 } else {
                     categoryStats[category].currentPity++;
                     if (category === "Chartered Headhunting") {
-                        if (categoryStats[category].lastBannerName !== bannerName) { categoryStats[category].rateUpPity = 0; categoryStats[category].hasPulledRateUp = false; categoryStats[category].tokenPulls = 0; categoryStats[category].lastBannerName = bannerName; }
-                        if (!categoryStats[category].hasPulledRateUp) categoryStats[category].rateUpPity++;
-                        categoryStats[category].tokenPulls++;
-                        if (categoryStats[category].tokenPulls > 0 && categoryStats[category].tokenPulls % 240 === 0) {
-                            let poolInfo = BANNER_DB[poolId];
-                            if (poolInfo && poolInfo.rateUpIds.length) {
+                        if (!bannerBoxes[bannerName].hasPulledRateUp) {
+                            bannerBoxes[bannerName].rateUpPity = Math.min(120, (bannerBoxes[bannerName].rateUpPity || 0) + 1);
+                        }
+                        bannerBoxes[bannerName].tokenPulls = (bannerBoxes[bannerName].tokenPulls || 0) + 1;
+                        if (bannerBoxes[bannerName].tokenPulls > 0 && bannerBoxes[bannerName].tokenPulls % 240 === 0) {
+                            let poolInfo = getBannerInfo(poolId, bannerName);
+                            if (poolInfo && poolInfo.rateUpIds && poolInfo.rateUpIds.length) {
                                 let ruId = poolInfo.rateUpIds[0], fallback = parseIdToName(ruId), locName = uniqueChars.get(ruId) || fallback;
                                 summaryChars.push({ id: ruId, name: locName, enName: fallback, rarity: "6", pity: "TOKEN", bannerName });
                             }
@@ -1846,11 +2086,18 @@
                         if (category === "New Horizons" && categoryStats[category].firstSixStarPity === null) categoryStats[category].firstSixStarPity = displayPity;
 
                         let wonRateUp = false, rateUpCopyNum = 0, pullProbability = undefined, generatedGraphHTML = "";
-                        let isRateUpBanner = BANNER_DB[poolId] && BANNER_DB[poolId].rateUpIds && BANNER_DB[poolId].rateUpIds.length > 0;
+                        let bannerInfo = getBannerInfo(poolId, bannerName);
+                        let isRateUpBanner = bannerInfo && bannerInfo.rateUpIds && bannerInfo.rateUpIds.length > 0;
                         
                         if (isRateUpBanner) {
-                            wonRateUp = BANNER_DB[poolId].rateUpIds.includes(itemId);
-                            let isGuaranteed = (prefix === 'char' && category === "Chartered Headhunting" && categoryStats[category].rateUpPity === 120 && !categoryStats[category].hasPulledRateUp) || (prefix === 'weap' && currentPullNum === 80 && !bannerBoxes[bannerName].hasPulledRateUp);
+                            wonRateUp = checkRateUpWon(bannerInfo, itemId, itemName, enName, pull);
+                            
+                            // 120th pull guarantee: if reaching 120 pulls on Chartered Headhunting without rate-up, this 6★ is guaranteed to be rate-up
+                            if (!wonRateUp && prefix === 'char' && category === "Chartered Headhunting" && ((bannerBoxes[bannerName].rateUpPity || 0) >= 120 || currentPullNum >= 120) && !bannerBoxes[bannerName].hasPulledRateUp) {
+                                wonRateUp = true;
+                            }
+
+                            let isGuaranteed = (prefix === 'char' && category === "Chartered Headhunting" && ((bannerBoxes[bannerName].rateUpPity || 0) >= 120 || currentPullNum >= 120) && !bannerBoxes[bannerName].hasPulledRateUp) || (prefix === 'weap' && currentPullNum === 80 && !bannerBoxes[bannerName].hasPulledRateUp);
                             
                             if (wonRateUp) {
                                 rateUpCopyNum = ++bannerBoxes[bannerName].rateUpCount;
@@ -1884,7 +2131,10 @@
                             bannerBoxes[bannerName].currentWeaponPity = 0; 
                             if (wonRateUp && !bannerBoxes[bannerName].hasPulledRateUp) { bannerBoxes[bannerName].hasPulledRateUp = true; bannerBoxes[bannerName].rateUpBlock = displayPity; }
                         } else {
-                            if (category === "Chartered Headhunting" && wonRateUp) categoryStats[category].hasPulledRateUp = bannerBoxes[bannerName].hasPulledRateUp = true;
+                            if (category === "Chartered Headhunting" && wonRateUp) {
+                                bannerBoxes[bannerName].hasPulledRateUp = true;
+                                categoryStats[category].hasPulledRateUp = true;
+                            }
                             if (category !== "New Horizons") categoryStats[category].currentPity = 0; 
                         }
 
@@ -1898,7 +2148,21 @@
                 if (!pushedToAllPulls) bannerBoxes[bannerName].allPulls.push({ name: itemName, enName, itemId, pityAtPull: prefix === 'weap' ? (Math.ceil(currentPullNum / 10) || 1) : null, rarity, pullNum: currentPullNum, isNew: isNewItem, timestamp: pull.gachaTs || pull.ts || pull.timestamp });
             }
 
-            if (category === "Chartered Headhunting" || category.startsWith("Joint Headhunting")) Object.assign(bannerBoxes[bannerName], { endPity: categoryStats[category].currentPity, endRateUpPity: categoryStats[category].rateUpPity, endTokenPulls: categoryStats[category].tokenPulls, endHasPulledRateUp: categoryStats[category].hasPulledRateUp });
+            if (category === "Chartered Headhunting") {
+                Object.assign(bannerBoxes[bannerName], { 
+                    endPity: categoryStats[category].currentPity, 
+                    endRateUpPity: Math.min(120, bannerBoxes[bannerName].rateUpPity || 0), 
+                    endTokenPulls: bannerBoxes[bannerName].tokenPulls || 0, 
+                    endHasPulledRateUp: !!bannerBoxes[bannerName].hasPulledRateUp 
+                });
+            } else if (category.startsWith("Joint Headhunting")) {
+                Object.assign(bannerBoxes[bannerName], { 
+                    endPity: categoryStats[category].currentPity, 
+                    endRateUpPity: 0, 
+                    endTokenPulls: categoryStats[category].tokenPulls || 0, 
+                    endHasPulledRateUp: false 
+                });
+            }
         });
 
         if (prefix === 'char') {
@@ -1922,10 +2186,11 @@
             if (prefix === 'weap' || (prefix === 'char' && data.category === "Chartered Headhunting") || isActive) {
                 if (prefix === 'char' && data.category === "Chartered Headhunting") {
                     let color = data.endPity >= 64 ? "var(--color-red)" : (data.endPity >= 40 ? "var(--accent-orange)" : "var(--color-green)");
-                    let ruColor = data.endRateUpPity >= 100 ? "var(--color-red)" : (data.endRateUpPity >= 70 ? "var(--accent-orange)" : "var(--color-green)");
+                    let clampedRateUp = Math.min(120, data.endRateUpPity || 0);
+                    let ruColor = clampedRateUp >= 100 ? "var(--color-red)" : (clampedRateUp >= 70 ? "var(--accent-orange)" : "var(--color-green)");
                     pityHTML = createPityBox([
                         createPityCol(data.endPity || 0, 80, isActive ? "PITY" : "PITY (FINAL)", isActive ? color : "#888888", isActive ? "var(--text-dim)" : "#888888"),
-                        createPityCol(data.endRateUpPity || 0, 120, "GUARANTEE", data.endHasPulledRateUp ? "#666666" : (isActive ? ruColor : "#888888"), data.endHasPulledRateUp ? "#666666" : (isActive ? "var(--text-dim)" : "#888888")),
+                        createPityCol(clampedRateUp, 120, "GUARANTEE", data.endHasPulledRateUp ? "#666666" : (isActive ? ruColor : "#888888"), data.endHasPulledRateUp ? "#666666" : (isActive ? "var(--text-dim)" : "#888888")),
                         createPityCol((data.endTokenPulls || 0) % 240, 240, "TOKEN", isActive ? "var(--accent-blue)" : "#888888", isActive ? "var(--text-dim)" : "#888888", `<span style="color: ${isActive ? 'var(--accent-blue)' : '#888888'}; font-weight: bold;">${Math.floor((data.endTokenPulls || 0) / 240)}</span>`)
                     ]);
                 } else if (prefix === 'weap') {
@@ -1977,27 +2242,29 @@
                     } else badgeHTML = `<span class="${bClass}" style="line-height: 1;">${pull.pityAtPull === "FREE" ? "FREE" : `${pull.pityAtPull} / ${prefix === 'weap' ? 8 : 80}`}</span>`;
                 }
 
-                return `${blockHeader}<li class="pull-item rarity-${pull.rarity}-item ${pull.isRateUpItem ? 'is-rate-up-item' : ''}" ${clickAction}><div class="pull-item-top" style="gap: 12px;"><span class="pull-name"><img src="${getItemIconUrl(prefix, pull.itemId, pull.enName)}" class="char-icon" loading="lazy" onerror="this.onerror=null; this.style.display='none';"><div style="display: flex; align-items: center; flex: 1; min-width: 0;"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pull.name}</span><span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag || newTag ? `<div style="display: flex; gap: 6px; margin-left: 8px; flex-shrink: 0;">${rateUpTag}${newTag}</div>` : ''}</div></span>${badgeHTML}</div><div class="extra-drawer">${timeStr ? `<div class="timestamp-content">${timeStr}</div>` : ''}${luckHTML}</div></li>`;
+                return `${blockHeader}<li class="pull-item rarity-${pull.rarity}-item ${pull.isRateUpItem ? 'is-rate-up-item' : ''}" ${clickAction}><div class="pull-item-top" style="gap: 12px;"><span class="pull-name"><img src="${getItemIconUrl(prefix, pull.itemId, pull.enName)}" class="char-icon" loading="lazy" onerror="handleIconError(this, '${prefix}', '${pull.itemId || ''}', '${(pull.enName || '').replace(/'/g, "\\'")}')"><div style="display: flex; align-items: center; flex: 1; min-width: 0;"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pull.name}</span><span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag || newTag ? `<div style="display: flex; gap: 6px; margin-left: 8px; flex-shrink: 0;">${rateUpTag}${newTag}</div>` : ''}</div></span>${badgeHTML}</div><div class="extra-drawer">${timeStr ? `<div class="timestamp-content">${timeStr}</div>` : ''}${luckHTML}</div></li>`;
             }).join('');
 
-            let bName = BANNER_DB[data.poolId]?.displayEn || name, bUrl = prefix === 'char' ? `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png/1024px-${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png` : `https://endfield.wiki.gg/images/thumb/${encodeURIComponent((bName.replace(/ /g, '_').toLowerCase().includes('issue') ? bName.replace(/ /g, '_') : bName.replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png/1024px-${encodeURIComponent((bName.replace(/ /g, '_').toLowerCase().includes('issue') ? bName.replace(/ /g, '_') : bName.replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png`;
+            let bInfo = getBannerInfo(data.poolId, name);
+            let bName = bInfo?.displayEn || bInfo?.name || name;
+            let bUrl = getBannerImageUrl(data.poolId, bName, prefix);
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
 
-            if (BANNER_DB[data.poolId]?.rateUpIds?.length) {
+            if (bInfo?.rateUpIds?.length) {
                 let isJointCat = data.category.startsWith("Joint Headhunting");
                 let ruText = "";
-                if (isJointCat && BANNER_DB[data.poolId].rateUpIds.length > 1) {
-                    ruText = BANNER_DB[data.poolId].rateUpIds.length + " RATE-UPS";
+                if (isJointCat && bInfo.rateUpIds.length > 1) {
+                    ruText = bInfo.rateUpIds.length + " RATE-UPS";
                 } else {
-                    let ruId = BANNER_DB[data.poolId].rateUpIds[0], fallback = parseIdToName(ruId);
+                    let ruId = bInfo.rateUpIds[0], fallback = parseIdToName(ruId);
                     ruText = (prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item";
                 }
                 
                 ruHTML = `<div class="banner-rate-up ${data.hasPulledRateUp ? 'won' : 'lost'}">RATE-UP: <span>${ruText}${data.hasPulledRateUp ? ' <span style="color: var(--color-green); margin-left: 4px;">&#10004;</span>' : ''}</span></div>`;
-                ruBtn = `<button class="filter-btn" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
+                ruBtn = `<button class="filter-btn" data-filter="RU" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
             }
 
-            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="if(this.hasAttribute('crossorigin')) { this.removeAttribute('crossorigin'); this.src=this.src; } else { this.style.display='none'; }">${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
+            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}')">${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" data-filter="6" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" data-filter="5" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" data-filter="4" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;
@@ -2215,7 +2482,7 @@
                     let imagesHtml = group.map(i => {
                         let title = i.name;
                         if (i.bannerName === "Basic Headhunting") title += ' (Basic Headhunting)';
-                        return `<img src="${getItemIconUrl(prefix, i.id, i.enName)}" title="${title}" class="summary-icon ${i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" style="background-color: transparent; border-radius: 0;" loading="lazy" onerror="this.onerror=null; this.style.display='none';">`;
+                        return `<img src="${getItemIconUrl(prefix, i.id, i.enName)}" title="${title}" class="summary-icon ${i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" style="background-color: transparent; border-radius: 0;" loading="lazy" onerror="handleIconError(this, '${prefix}', '${i.id || ''}', '${(i.enName || '').replace(/'/g, "\\'")}')">`;
                     }).join('');
                     
                     html += `<div class="${itemClass}">
@@ -2236,7 +2503,7 @@
                     }
                     
                     html += `<div class="${itemClass}" title="${title}">
-                        <img src="${getItemIconUrl(prefix, i.id, i.enName)}" class="summary-icon ${isWeap && i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
+                        <img src="${getItemIconUrl(prefix, i.id, i.enName)}" class="summary-icon ${isWeap && i.rarity === '5' ? 'summary-icon-5' : 'summary-icon-6'}" loading="lazy" onerror="handleIconError(this, '${prefix}', '${i.id || ''}', '${(i.enName || '').replace(/'/g, "\\'")}')">
                         <div class="${pityClass}"><span class="luck-dot" style="background-color: ${colorVal};"></span>${pityDisplay}</div>
                     </div>`;
                 });
@@ -2438,6 +2705,9 @@
         
         // Populate export list
         populateExportList();
+
+        // Sync remote banners database from GitHub repository
+        syncRemoteBannersJson();
 
         if (config.showTimestamps === true) {
             document.body.classList.add('show-timestamps');
