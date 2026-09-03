@@ -759,93 +759,124 @@
     const EF_ASSETS_BASE = "https://raw.githubusercontent.com/ram-prices/ef-assets/main";
     const EF_ASSETS_CDN = "https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main";
 
-    const BANNER_DB = {
-        "beginner": { name: "New Horizons", displayEn: "New Horizons", rateUpIds: [], type: "New Horizons" },
-        "standard": { name: "Basic Headhunting", displayEn: "Basic Headhunting", rateUpIds: [], type: "Standard" },
-        "special_1_0_1": { name: "Scars of the Forge", displayEn: "Scars of the Forge", rateUpIds: ["chr_0016_laevat"], type: "Special" },
-        "special_1_0_2": { name: "Hues of Passion", displayEn: "Hues of Passion", rateUpIds: ["chr_0017_yvonne"], type: "Special" },
-        "special_1_0_3": { name: "The Floaty Messenger", displayEn: "The Floaty Messenger", rateUpIds: ["chr_0013_aglina"], type: "Special" },
-        "special_1_1_1": { name: "River's Daughter", displayEn: "River's Daughter", rateUpIds: ["chr_0027_tangtang"], type: "Special" },
-        "special_1_1_2": { name: "Wolf Pearl", displayEn: "Wolf Pearl", rateUpIds: ["chr_0028_wulfa"], type: "Special" },
-        "special_1_2_1": { name: "Thunder of Renewal", displayEn: "Thunder of Renewal", rateUpIds: ["chr_0030_zhuangfy"], type: "Special" },
-        "joint_1_0_1": { name: "Joint Operation 1", displayEn: "Joint Operation 1", rateUpIds: ["chr_0016_laevat", "chr_0017_yvonne", "chr_0013_aglina", "chr_0027_tangtang"], type: "Special" },
-        "special_1_3_1": { name: "Fists of No Regrets", displayEn: "Fists of No Regrets", rateUpIds: ["chr_0031_mifu"], type: "Special" },
-        "special_1_3_2": { name: "Expunger of Sin", displayEn: "Expunger of Sin", rateUpIds: ["chr_0033_camille"], type: "Special" },
-        "special_1_4_1": { name: "North Yearns The Rift Vigile", displayEn: "North Yearns The Rift Vigile", rateUpIds: ["chr_0032_lizhiyan"], type: "Special" },
-        "special_1_4_2": { name: "Good Morning from Your Dawnstar", displayEn: "Good Morning from Your Dawnstar", rateUpIds: ["chr_0035_liino"], type: "Special" },
-        "special_1_5_1": { name: "Winter Hunt", displayEn: "Winter Hunt", rateUpIds: ["chr_0034_typhoea", "chr_0034_typhoeus"], type: "Special" },
-        "weponbox_1_0_1": { name: "Smelting Forge Issue", displayEn: "Smelting Forge Issue", rateUpIds: ["wpn_sword_0006"], type: "Weapon" },
-        "weponbox_1_0_2": { name: "Graffiti Issue", displayEn: "Graffiti Issue", rateUpIds: ["wpn_pistol_0010"], type: "Weapon" },
-        "weponbox_1_0_3": { name: "Express Delivery Issue", displayEn: "Express Delivery Issue", rateUpIds: ["wpn_funnel_0011"], type: "Weapon" },
-        "weponbox_1_1_1": { name: "Budding Anew", displayEn: "Budding Anew", rateUpIds: ["wpn_pistol_0011"], type: "Weapon" },
-        "weponbox_1_1_2": { name: "Scarlet Pearl", displayEn: "Scarlet Pearl", rateUpIds: ["wpn_sword_0022"], type: "Weapon" },
-        "weponbox_1_2_1": { name: "Drifting Raft", displayEn: "Drifting Raft", rateUpIds: ["wpn_funnel_0015"], type: "Weapon" },
-        "weponbox_1_3_1": { name: "Scarlet Knot Issue", displayEn: "Scarlet Knot Issue", rateUpIds: ["wpn_claym_0017"], type: "Weapon" },
-        "weponbox_1_3_2": { name: "Crimson Hued Issue", displayEn: "Crimson Hued Issue", rateUpIds: ["wpn_lance_0015"], type: "Weapon" },
-        "weponbox_1_4_1": { name: "Military Grade Issue", displayEn: "Military Grade Issue", rateUpIds: ["wpn_funnel_0016"], type: "Weapon" },
-        "weponbox_1_4_2": { name: "Bedazzled Issue", displayEn: "Bedazzled Issue", rateUpIds: ["wpn_lance_0014"], type: "Weapon" },
-        "weponbox_1_5_1": { name: "Deep Cold Issue", displayEn: "Deep Cold Issue", rateUpIds: ["wpn_funnel_0019"], type: "Weapon" },
-        "weaponbox_constant_1": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_claym_0013"], type: "Weapon" },
-        "weaponbox_constant_2": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_funnel_0013"], type: "Weapon" },
-        "weaponbox_constant_3": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_sword_0016"], type: "Weapon" },
-        "weaponbox_constant_4": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_lance_0012"], type: "Weapon" },
-        "weaponbox_constant_5": { name: "Constant Issue", displayEn: "Constant Issue", rateUpIds: ["wpn_claym_0007"], type: "Weapon" }
-    };
+    let BANNER_DB = {};
+    try {
+        const cachedBanners = localStorage.getItem('efBannersDb');
+        if (cachedBanners) {
+            BANNER_DB = JSON.parse(cachedBanners) || {};
+        }
+    } catch (e) {
+        BANNER_DB = {};
+    }
 
     function getBannerInfo(poolId, bannerName = '') {
         if (!poolId && !bannerName) return null;
+        let info = null;
+
         if (poolId) {
-            if (BANNER_DB[poolId]) return BANNER_DB[poolId];
-            let lower = poolId.toLowerCase().trim();
-            if (BANNER_DB[lower]) return BANNER_DB[lower];
-            let norm = lower.replace(/^weaponbox_/, 'weponbox_');
-            if (BANNER_DB[norm]) return BANNER_DB[norm];
-            norm = lower.replace(/^weponbox_/, 'weaponbox_');
-            if (BANNER_DB[norm]) return BANNER_DB[norm];
-            if (lower.startsWith('joint_')) {
-                return BANNER_DB['joint_1_0_1'] || BANNER_DB['joint_1_2_2'] || null;
+            let cleanId = poolId.toString().trim();
+            let lower = cleanId.toLowerCase();
+            if (BANNER_DB[cleanId]) info = BANNER_DB[cleanId];
+            else if (BANNER_DB[lower]) info = BANNER_DB[lower];
+            else {
+                let normWep = lower.replace(/^weaponbox_/, 'weponbox_');
+                if (BANNER_DB[normWep]) info = BANNER_DB[normWep];
+                else {
+                    let normWeap = lower.replace(/^weponbox_/, 'weaponbox_');
+                    if (BANNER_DB[normWeap]) info = BANNER_DB[normWeap];
+                    else if (lower.startsWith('joint_')) {
+                        info = BANNER_DB['joint_1_0_1'] || BANNER_DB['joint_1_2_2'] || null;
+                    }
+                }
             }
         }
-        if (bannerName) {
-            let bLower = bannerName.toLowerCase().trim();
+
+        if (!info && bannerName) {
+            let bLower = bannerName.toString().toLowerCase().trim();
             for (const key of Object.keys(BANNER_DB)) {
                 const b = BANNER_DB[key];
-                if (b.name && b.name.toLowerCase() === bLower) return b;
-                if (b.displayEn && b.displayEn.toLowerCase() === bLower) return b;
+                if (!b) continue;
+                let n = (b.name || '').toLowerCase().trim();
+                let d = (b.displayEn || '').toLowerCase().trim();
+                if (n === bLower || d === bLower) {
+                    info = b;
+                    break;
+                }
             }
-            for (const key of Object.keys(BANNER_DB)) {
-                const b = BANNER_DB[key];
-                if (b.name && (bLower.includes(b.name.toLowerCase()) || b.name.toLowerCase().includes(bLower))) return b;
-                if (b.displayEn && (bLower.includes(b.displayEn.toLowerCase()) || b.displayEn.toLowerCase().includes(bLower))) return b;
+            if (!info) {
+                for (const key of Object.keys(BANNER_DB)) {
+                    const b = BANNER_DB[key];
+                    if (!b) continue;
+                    let n = (b.name || '').toLowerCase().trim();
+                    let d = (b.displayEn || '').toLowerCase().trim();
+                    if ((n && (bLower.includes(n) || n.includes(bLower))) ||
+                        (d && (bLower.includes(d) || d.includes(bLower)))) {
+                        info = b;
+                        break;
+                    }
+                }
             }
-            if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) return BANNER_DB['special_1_5_1'];
-            if (bLower.includes('dawnstar') || bLower.includes('liino')) return BANNER_DB['special_1_4_2'];
-            if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) return BANNER_DB['special_1_4_1'];
-            if (bLower.includes('deep cold')) return BANNER_DB['weponbox_1_5_1'];
+            if (!info) {
+                if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) info = BANNER_DB['special_1_5_1'];
+                else if (bLower.includes('dawnstar') || bLower.includes('liino')) info = BANNER_DB['special_1_4_2'];
+                else if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) info = BANNER_DB['special_1_4_1'];
+                else if (bLower.includes('deep cold')) info = BANNER_DB['weponbox_1_5_1'];
+            }
         }
-        return null;
+
+        if (!info) return null;
+
+        let rUps = info.rateUpIds || info.rateupIDs || info.rateupIds || [];
+        let rNames = info.rateUpName || info.rateupName || info.rateUpNames || info.rateupNames || [];
+        if (typeof rNames === 'string') rNames = [rNames];
+        return {
+            ...info,
+            rateUpIds: rUps,
+            rateupIDs: rUps,
+            rateUpName: rNames,
+            rateupName: rNames,
+            type: info.type || "Special"
+        };
     }
 
     async function syncRemoteBannersJson() {
         try {
-            let res = await fetch(`${EF_ASSETS_BASE}/banners.json`);
-            if (!res.ok) res = await fetch(`${EF_ASSETS_CDN}/banners.json`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+            let res = await fetch(`${EF_ASSETS_BASE}/banners.json`, { signal: controller.signal });
+            if (!res.ok) res = await fetch(`${EF_ASSETS_CDN}/banners.json`, { signal: controller.signal });
+            clearTimeout(timeoutId);
             if (!res.ok) return;
             const remoteDb = await res.json();
             if (remoteDb && typeof remoteDb === 'object') {
                 for (const [k, val] of Object.entries(remoteDb)) {
                     if (!val) continue;
-                    let existingRateUps = BANNER_DB[k]?.rateUpIds || [];
-                    let newRateUps = val.rateUpIds || [];
+                    let existingRateUps = BANNER_DB[k]?.rateUpIds || BANNER_DB[k]?.rateupIDs || [];
+                    let newRateUps = val.rateUpIds || val.rateupIDs || val.rateupIds || [];
                     let mergedRateUps = Array.from(new Set([...existingRateUps, ...newRateUps]));
+
+                    let existingRateUpNames = BANNER_DB[k]?.rateUpName || BANNER_DB[k]?.rateupName || [];
+                    let newRateUpNames = val.rateUpName || val.rateupName || val.rateUpNames || val.rateupNames || [];
+                    if (typeof newRateUpNames === 'string') newRateUpNames = [newRateUpNames];
+                    if (typeof existingRateUpNames === 'string') existingRateUpNames = [existingRateUpNames];
+                    let mergedRateUpNames = Array.from(new Set([...existingRateUpNames, ...newRateUpNames]));
+
                     BANNER_DB[k] = {
                         ...(BANNER_DB[k] || {}),
                         ...val,
-                        rateUpIds: mergedRateUps.length ? mergedRateUps : (BANNER_DB[k]?.rateUpIds || []),
-                        displayEn: val.displayEn || val.name || BANNER_DB[k]?.displayEn,
-                        name: val.name || BANNER_DB[k]?.name || val.displayEn
+                        rateUpIds: mergedRateUps.length ? mergedRateUps : newRateUps,
+                        rateupIDs: mergedRateUps.length ? mergedRateUps : newRateUps,
+                        rateUpName: mergedRateUpNames.length ? mergedRateUpNames : newRateUpNames,
+                        rateupName: mergedRateUpNames.length ? mergedRateUpNames : newRateUpNames,
+                        type: val.type || BANNER_DB[k]?.type || "Special",
+                        displayEn: val.displayEn || val.name || BANNER_DB[k]?.displayEn || "",
+                        name: val.name || BANNER_DB[k]?.name || val.displayEn || ""
                     };
                 }
+                try {
+                    localStorage.setItem('efBannersDb', JSON.stringify(BANNER_DB));
+                } catch (e) {}
+
                 if (isDataLoaded && lastLoadedData) {
                     processAndLoadData(lastLoadedData);
                 }
@@ -987,12 +1018,21 @@
     }
 
     function checkRateUpWon(bannerInfo, itemId, itemName, enName, pull) {
-        if (!bannerInfo || !bannerInfo.rateUpIds || !bannerInfo.rateUpIds.length) return false;
+        if (!bannerInfo) return false;
         
         const clean = (s) => (s || '').toString().toLowerCase().replace(/[\s_\-]/g, '');
         const curId = clean(itemId);
         const curName = clean(itemName);
         const curEnName = clean(enName);
+
+        let ruNames = bannerInfo.rateUpName || bannerInfo.rateupName || [];
+        if (!Array.isArray(ruNames)) ruNames = [ruNames];
+        for (let rName of ruNames) {
+            let cleanRName = clean(rName);
+            if (cleanRName && (curName === cleanRName || curEnName === cleanRName || (curName && curName.includes(cleanRName)) || (curEnName && curEnName.includes(cleanRName)))) return true;
+        }
+
+        if (!bannerInfo.rateUpIds || !bannerInfo.rateUpIds.length) return false;
 
         for (let rId of bannerInfo.rateUpIds) {
             let cleanRId = clean(rId);
@@ -1997,24 +2037,27 @@
         pullsCopy.forEach(pull => {
             if (isHuntingDossier(pull)) return;
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
-            let poolId = pull.poolId || poolTypeRaw;
+            let poolId = pull.poolId || pull.gachaPoolId || pull.pool_id || poolTypeRaw;
             let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
             let isJoint = false;
             let category = "Chartered Headhunting";
 
+            let bannerInfo = getBannerInfo(poolId, bannerName);
+            let bannerType = bannerInfo?.type || "";
+
             if (prefix === 'char') {
-                if (poolTypeRaw.includes("joint") || poolId === "joint" || bannerName.toLowerCase().includes("joint")) {
+                if (bannerType === "New Horizons" || poolTypeRaw.includes("new") || poolTypeRaw.includes("horizon") || poolTypeRaw.includes("beginner") || poolId === "beginner") {
+                    category = "New Horizons";
+                } else if (bannerType === "Standard" || poolTypeRaw.includes("basic") || poolTypeRaw.includes("standard") || poolId === "standard") {
+                    category = "Basic Headhunting";
+                } else if (poolTypeRaw.includes("joint") || poolId === "joint" || bannerName.toLowerCase().includes("joint") || (poolId && poolId.toString().toLowerCase().startsWith("joint_"))) {
                     isJoint = true;
                     category = "Joint Headhunting: " + bannerName;
-                } else if (poolTypeRaw.includes("basic") || poolTypeRaw.includes("standard") || poolId === "standard") {
-                    category = "Basic Headhunting";
-                } else if (poolTypeRaw.includes("new") || poolTypeRaw.includes("horizon") || poolTypeRaw.includes("beginner") || poolId === "beginner") {
-                    category = "New Horizons";
                 } else {
                     category = "Chartered Headhunting";
                 }
             } else {
-                category = (poolTypeRaw.includes("constant") || bannerName.toLowerCase().includes("constant") || poolTypeRaw.includes("standard") || poolId === "standard") ? "Constant Issue" : bannerName;
+                category = (bannerType === "Standard" || poolTypeRaw.includes("constant") || bannerName.toLowerCase().includes("constant") || poolTypeRaw.includes("standard") || poolId === "standard" || (poolId && poolId.toString().toLowerCase().includes("constant"))) ? "Constant Issue" : bannerName;
             }
 
             if (!categoryStats[category]) categoryStats[category] = { currentPity: 0, rateUpPity: 0, totalPulls: 0, lastBannerName: "", firstSixStarPity: null, hasPulledRateUp: false, tokenPulls: 0 };
@@ -2025,8 +2068,8 @@
 
             if (!bannerBoxes[bannerName].pmfs) bannerBoxes[bannerName].pmfs = [null, prefix === 'char' ? (isJoint ? buildPMF(MAX_PULLS, 80, 65, 0.008, 1.0, null, 0) : buildPMF(MAX_PULLS, 80, 65, 0.008, 0.50, 120, bannerBoxes[bannerName].startingPityForMath)) : buildPMF(MAX_PULLS, 40, 40, 0.04, 0.25, 80, 0)];
 
-            let itemId = pull.charId || pull.weaponId || pull.itemId || "";
-            let itemName = pull.name || pull.itemName || pull.charName || pull.weaponName || (pull.weapon ? pull.weapon.name || pull.weapon.weaponName : "Unknown Item");
+            let itemId = (prefix === 'char' ? (pull.charId || pull.itemId) : (pull.weaponId || pull.itemId)) || pull.charId || pull.weaponId || pull.itemId || "";
+            let itemName = (prefix === 'char' ? (pull.charName || pull.name || pull.itemName) : (pull.weaponName || pull.name || pull.itemName)) || pull.charName || pull.weaponName || pull.name || pull.itemName || (pull.weapon ? pull.weapon.name || pull.weapon.weaponName : "Unknown Item");
             let enName = parseIdToName(itemId) || itemName.replace(/[:;]/g, '');
 
             if (itemId) (prefix === 'char' ? uniqueChars : uniqueWeaps).set(itemId, itemName);
@@ -2052,7 +2095,9 @@
                         if (tB >= 18 && (tB - 18) % 16 === 0) {
                             let poolInfo = getBannerInfo(poolId, bannerName);
                             if (poolInfo && poolInfo.rateUpIds && poolInfo.rateUpIds.length) {
-                                let ruId = poolInfo.rateUpIds[0], fallback = parseIdToName(ruId), locName = uniqueWeaps.get(ruId) || fallback;
+                                let ruNames = poolInfo.rateUpName || poolInfo.rateupName || [];
+                                let ruNameFromDb = Array.isArray(ruNames) ? ruNames[0] : ruNames;
+                                let ruId = poolInfo.rateUpIds[0], fallback = ruNameFromDb || parseIdToName(ruId), locName = uniqueWeaps.get(ruId) || fallback;
                                 summaryWeaps.push({ id: ruId, name: locName, enName: fallback, rarity: "6", pity: "TOKEN", bannerName });
                             }
                         }
@@ -2067,7 +2112,9 @@
                         if (bannerBoxes[bannerName].tokenPulls > 0 && bannerBoxes[bannerName].tokenPulls % 240 === 0) {
                             let poolInfo = getBannerInfo(poolId, bannerName);
                             if (poolInfo && poolInfo.rateUpIds && poolInfo.rateUpIds.length) {
-                                let ruId = poolInfo.rateUpIds[0], fallback = parseIdToName(ruId), locName = uniqueChars.get(ruId) || fallback;
+                                let ruNames = poolInfo.rateUpName || poolInfo.rateupName || [];
+                                let ruNameFromDb = Array.isArray(ruNames) ? ruNames[0] : ruNames;
+                                let ruId = poolInfo.rateUpIds[0], fallback = ruNameFromDb || parseIdToName(ruId), locName = uniqueChars.get(ruId) || fallback;
                                 summaryChars.push({ id: ruId, name: locName, enName: fallback, rarity: "6", pity: "TOKEN", bannerName });
                             }
                         }
@@ -2250,14 +2297,17 @@
             let bUrl = getBannerImageUrl(data.poolId, bName, prefix);
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
 
-            if (bInfo?.rateUpIds?.length) {
+            let hasRateUp = (bInfo?.rateUpIds && bInfo.rateUpIds.length > 0) || (bInfo?.rateUpName && bInfo.rateUpName.length > 0) || (bInfo?.rateupName && bInfo.rateupName.length > 0);
+            if (hasRateUp) {
                 let isJointCat = data.category.startsWith("Joint Headhunting");
                 let ruText = "";
-                if (isJointCat && bInfo.rateUpIds.length > 1) {
+                if (isJointCat && bInfo.rateUpIds && bInfo.rateUpIds.length > 1) {
                     ruText = bInfo.rateUpIds.length + " RATE-UPS";
                 } else {
-                    let ruId = bInfo.rateUpIds[0], fallback = parseIdToName(ruId);
-                    ruText = (prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item";
+                    let ruNames = bInfo.rateUpName || bInfo.rateupName || [];
+                    let ruNameFromDb = Array.isArray(ruNames) ? (ruNames.length > 1 ? ruNames.join(', ') : ruNames[0]) : ruNames;
+                    let ruId = bInfo.rateUpIds?.[0], fallback = parseIdToName(ruId);
+                    ruText = ruNameFromDb || (prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item";
                 }
                 
                 ruHTML = `<div class="banner-rate-up ${data.hasPulledRateUp ? 'won' : 'lost'}">RATE-UP: <span>${ruText}${data.hasPulledRateUp ? ' <span style="color: var(--color-green); margin-left: 4px;">&#10004;</span>' : ''}</span></div>`;
@@ -2650,7 +2700,7 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         // Migrate old config keys
         migrateOldConfig();
         const config = getEfConfig();
@@ -2707,7 +2757,7 @@
         populateExportList();
 
         // Sync remote banners database from GitHub repository
-        syncRemoteBannersJson();
+        await syncRemoteBannersJson();
 
         if (config.showTimestamps === true) {
             document.body.classList.add('show-timestamps');
