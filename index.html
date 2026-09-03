@@ -221,6 +221,339 @@
         .about-highlight { color: var(--accent-orange); font-weight: bold; }
         .about-highlight-green { color: var(--color-green); font-weight: bold; }
 
+        /* --- PATCH STATS STYLING --- */
+        .patch-card {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid var(--accent-orange);
+            padding: 24px;
+            margin-bottom: 25px;
+            position: relative;
+            box-sizing: border-box;
+            transition: border-color 0.25s ease, transform 0.25s ease;
+        }
+        .patch-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            border-left-color: var(--color-yellow);
+        }
+        .patch-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 14px;
+        }
+        .patch-tag-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .patch-title-text {
+            font-size: 24px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+        .patch-status-badge {
+            font-size: 11px;
+            font-family: monospace;
+            padding: 3px 8px;
+            background: rgba(255, 250, 0, 0.12);
+            color: var(--color-yellow);
+            border: 1px solid rgba(255, 250, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .patch-pulls-dual-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .patch-pull-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+        }
+        .patch-pull-badge.char {
+            border-left: 3px solid var(--accent-orange);
+        }
+        .patch-pull-badge.weap {
+            border-left: 3px solid var(--accent-blue);
+        }
+        .patch-pull-badge-num {
+            font-size: 22px;
+            font-family: monospace;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .patch-pull-badge.char .patch-pull-badge-num {
+            color: var(--accent-orange);
+        }
+        .patch-pull-badge.weap .patch-pull-badge-num {
+            color: var(--accent-blue);
+        }
+        .patch-pull-badge-label {
+            font-size: 10px;
+            font-family: monospace;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            margin-top: 3px;
+        }
+        .patch-subline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: monospace;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .patch-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .patch-metric-cell {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 14px;
+        }
+        .patch-metric-title {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-family: monospace;
+            margin-bottom: 4px;
+        }
+        .patch-metric-val {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: monospace;
+            color: #ffffff;
+        }
+        .patch-metric-sub {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+        .patch-banners-subhead {
+            font-size: 13px;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+            font-family: monospace;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .patch-banners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 15px;
+        }
+        .patch-banner-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+        }
+        .patch-banner-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .patch-banner-item.skipped {
+            opacity: 0.55;
+        }
+        .patch-banner-item-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .patch-banner-thumb {
+            width: 58px;
+            height: 38px;
+            object-fit: cover;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .patch-banner-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .patch-banner-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+        .patch-banner-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--text-dim);
+            flex-wrap: wrap;
+        }
+        .patch-pill-char {
+            color: var(--accent-orange);
+            background: rgba(255, 152, 0, 0.12);
+            padding: 1px 5px;
+            font-size: 10px;
+        }
+        .patch-pill-weap {
+            color: var(--accent-blue);
+            background: rgba(33, 150, 243, 0.12);
+            padding: 1px 5px;
+            font-size: 10px;
+        }
+        .patch-banner-pulls {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .patch-banner-pulls-val {
+            font-size: 16px;
+            font-weight: 800;
+            font-family: monospace;
+            color: var(--text-main);
+        }
+        .patch-banner-pulls-share {
+            font-size: 10px;
+            font-family: monospace;
+            color: var(--text-dim);
+        }
+        .patch-banner-drops {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 8px;
+        }
+        .patch-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 152, 0, 0.4);
+            padding: 3px 8px 3px 4px;
+            border-radius: 2px;
+        }
+        .patch-drop-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
+            border-radius: 2px;
+            background: #000;
+        }
+        .patch-drop-name {
+            font-size: 11px;
+            color: #ffffff;
+            max-width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .patch-drop-pity {
+            font-size: 11px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .dist-patch-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 2px;
+        }
+        .dist-patch-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .dist-patch-label {
+            width: 95px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: monospace;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+        .dist-bars-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .dist-bar-single {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .dist-bar-type-tag {
+            font-size: 9px;
+            font-family: monospace;
+            width: 38px;
+            flex-shrink: 0;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .dist-bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 1px;
+            overflow: hidden;
+            position: relative;
+        }
+        .dist-bar-fill-char {
+            background: var(--accent-orange);
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .dist-bar-fill-weap {
+            background: var(--accent-blue);
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .dist-bar-count-inline {
+            font-size: 11px;
+            font-family: monospace;
+            width: 48px;
+            text-align: right;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+        .dist-patch-stats {
+            width: 180px;
+            text-align: right;
+            font-size: 12px;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
         /* --- BANNERS --- */
         .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; align-items: start; }
         .banner-box { 
@@ -732,6 +1065,9 @@
             <button id="tab-weap" class="tab-btn" onclick="switchTab('weap')" title="Arsenals" style="display: none;">
                 <svg viewBox="0 0 24 24"><path d="M19.7 4.3c-.4-.4-1-.4-1.4 0L12 10.6 8.7 7.3c-.4-.4-1-.4-1.4 0l-3 3c-.4.4-.4 1 0 1.4l3.3 3.3-4.3 4.3c-.4.4-.4 1 0 1.4.4.4 1 .4 1.4 0l4.3-4.3 3.3 3.3c.4.4 1 .4 1.4 0l3-3c.4-.4.4-1 0-1.4L13.4 12l6.3-6.3c.4-.4.4-1 0-1.4z"/></svg>
             </button>
+            <button id="tab-stats" class="tab-btn" onclick="switchTab('stats')" title="Patch Stats" style="display: none;">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </button>
             <button id="tab-settings" class="tab-btn" onclick="switchTab('settings')" title="Settings">
                 <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
             </button>
@@ -765,6 +1101,27 @@
 
             <h2 id="weap-title">// Arsenal Issues</h2>
             <div class="banner-grid" id="weapBannerGrid"></div>
+        </div>
+
+        <div id="stats-section" style="display: none;">
+            <div class="section-header">
+                <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
+                <h2 class="main-title">Patch Stats</h2>
+            </div>
+            <div id="patchStatsKpiDashboard" class="stats-card-container" style="margin-bottom: 25px;"></div>
+            <div id="patchStatsDistributionCard" class="about-card" style="margin-bottom: 25px; padding: 22px;"></div>
+
+            <div class="nav-bar-content" style="padding-top: 5px; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h2 style="margin: 0;">// Update Breakdown</h2>
+                <div class="banner-filters" id="patchStatsFilterControls">
+                    <button class="filter-btn active" id="patch-filter-all" onclick="setPatchCategoryFilter('all')">SIDE-BY-SIDE</button>
+                    <button class="filter-btn" id="patch-filter-char" onclick="setPatchCategoryFilter('char')">OPERATORS ONLY</button>
+                    <button class="filter-btn" id="patch-filter-weap" onclick="setPatchCategoryFilter('weap')">ARSENALS ONLY</button>
+                    <button class="filter-btn" id="patch-sort-btn" onclick="cyclePatchSort()" style="margin-left: 10px;">LATEST FIRST ▼</button>
+                </div>
+            </div>
+
+            <div id="patchCardsContainer" style="display: flex; flex-direction: column; gap: 20px;"></div>
         </div>
 
         <div id="settings-section" style="display: none;">
@@ -901,24 +1258,31 @@
     } catch (e) {
         BANNER_DB = {};
     }
+    // Normalize weapon banner names to prevent duplicate stubs
+    if (BANNER_DB['weponbox_1_2_1']) {
+        BANNER_DB['weponbox_1_2_1'].name = "Drifting Raft Issue";
+        BANNER_DB['weponbox_1_2_1'].displayEn = "Drifting Raft Issue";
+    }
 
     function getBannerInfo(poolId, bannerName = '') {
         if (!poolId && !bannerName) return null;
         let info = null;
+        let infoKey = null;
 
         if (poolId) {
             let cleanId = poolId.toString().trim();
             let lower = cleanId.toLowerCase();
-            if (BANNER_DB[cleanId]) info = BANNER_DB[cleanId];
-            else if (BANNER_DB[lower]) info = BANNER_DB[lower];
+            if (BANNER_DB[cleanId]) { info = BANNER_DB[cleanId]; infoKey = cleanId; }
+            else if (BANNER_DB[lower]) { info = BANNER_DB[lower]; infoKey = lower; }
             else {
                 let normWep = lower.replace(/^weaponbox_/, 'weponbox_');
-                if (BANNER_DB[normWep]) info = BANNER_DB[normWep];
+                if (BANNER_DB[normWep]) { info = BANNER_DB[normWep]; infoKey = normWep; }
                 else {
                     let normWeap = lower.replace(/^weponbox_/, 'weaponbox_');
-                    if (BANNER_DB[normWeap]) info = BANNER_DB[normWeap];
+                    if (BANNER_DB[normWeap]) { info = BANNER_DB[normWeap]; infoKey = normWeap; }
                     else if (lower.startsWith('joint_')) {
                         info = BANNER_DB['joint_1_0_1'] || BANNER_DB['joint_1_2_2'] || null;
+                        infoKey = lower;
                     }
                 }
             }
@@ -933,6 +1297,7 @@
                 let d = (b.displayEn || '').toLowerCase().trim();
                 if (n === bLower || d === bLower) {
                     info = b;
+                    infoKey = key;
                     break;
                 }
             }
@@ -945,15 +1310,16 @@
                     if ((n && (bLower.includes(n) || n.includes(bLower))) ||
                         (d && (bLower.includes(d) || d.includes(bLower)))) {
                         info = b;
+                        infoKey = key;
                         break;
                     }
                 }
             }
             if (!info) {
-                if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) info = BANNER_DB['special_1_5_1'];
-                else if (bLower.includes('dawnstar') || bLower.includes('liino')) info = BANNER_DB['special_1_4_2'];
-                else if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) info = BANNER_DB['special_1_4_1'];
-                else if (bLower.includes('deep cold')) info = BANNER_DB['weponbox_1_5_1'];
+                if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) { info = BANNER_DB['special_1_5_1']; infoKey = 'special_1_5_1'; }
+                else if (bLower.includes('dawnstar') || bLower.includes('liino')) { info = BANNER_DB['special_1_4_2']; infoKey = 'special_1_4_2'; }
+                else if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) { info = BANNER_DB['special_1_4_1']; infoKey = 'special_1_4_1'; }
+                else if (bLower.includes('deep cold')) { info = BANNER_DB['weponbox_1_5_1']; infoKey = 'weponbox_1_5_1'; }
             }
         }
 
@@ -964,11 +1330,77 @@
         if (typeof rNames === 'string') rNames = [rNames];
         return {
             ...info,
+            id: info.id || infoKey || poolId,
+            poolId: info.poolId || infoKey || poolId,
             rateUpIds: rUps,
             rateupIDs: rUps,
             rateUpName: rNames,
             rateupName: rNames,
             type: info.type || "Special"
+        };
+    }
+
+    function getBannerPatchInfo(poolId, bannerName = '', bInfo = null) {
+        if (!bInfo && (poolId || bannerName)) {
+            bInfo = getBannerInfo(poolId, bannerName);
+        }
+
+        let candidates = [];
+        if (bInfo) {
+            if (bInfo.id) candidates.push(bInfo.id.toString());
+            if (bInfo.poolId) candidates.push(bInfo.poolId.toString());
+        }
+        if (poolId) candidates.push(poolId.toString());
+        if (bannerName) candidates.push(bannerName.toString());
+
+        for (let str of candidates) {
+            // Match pattern like 1_4_1, special_1_4_1, weponbox_1_4_2, 1.4
+            let m = str.match(/(?:^|[^0-9])(\d+)[._](\d+)(?:[._](\d+))?(?:$|[^0-9])/);
+            if (m) {
+                let major = parseInt(m[1], 10);
+                let minor = parseInt(m[2], 10);
+                let bannerSeq = m[3] ? parseInt(m[3], 10) : null;
+                return {
+                    patchKey: `${major}.${minor}`,
+                    patchTitle: `Patch ${major}.${minor}`,
+                    major,
+                    minor,
+                    bannerSeq,
+                    isPermanent: false
+                };
+            }
+        }
+
+        let bLower = (bannerName || '').toLowerCase().trim();
+        for (const [key, b] of Object.entries(BANNER_DB)) {
+            if (!b) continue;
+            let n = (b.name || '').toLowerCase().trim();
+            let d = (b.displayEn || '').toLowerCase().trim();
+            if ((n && (bLower.includes(n) || n.includes(bLower))) ||
+                (d && (bLower.includes(d) || d.includes(bLower)))) {
+                let m = key.match(/(?:^|[^0-9])(\d+)[._](\d+)(?:[._](\d+))?/);
+                if (m) {
+                    let major = parseInt(m[1], 10);
+                    let minor = parseInt(m[2], 10);
+                    return {
+                        patchKey: `${major}.${minor}`,
+                        patchTitle: `Patch ${major}.${minor}`,
+                        major,
+                        minor,
+                        bannerSeq: m[3] ? parseInt(m[3], 10) : null,
+                        isPermanent: false
+                    };
+                }
+            }
+        }
+
+        return {
+            patchKey: 'Permanent',
+            patchTitle: 'Standard / Constant',
+            major: -1,
+            minor: -1,
+            bannerSeq: null,
+            isPermanent: true
         };
     }
 
@@ -994,6 +1426,13 @@
                     if (typeof existingRateUpNames === 'string') existingRateUpNames = [existingRateUpNames];
                     let mergedRateUpNames = Array.from(new Set([...existingRateUpNames, ...newRateUpNames]));
 
+                    let bName = val.name || BANNER_DB[k]?.name || val.displayEn || "";
+                    let bDisplay = val.displayEn || val.name || BANNER_DB[k]?.displayEn || "";
+                    if (k === 'weponbox_1_2_1' || bName === 'Drifting Raft' || bDisplay === 'Drifting Raft') {
+                        bName = 'Drifting Raft Issue';
+                        bDisplay = 'Drifting Raft Issue';
+                    }
+
                     BANNER_DB[k] = {
                         ...(BANNER_DB[k] || {}),
                         ...val,
@@ -1002,8 +1441,8 @@
                         rateUpName: mergedRateUpNames.length ? mergedRateUpNames : newRateUpNames,
                         rateupName: mergedRateUpNames.length ? mergedRateUpNames : newRateUpNames,
                         type: val.type || BANNER_DB[k]?.type || "Special",
-                        displayEn: val.displayEn || val.name || BANNER_DB[k]?.displayEn || "",
-                        name: val.name || BANNER_DB[k]?.name || val.displayEn || ""
+                        displayEn: bDisplay,
+                        name: bName
                     };
                 }
                 try {
@@ -1020,7 +1459,7 @@
     }
 
     const MAX_PULLS = 1500;
-    const SECTION_ORDER = ['char', 'weap', 'settings', 'about'];
+    const SECTION_ORDER = ['char', 'weap', 'stats', 'settings', 'about'];
     
     let currentTab = 'settings';
     let isAnimating = false;
@@ -1077,6 +1516,9 @@
     
     let summaryChars = [], summaryWeaps = [];
     let charBannerTimeline = [], weapBannerTimeline = [];
+    let charBannerBoxes = {}, weapBannerBoxes = {};
+    let patchCategoryFilter = 'all';
+    let patchSortMode = 'latest';
     let uniqueChars = new Map(), uniqueWeaps = new Map();
     let lastLoadedData = null;
     let pmf_char_any = [], pmf_weap_any = [], pmf_joint_any = [];
@@ -1443,7 +1885,7 @@
     function getTabIndex(t) { return SECTION_ORDER.indexOf(t); }
 
     function updateTabButtonStyles(activeTabId) {
-        ['char', 'weap', 'settings', 'about'].forEach(t => {
+        ['char', 'weap', 'stats', 'settings', 'about'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.classList.toggle('active-tab', t === activeTabId);
         });
@@ -1537,6 +1979,8 @@
                     }, 3000);
                 }
             }
+        } else if (tab === 'stats') {
+            renderPatchStats();
         }
 
         let ease = 'cubic-bezier(0.25, 1, 0.5, 1)';
@@ -2170,6 +2614,7 @@
         }
         
         summaryChars = []; summaryWeaps = []; uniqueChars.clear(); uniqueWeaps.clear();
+        charBannerBoxes = {}; weapBannerBoxes = {};
         advStats = { char: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 }, weap: { pulls: 0, s6: 0, s5: 0, rateUpWins: 0, rateUpLosses: 0 } };
         
         if (data.characters) analyzeData(data.characters, 'char');
@@ -2189,12 +2634,12 @@
             }, 3000);
         }
         
-        renderSummary(); renderOverviews();
+        renderSummary(); renderOverviews(); renderPatchStats();
         
         isDataLoaded = true;
         
         // Show hidden tabs
-        ['char', 'weap'].forEach(t => {
+        ['char', 'weap', 'stats'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.style.display = 'flex';
         });
@@ -2274,6 +2719,7 @@
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
             let poolId = pull.poolId || pull.gachaPoolId || pull.pool_id || poolTypeRaw;
             let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
+            if (bannerName === 'Drifting Raft') bannerName = 'Drifting Raft Issue';
             let isJoint = false;
             let category = "Chartered Headhunting";
 
@@ -2560,6 +3006,8 @@
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;
+        if (prefix === 'char') charBannerBoxes = bannerBoxes;
+        else weapBannerBoxes = bannerBoxes;
         sortedTimeline.forEach((_, i) => { let l = document.getElementById(`list-banner-${prefix}-${i}`); if (l) updateBlockHeaders(l); });
         initScrollReveal();
     }
@@ -2579,6 +3027,773 @@
             }
             document.getElementById(`${type}OverviewDashboard`).innerHTML = html;
         });
+        initScrollReveal();
+    }
+
+    // ==============================================================================
+    // PATCH / UPDATE STATISTICS ENGINE
+    // ==============================================================================
+    function buildPatchStatsData() {
+        if (!lastLoadedData) return { patches: [], grandTotal: 0, peakPatch: null, avgPulls: 0, total6: 0, activePatchesCount: 0 };
+
+        let patchMap = new Map();
+
+        function getOrCreatePatch(patchKey, patchTitle, major, minor, isPermanent) {
+            if (!patchMap.has(patchKey)) {
+                patchMap.set(patchKey, {
+                    patchKey,
+                    patchTitle,
+                    major,
+                    minor,
+                    isPermanent,
+                    totalPulls: 0,
+                    charPulls: 0,
+                    weapPulls: 0,
+                    sixStars: [],
+                    fiveStars: 0,
+                    fourStars: 0,
+                    threeStars: 0,
+                    banners: new Map()
+                });
+            }
+            return patchMap.get(patchKey);
+        }
+
+        function findPatchBanner(patch, poolId, bName) {
+            let cleanPool = (poolId || '').toString().toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+            let normTarget = (bName || '').toLowerCase()
+                .replace(/\s+(issue|headhunting|banner|operation)$/i, '')
+                .replace(/[^a-z0-9]/g, '');
+
+            for (let entry of patch.banners.values()) {
+                let entryCleanPool = (entry.poolId || '').toString().toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+                if (cleanPool && entryCleanPool && cleanPool !== 'special' && cleanPool !== 'weapon' && cleanPool !== 'unknown') {
+                    if (cleanPool === entryCleanPool) return entry;
+                }
+                if (entry.bannerName && bName && entry.bannerName.toLowerCase().trim() === bName.toLowerCase().trim()) {
+                    return entry;
+                }
+                let entryNorm = (entry.bannerName || '').toLowerCase()
+                    .replace(/\s+(issue|headhunting|banner|operation)$/i, '')
+                    .replace(/[^a-z0-9]/g, '');
+                if (normTarget && entryNorm && (normTarget === entryNorm || normTarget.includes(entryNorm) || entryNorm.includes(normTarget))) {
+                    return entry;
+                }
+            }
+            return null;
+        }
+
+        // 1. Pre-populate banners from BANNER_DB so patches reflect banners that appeared in that update
+        for (const [dbKey, dbVal] of Object.entries(BANNER_DB)) {
+            if (!dbVal) continue;
+            let pInfo = getBannerPatchInfo(dbKey, dbVal.name || dbVal.displayEn || '', dbVal);
+            if (pInfo && !pInfo.isPermanent) {
+                let patch = getOrCreatePatch(pInfo.patchKey, pInfo.patchTitle, pInfo.major, pInfo.minor, false);
+                let bName = dbVal.name || dbVal.displayEn || dbKey;
+                let isWeap = dbKey.toLowerCase().startsWith('weponbox') || dbKey.toLowerCase().startsWith('weaponbox');
+                if (isWeap && bName.toLowerCase().trim() === 'drifting raft') {
+                    bName = 'Drifting Raft Issue';
+                }
+                let existing = findPatchBanner(patch, dbKey, bName);
+                if (!existing) {
+                    patch.banners.set(dbKey, {
+                        bannerName: bName,
+                        poolId: dbKey,
+                        bannerInfo: dbVal,
+                        prefix: isWeap ? 'weap' : 'char',
+                        totalPulls: 0,
+                        sixStars: [],
+                        fiveStars: 0,
+                        rateUpWon: false,
+                        isOfficial: true
+                    });
+                }
+            }
+        }
+
+        // 2. Aggregate Character Banners from charBannerBoxes
+        for (const [bName, bBox] of Object.entries(charBannerBoxes)) {
+            let pInfo = getBannerPatchInfo(bBox.poolId, bName, getBannerInfo(bBox.poolId, bName));
+            let patch = getOrCreatePatch(pInfo.patchKey, pInfo.patchTitle, pInfo.major, pInfo.minor, pInfo.isPermanent);
+
+            let bannerEntry = findPatchBanner(patch, bBox.poolId, bName);
+            if (!bannerEntry) {
+                bannerEntry = {
+                    bannerName: bName,
+                    poolId: bBox.poolId,
+                    bannerInfo: getBannerInfo(bBox.poolId, bName),
+                    prefix: 'char',
+                    totalPulls: 0,
+                    sixStars: [],
+                    fiveStars: 0,
+                    rateUpWon: false,
+                    isOfficial: false
+                };
+                patch.banners.set(bBox.poolId || bName, bannerEntry);
+            } else {
+                bannerEntry.bannerName = bName;
+                if (bBox.poolId && !bannerEntry.poolId) bannerEntry.poolId = bBox.poolId;
+            }
+
+            let pullsOnThisBanner = bBox.totalPulls || 0;
+            bannerEntry.totalPulls = pullsOnThisBanner;
+            bannerEntry.rateUpWon = !!bBox.hasPulledRateUp;
+
+            patch.charPulls += pullsOnThisBanner;
+            patch.totalPulls += pullsOnThisBanner;
+
+            (bBox.allPulls || []).forEach(p => {
+                if (p.rarity === "6") {
+                    let item = {
+                        name: p.name,
+                        enName: p.enName,
+                        id: p.itemId,
+                        rarity: "6",
+                        pity: p.pityAtPull,
+                        isRateUpItem: !!p.isRateUpItem,
+                        bannerName: bName,
+                        prefix: 'char',
+                        timestamp: p.timestamp
+                    };
+                    bannerEntry.sixStars.push(item);
+                    patch.sixStars.push(item);
+                } else if (p.rarity === "5") {
+                    bannerEntry.fiveStars++;
+                    patch.fiveStars++;
+                } else if (p.rarity === "4") {
+                    patch.fourStars++;
+                } else if (p.rarity === "3") {
+                    patch.threeStars++;
+                }
+            });
+        }
+
+        // 3. Aggregate Weapon Banners from weapBannerBoxes
+        for (let [bName, bBox] of Object.entries(weapBannerBoxes)) {
+            if (bName === 'Drifting Raft') bName = 'Drifting Raft Issue';
+            let pInfo = getBannerPatchInfo(bBox.poolId, bName, getBannerInfo(bBox.poolId, bName));
+            let patch = getOrCreatePatch(pInfo.patchKey, pInfo.patchTitle, pInfo.major, pInfo.minor, pInfo.isPermanent);
+
+            let bannerEntry = findPatchBanner(patch, bBox.poolId, bName);
+            if (!bannerEntry) {
+                bannerEntry = {
+                    bannerName: bName,
+                    poolId: bBox.poolId,
+                    bannerInfo: getBannerInfo(bBox.poolId, bName),
+                    prefix: 'weap',
+                    totalPulls: 0,
+                    sixStars: [],
+                    fiveStars: 0,
+                    rateUpWon: false,
+                    isOfficial: false
+                };
+                patch.banners.set(bBox.poolId || bName, bannerEntry);
+            } else {
+                bannerEntry.bannerName = bName;
+                if (bBox.poolId && !bannerEntry.poolId) bannerEntry.poolId = bBox.poolId;
+            }
+
+            let pullsOnThisBanner = bBox.totalPulls || 0;
+            bannerEntry.totalPulls = pullsOnThisBanner;
+            bannerEntry.rateUpWon = !!bBox.hasPulledRateUp;
+
+            patch.weapPulls += pullsOnThisBanner;
+            patch.totalPulls += pullsOnThisBanner;
+
+            (bBox.allPulls || []).forEach(p => {
+                if (p.rarity === "6") {
+                    let item = {
+                        name: p.name,
+                        enName: p.enName,
+                        id: p.itemId,
+                        rarity: "6",
+                        pity: p.pityAtPull,
+                        isRateUpItem: !!p.isRateUpItem,
+                        bannerName: bName,
+                        prefix: 'weap',
+                        timestamp: p.timestamp
+                    };
+                    bannerEntry.sixStars.push(item);
+                    patch.sixStars.push(item);
+                } else if (p.rarity === "5") {
+                    bannerEntry.fiveStars++;
+                    patch.fiveStars++;
+                } else if (p.rarity === "4") {
+                    patch.fourStars++;
+                } else if (p.rarity === "3") {
+                    patch.threeStars++;
+                }
+            });
+        }
+
+        // 4. Deduplicate any duplicate banner entries within each patch
+        patchMap.forEach(patch => {
+            let uniqueList = [];
+            for (let b of patch.banners.values()) {
+                if (b.bannerName === 'Drifting Raft') b.bannerName = 'Drifting Raft Issue';
+
+                let matchIdx = uniqueList.findIndex(existing => {
+                    let pA = (existing.poolId || '').toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+                    let pB = (b.poolId || '').toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+                    if (pA && pB && pA !== 'special' && pA !== 'weapon' && pA !== 'unknown' && pA === pB) return true;
+                    let nA = (existing.bannerName || '').toLowerCase().replace(/\s+(issue|headhunting|banner|operation)$/i, '').replace(/[^a-z0-9]/g, '');
+                    let nB = (b.bannerName || '').toLowerCase().replace(/\s+(issue|headhunting|banner|operation)$/i, '').replace(/[^a-z0-9]/g, '');
+                    return (nA && nB && (nA === nB || nA.includes(nB) || nB.includes(nA)));
+                });
+
+                if (matchIdx !== -1) {
+                    let existing = uniqueList[matchIdx];
+                    if (b.totalPulls > 0 && existing.totalPulls === 0) {
+                        existing.bannerName = b.bannerName;
+                        existing.totalPulls = b.totalPulls;
+                        existing.rateUpWon = b.rateUpWon;
+                    } else if (b.bannerName.toLowerCase().includes('issue') && !existing.bannerName.toLowerCase().includes('issue')) {
+                        existing.bannerName = b.bannerName;
+                    }
+                    if (b.sixStars && b.sixStars.length) {
+                        existing.sixStars = Array.from(new Set([...existing.sixStars, ...b.sixStars]));
+                    }
+                    existing.fiveStars = Math.max(existing.fiveStars, b.fiveStars);
+                } else {
+                    uniqueList.push(b);
+                }
+            }
+            patch.banners = new Map(uniqueList.map((b, idx) => [b.poolId || b.bannerName || idx, b]));
+        });
+
+        let patchesList = Array.from(patchMap.values());
+        // Remove empty permanent patch if 0 pulls in both
+        patchesList = patchesList.filter(p => !p.isPermanent || (p.charPulls > 0 || p.weapPulls > 0));
+
+        let grandCharTotal = 0;
+        let grandWeapTotal = 0;
+        let char6Stars = 0;
+        let weap6Stars = 0;
+        patchesList.forEach(p => {
+            grandCharTotal += p.charPulls;
+            grandWeapTotal += p.weapPulls;
+            char6Stars += p.sixStars.filter(s => s.prefix === 'char').length;
+            weap6Stars += p.sixStars.filter(s => s.prefix === 'weap').length;
+        });
+
+        let peakCharPatch = null;
+        let maxCharPull = -1;
+        let peakWeapPatch = null;
+        let maxWeapPull = -1;
+        patchesList.forEach(p => {
+            if (p.charPulls > maxCharPull) {
+                maxCharPull = p.charPulls;
+                peakCharPatch = p;
+            }
+            if (p.weapPulls > maxWeapPull) {
+                maxWeapPull = p.weapPulls;
+                peakWeapPatch = p;
+            }
+        });
+
+        let activeCharPatchesCount = patchesList.filter(p => p.charPulls > 0).length;
+        let activeWeapPatchesCount = patchesList.filter(p => p.weapPulls > 0).length;
+
+        let avgCharPulls = activeCharPatchesCount > 0 ? Math.round(grandCharTotal / activeCharPatchesCount) : 0;
+        let avgWeapPulls = activeWeapPatchesCount > 0 ? Math.round(grandWeapTotal / activeWeapPatchesCount) : 0;
+
+        return {
+            patches: patchesList,
+            grandCharTotal,
+            grandWeapTotal,
+            peakCharPatch,
+            peakWeapPatch,
+            avgCharPulls,
+            avgWeapPulls,
+            char6Stars,
+            weap6Stars,
+            activeCharPatchesCount,
+            activeWeapPatchesCount
+        };
+    }
+
+    function sortPatches(patchesList, sortMode) {
+        return [...patchesList].sort((a, b) => {
+            if (sortMode === 'pulls') {
+                if (patchCategoryFilter === 'char') {
+                    if (b.charPulls !== a.charPulls) return b.charPulls - a.charPulls;
+                } else if (patchCategoryFilter === 'weap') {
+                    if (b.weapPulls !== a.weapPulls) return b.weapPulls - a.weapPulls;
+                } else {
+                    // For side-by-side mode, rank by operator pulls first, then arsenal pulls
+                    if (b.charPulls !== a.charPulls) return b.charPulls - a.charPulls;
+                    if (b.weapPulls !== a.weapPulls) return b.weapPulls - a.weapPulls;
+                }
+            }
+            if (a.isPermanent && !b.isPermanent) return 1;
+            if (!a.isPermanent && b.isPermanent) return -1;
+            if (sortMode === 'chrono') {
+                if (a.major !== b.major) return a.major - b.major;
+                return a.minor - b.minor;
+            }
+            // default 'latest'
+            if (a.major !== b.major) return b.major - a.major;
+            return b.minor - a.minor;
+        });
+    }
+
+    function setPatchCategoryFilter(filter) {
+        patchCategoryFilter = filter;
+        ['all', 'char', 'weap'].forEach(f => {
+            const btn = document.getElementById(`patch-filter-${f}`);
+            if (btn) btn.classList.toggle('active', f === filter);
+        });
+        renderPatchStats();
+    }
+
+    function cyclePatchSort() {
+        const modes = ['latest', 'chrono', 'pulls'];
+        const labels = {
+            'latest': 'LATEST FIRST ▼',
+            'chrono': 'EARLIEST FIRST ▲',
+            'pulls': 'MOST PULLS ★'
+        };
+        let idx = modes.indexOf(patchSortMode);
+        let nextIdx = (idx + 1) % modes.length;
+        patchSortMode = modes[nextIdx];
+        const btn = document.getElementById('patch-sort-btn');
+        if (btn) btn.innerText = labels[patchSortMode];
+        renderPatchStats();
+    }
+
+    function scrollToPatchCard(patchKey) {
+        const el = document.getElementById(`patch-card-${patchKey.replace(/\./g, '_')}`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el.style.boxShadow = '0 0 20px rgba(255, 250, 0, 0.4)';
+            setTimeout(() => {
+                el.style.boxShadow = '';
+            }, 1600);
+        }
+    }
+
+    function renderPatchStats() {
+        const kpiContainer = document.getElementById('patchStatsKpiDashboard');
+        const distContainer = document.getElementById('patchStatsDistributionCard');
+        const cardsContainer = document.getElementById('patchCardsContainer');
+        if (!kpiContainer || !distContainer || !cardsContainer) return;
+
+        if (!isDataLoaded || !lastLoadedData) {
+            kpiContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 13px; font-style: italic; font-family: monospace;">LOAD DATA TO VIEW UPDATE & PATCH STATISTICS</div>`;
+            distContainer.innerHTML = '';
+            cardsContainer.innerHTML = '';
+            return;
+        }
+
+        const statsData = buildPatchStatsData();
+
+        // 1. KPI Overview Cards - Strictly separated into Operator & Arsenal currencies
+        let kpiHtml = '';
+
+        if (patchCategoryFilter === 'char') {
+            const totalCharCard = createStatCard(
+                "OPERATOR PULLS",
+                statsData.grandCharTotal,
+                `Across ${statsData.activeCharPatchesCount} active updates`,
+                null,
+                null,
+                'var(--accent-orange)'
+            );
+            const peakCharCard = createStatCard(
+                "PEAK OPERATOR INVESTMENT",
+                statsData.peakCharPatch ? statsData.peakCharPatch.patchTitle : "N/A",
+                statsData.peakCharPatch ? `${statsData.peakCharPatch.charPulls} Operator Pulls` : "0 Pulls",
+                null,
+                null,
+                'var(--color-yellow)'
+            );
+            const avgCharCard = createStatCard(
+                "AVG PER UPDATE",
+                statsData.avgCharPulls,
+                "Operator pulls per active patch",
+                null,
+                null,
+                'var(--accent-orange)'
+            );
+            const sixCharCard = createStatCard(
+                "6★ OPERATORS WON",
+                statsData.char6Stars,
+                `Drop Rate: ${statsData.grandCharTotal > 0 ? ((statsData.char6Stars / statsData.grandCharTotal) * 100).toFixed(2) + '%' : '0%'}`,
+                null,
+                null,
+                'var(--color-yellow)'
+            );
+            kpiHtml = totalCharCard + peakCharCard + avgCharCard + sixCharCard;
+        } else if (patchCategoryFilter === 'weap') {
+            const totalWeapCard = createStatCard(
+                "ARSENAL PULLS",
+                statsData.grandWeapTotal,
+                `Across ${statsData.activeWeapPatchesCount} active updates`,
+                null,
+                null,
+                'var(--accent-blue)'
+            );
+            const peakWeapCard = createStatCard(
+                "PEAK ARSENAL INVESTMENT",
+                statsData.peakWeapPatch ? statsData.peakWeapPatch.patchTitle : "N/A",
+                statsData.peakWeapPatch ? `${statsData.peakWeapPatch.weapPulls} Arsenal Pulls` : "0 Pulls",
+                null,
+                null,
+                'var(--accent-blue)'
+            );
+            const avgWeapCard = createStatCard(
+                "AVG PER UPDATE",
+                statsData.avgWeapPulls,
+                "Arsenal pulls per active patch",
+                null,
+                null,
+                'var(--accent-blue)'
+            );
+            const sixWeapCard = createStatCard(
+                "6★ WEAPONS WON",
+                statsData.weap6Stars,
+                `Drop Rate: ${statsData.grandWeapTotal > 0 ? ((statsData.weap6Stars / statsData.grandWeapTotal) * 100).toFixed(2) + '%' : '0%'}`,
+                null,
+                null,
+                'var(--color-yellow)'
+            );
+            kpiHtml = totalWeapCard + peakWeapCard + avgWeapCard + sixWeapCard;
+        } else {
+            // Side-by-side mode: Independent cards for each currency
+            const charCard = createStatCard(
+                "OPERATOR PULLS",
+                statsData.grandCharTotal,
+                `Peak: ${statsData.peakCharPatch ? statsData.peakCharPatch.patchTitle + ' (' + statsData.peakCharPatch.charPulls + ')' : 'N/A'}`,
+                null,
+                null,
+                'var(--accent-orange)'
+            );
+            const weapCard = createStatCard(
+                "ARSENAL PULLS",
+                statsData.grandWeapTotal,
+                `Peak: ${statsData.peakWeapPatch ? statsData.peakWeapPatch.patchTitle + ' (' + statsData.peakWeapPatch.weapPulls + ')' : 'N/A'}`,
+                null,
+                null,
+                'var(--accent-blue)'
+            );
+            const char6Card = createStatCard(
+                "6★ OPERATORS",
+                statsData.char6Stars,
+                `Rate: ${statsData.grandCharTotal > 0 ? ((statsData.char6Stars / statsData.grandCharTotal) * 100).toFixed(2) + '%' : '0%'} (Avg ${statsData.avgCharPulls}/patch)`,
+                null,
+                null,
+                'var(--accent-orange)'
+            );
+            const weap6Card = createStatCard(
+                "6★ ARSENALS",
+                statsData.weap6Stars,
+                `Rate: ${statsData.grandWeapTotal > 0 ? ((statsData.weap6Stars / statsData.grandWeapTotal) * 100).toFixed(2) + '%' : '0%'} (Avg ${statsData.avgWeapPulls}/patch)`,
+                null,
+                null,
+                'var(--accent-blue)'
+            );
+            kpiHtml = charCard + weapCard + char6Card + weap6Card;
+        }
+
+        kpiContainer.innerHTML = kpiHtml;
+
+        // 2. Distribution Graph - Separate independent progress bars per currency
+        let distPatches = sortPatches(statsData.patches, 'chrono');
+        let maxCharInAny = Math.max(1, ...distPatches.map(p => p.charPulls));
+        let maxWeapInAny = Math.max(1, ...distPatches.map(p => p.weapPulls));
+
+        let distHtml = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 13px; color: #ffffff; font-family: monospace; font-weight: bold; letter-spacing: 0.05em;">INVESTMENT BY UPDATE / PATCH</div>
+                <div style="display: flex; gap: 15px; font-size: 11px; font-family: monospace; color: var(--text-dim);">
+                    ${patchCategoryFilter !== 'weap' ? '<span><span style="display:inline-block;width:10px;height:10px;background:var(--accent-orange);margin-right:5px;vertical-align:middle;border-radius:1px;"></span>Operators</span>' : ''}
+                    ${patchCategoryFilter !== 'char' ? '<span><span style="display:inline-block;width:10px;height:10px;background:var(--accent-blue);margin-right:5px;vertical-align:middle;border-radius:1px;"></span>Arsenals</span>' : ''}
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+        distPatches.forEach(p => {
+            let charWidth = maxCharInAny > 0 ? (p.charPulls / maxCharInAny) * 100 : 0;
+            let weapWidth = maxWeapInAny > 0 ? (p.weapPulls / maxWeapInAny) * 100 : 0;
+
+            let barsHtml = '';
+            let statsText = '';
+
+            if (patchCategoryFilter === 'char') {
+                let shareChar = statsData.grandCharTotal > 0 ? ((p.charPulls / statsData.grandCharTotal) * 100).toFixed(1) : "0.0";
+                barsHtml = `
+                    <div class="dist-bar-single">
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill-char" style="width: ${charWidth}%;"></div>
+                        </div>
+                    </div>`;
+                statsText = `<strong style="color: var(--accent-orange);">${p.charPulls}</strong> <span style="color: var(--text-dim); font-size: 11px;">Pulls (${shareChar}%)</span>`;
+            } else if (patchCategoryFilter === 'weap') {
+                let shareWeap = statsData.grandWeapTotal > 0 ? ((p.weapPulls / statsData.grandWeapTotal) * 100).toFixed(1) : "0.0";
+                barsHtml = `
+                    <div class="dist-bar-single">
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill-weap" style="width: ${weapWidth}%;"></div>
+                        </div>
+                    </div>`;
+                statsText = `<strong style="color: var(--accent-blue);">${p.weapPulls}</strong> <span style="color: var(--text-dim); font-size: 11px;">Pulls (${shareWeap}%)</span>`;
+            } else {
+                // Side-by-side view with distinct individual tracks
+                let shareChar = statsData.grandCharTotal > 0 ? ((p.charPulls / statsData.grandCharTotal) * 100).toFixed(1) : "0.0";
+                let shareWeap = statsData.grandWeapTotal > 0 ? ((p.weapPulls / statsData.grandWeapTotal) * 100).toFixed(1) : "0.0";
+                barsHtml = `
+                    <div class="dist-bar-single">
+                        <span class="dist-bar-type-tag" style="color: var(--accent-orange);">OPER</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill-char" style="width: ${charWidth}%;"></div>
+                        </div>
+                        <span class="dist-bar-count-inline" style="color: var(--accent-orange);">${p.charPulls}</span>
+                    </div>
+                    <div class="dist-bar-single">
+                        <span class="dist-bar-type-tag" style="color: var(--accent-blue);">ARSEN</span>
+                        <div class="dist-bar-track">
+                            <div class="dist-bar-fill-weap" style="width: ${weapWidth}%;"></div>
+                        </div>
+                        <span class="dist-bar-count-inline" style="color: var(--accent-blue);">${p.weapPulls}</span>
+                    </div>`;
+                statsText = `
+                    <div style="line-height: 1.4;">
+                        <div><strong style="color: var(--accent-orange);">${p.charPulls}</strong> <span style="color: var(--text-dim); font-size: 10px;">Op (${shareChar}%)</span></div>
+                        <div><strong style="color: var(--accent-blue);">${p.weapPulls}</strong> <span style="color: var(--text-dim); font-size: 10px;">Ars (${shareWeap}%)</span></div>
+                    </div>`;
+            }
+
+            distHtml += `
+                <div class="dist-patch-row" onclick="scrollToPatchCard('${p.patchKey}')" title="Jump to ${p.patchTitle}">
+                    <div class="dist-patch-label">${p.patchTitle}</div>
+                    <div class="dist-bars-container">
+                        ${barsHtml}
+                    </div>
+                    <div class="dist-patch-stats">
+                        ${statsText}
+                    </div>
+                </div>`;
+        });
+        distHtml += `</div>`;
+        distContainer.innerHTML = distHtml;
+
+        // 3. Patch Breakdown Cards
+        let sortedPatches = sortPatches(statsData.patches, patchSortMode);
+        let cardsHtml = '';
+
+        sortedPatches.forEach(p => {
+            let charShare = statsData.grandCharTotal > 0 ? ((p.charPulls / statsData.grandCharTotal) * 100).toFixed(1) : "0.0";
+            let weapShare = statsData.grandWeapTotal > 0 ? ((p.weapPulls / statsData.grandWeapTotal) * 100).toFixed(1) : "0.0";
+
+            let char6s = p.sixStars.filter(s => s.prefix === 'char');
+            let weap6s = p.sixStars.filter(s => s.prefix === 'weap');
+
+            let avgCharPity = char6s.length > 0
+                ? (char6s.reduce((a, b) => a + (b.pity || 0), 0) / char6s.length).toFixed(1)
+                : '-';
+            let avgWeapPity = weap6s.length > 0
+                ? (weap6s.reduce((a, b) => a + (b.pity || 0), 0) / weap6s.length).toFixed(1)
+                : '-';
+
+            // Filter banners by active category
+            let bannerList = Array.from(p.banners.values()).filter(b => {
+                if (patchCategoryFilter === 'char' && b.prefix !== 'char') return false;
+                if (patchCategoryFilter === 'weap' && b.prefix !== 'weap') return false;
+                return true;
+            });
+
+            // Sort: banners with pulls first, then by poolId
+            bannerList.sort((a, b) => {
+                if (b.totalPulls !== a.totalPulls) return b.totalPulls - a.totalPulls;
+                return (a.poolId || '').localeCompare(b.poolId || '');
+            });
+
+            let bannersHtml = '';
+            bannerList.forEach(b => {
+                let bannerImgUrl = getBannerImageUrl(b.poolId, b.bannerName, b.prefix);
+                let thumbHtml = '';
+                if (bannerImgUrl) {
+                    thumbHtml = `<img src="${bannerImgUrl}" class="patch-banner-thumb" alt="${b.bannerName}" onerror="this.style.display='none';">`;
+                }
+
+                let pillClass = b.prefix === 'char' ? 'patch-pill-char' : 'patch-pill-weap';
+                let pillLabel = b.prefix === 'char' ? 'OPERATOR' : 'ARSENAL';
+                let poolTotalInPatch = b.prefix === 'char' ? p.charPulls : p.weapPulls;
+                let bShare = poolTotalInPatch > 0 ? ((b.totalPulls / poolTotalInPatch) * 100).toFixed(0) + `% of patch ${b.prefix === 'char' ? 'operators' : 'arsenals'}` : '';
+
+                let dropsHtml = '';
+                if (b.sixStars.length > 0) {
+                    dropsHtml = `<div class="patch-banner-drops">`;
+                    b.sixStars.forEach(s => {
+                        let iconUrl = getItemIconUrl(s.prefix, s.id, s.enName || s.name);
+                        let luckClass = s.pity <= 40 ? 'luck-good' : (s.pity <= 65 ? 'luck-avg' : 'luck-bad');
+                        dropsHtml += `
+                            <div class="patch-drop-item" title="${s.name} (Pity: ${s.pity})">
+                                <img src="${iconUrl}" class="patch-drop-icon" alt="${s.name}" onerror="handleIconError(this, '${s.prefix}', '${s.id}', '${(s.enName || s.name || '').replace(/'/g, "\\'")}')">
+                                <span class="patch-drop-name">${s.name}</span>
+                                <span class="patch-drop-pity ${luckClass}">${s.pity}</span>
+                                ${s.isRateUpItem ? '<span style="color: var(--color-green); font-size: 10px;" title="Rate-Up Won">&#10004;</span>' : '<span style="color: var(--color-red); font-size: 10px;" title="Off-Banner">&#10006;</span>'}
+                            </div>`;
+                    });
+                    dropsHtml += `</div>`;
+                }
+
+                bannersHtml += `
+                    <div class="patch-banner-item ${b.totalPulls === 0 ? 'skipped' : ''}">
+                        <div class="patch-banner-item-header">
+                            ${thumbHtml}
+                            <div class="patch-banner-info">
+                                <div class="patch-banner-name" title="${b.bannerName}">${b.bannerName}</div>
+                                <div class="patch-banner-meta">
+                                    <span class="${pillClass}">${pillLabel}</span>
+                                    <span>${b.poolId || ''}</span>
+                                </div>
+                            </div>
+                            <div class="patch-banner-pulls">
+                                <div class="patch-banner-pulls-val" style="color: ${b.totalPulls > 0 ? '#ffffff' : 'var(--text-dim)'};">
+                                    ${b.totalPulls} <span style="font-size: 11px; font-weight: normal; color: var(--text-dim);">PULLS</span>
+                                </div>
+                                ${b.totalPulls > 0 ? `<div class="patch-banner-pulls-share">${bShare}</div>` : `<div class="patch-banner-pulls-share" style="color: #666;">SKIPPED</div>`}
+                            </div>
+                        </div>
+                        ${dropsHtml}
+                    </div>`;
+            });
+
+            // Header pull badges: separated by currency
+            let pullsBadgeHtml = '';
+            if (patchCategoryFilter === 'char') {
+                pullsBadgeHtml = `
+                    <div class="patch-pull-badge char">
+                        <div class="patch-pull-badge-num">${p.charPulls}</div>
+                        <div class="patch-pull-badge-label">OPERATOR PULLS</div>
+                    </div>`;
+            } else if (patchCategoryFilter === 'weap') {
+                pullsBadgeHtml = `
+                    <div class="patch-pull-badge weap">
+                        <div class="patch-pull-badge-num">${p.weapPulls}</div>
+                        <div class="patch-pull-badge-label">ARSENAL PULLS</div>
+                    </div>`;
+            } else {
+                pullsBadgeHtml = `
+                    <div class="patch-pulls-dual-box">
+                        <div class="patch-pull-badge char">
+                            <div class="patch-pull-badge-num">${p.charPulls}</div>
+                            <div class="patch-pull-badge-label">OPERATOR PULLS</div>
+                        </div>
+                        <div class="patch-pull-badge weap">
+                            <div class="patch-pull-badge-num">${p.weapPulls}</div>
+                            <div class="patch-pull-badge-label">ARSENAL PULLS</div>
+                        </div>
+                    </div>`;
+            }
+
+            // Subline: separate shares without blending totals
+            let sublineHtml = '';
+            if (patchCategoryFilter === 'char') {
+                sublineHtml = `
+                    <span>Operator Pulls Share: <strong style="color: var(--accent-orange);">${charShare}%</strong> of all operator pulls</span>
+                    <span>${char6s.length} 6★ Operators &middot; Avg Pity: ${avgCharPity}</span>`;
+            } else if (patchCategoryFilter === 'weap') {
+                sublineHtml = `
+                    <span>Arsenal Pulls Share: <strong style="color: var(--accent-blue);">${weapShare}%</strong> of all arsenal pulls</span>
+                    <span>${weap6s.length} 6★ Weapons &middot; Avg Pity: ${avgWeapPity}</span>`;
+            } else {
+                sublineHtml = `
+                    <span>Operator Share: <strong style="color: var(--accent-orange);">${charShare}%</strong> &nbsp;|&nbsp; Arsenal Share: <strong style="color: var(--accent-blue);">${weapShare}%</strong></span>
+                    <span>Active Banners: <strong>${bannerList.length}</strong></span>`;
+            }
+
+            // Metrics grid: clean independent metrics
+            let metricsGridHtml = '';
+            if (patchCategoryFilter === 'char') {
+                metricsGridHtml = `
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">6★ OPERATORS</div>
+                        <div class="patch-metric-val" style="color: var(--color-yellow);">${char6s.length}</div>
+                        <div class="patch-metric-sub">Avg Pity: ${avgCharPity}</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">OPERATOR PULLS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-orange);">${p.charPulls}</div>
+                        <div class="patch-metric-sub">${charShare}% of all Op pulls</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">BANNERS ACTIVE</div>
+                        <div class="patch-metric-val">${bannerList.length}</div>
+                        <div class="patch-metric-sub">${bannerList.filter(b => b.totalPulls > 0).length} Pulled &middot; ${bannerList.filter(b => b.totalPulls === 0).length} Skipped</div>
+                    </div>`;
+            } else if (patchCategoryFilter === 'weap') {
+                metricsGridHtml = `
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">6★ WEAPONS</div>
+                        <div class="patch-metric-val" style="color: var(--color-yellow);">${weap6s.length}</div>
+                        <div class="patch-metric-sub">Avg Pity: ${avgWeapPity}</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">ARSENAL PULLS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-blue);">${p.weapPulls}</div>
+                        <div class="patch-metric-sub">${weapShare}% of all Ars pulls</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">BANNERS ACTIVE</div>
+                        <div class="patch-metric-val">${bannerList.length}</div>
+                        <div class="patch-metric-sub">${bannerList.filter(b => b.totalPulls > 0).length} Pulled &middot; ${bannerList.filter(b => b.totalPulls === 0).length} Skipped</div>
+                    </div>`;
+            } else {
+                metricsGridHtml = `
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">6★ OPERATORS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-orange);">${char6s.length}</div>
+                        <div class="patch-metric-sub">Avg Pity: ${avgCharPity}</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">6★ WEAPONS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-blue);">${weap6s.length}</div>
+                        <div class="patch-metric-sub">Avg Pity: ${avgWeapPity}</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">OPERATOR PULLS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-orange);">${p.charPulls}</div>
+                        <div class="patch-metric-sub">${charShare}% of Op pulls</div>
+                    </div>
+                    <div class="patch-metric-cell">
+                        <div class="patch-metric-title">ARSENAL PULLS</div>
+                        <div class="patch-metric-val" style="color: var(--accent-blue);">${p.weapPulls}</div>
+                        <div class="patch-metric-sub">${weapShare}% of Ars pulls</div>
+                    </div>`;
+            }
+
+            cardsHtml += `
+                <div class="patch-card reveal-on-scroll" id="patch-card-${p.patchKey.replace(/\./g, '_')}">
+                    <div class="patch-card-header">
+                        <div class="patch-tag-box">
+                            <h3 class="patch-title-text">${p.patchTitle}</h3>
+                            <span class="patch-status-badge">${p.isPermanent ? 'PERMANENT' : 'UPDATE'}</span>
+                        </div>
+                        ${pullsBadgeHtml}
+                    </div>
+
+                    <div class="patch-subline">
+                        ${sublineHtml}
+                    </div>
+
+                    <div class="patch-metrics-grid">
+                        ${metricsGridHtml}
+                    </div>
+
+                    <div class="patch-banners-subhead">
+                        <span>Banners in ${p.patchTitle}</span>
+                        <span style="font-size: 11px; color: var(--text-dim); text-transform: none;">${bannerList.length} banners recorded</span>
+                    </div>
+
+                    <div class="patch-banners-grid">
+                        ${bannersHtml || '<div style="color: var(--text-dim); font-size: 12px; font-style: italic;">No banners recorded for this category.</div>'}
+                    </div>
+                </div>`;
+        });
+
+        cardsContainer.innerHTML = cardsHtml;
         initScrollReveal();
     }
 
