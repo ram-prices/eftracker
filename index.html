@@ -268,6 +268,139 @@
         .banner-rate-up.lost span { color: #999; font-weight: normal; }
 
         .banner-img { width: 100%; max-height: 110px; object-fit: cover; border: none; margin-bottom: 12px; display: block;}
+
+        /* Fallback Banner for Banners without an official banner image */
+        .fallback-banner {
+            width: 100%;
+            height: 110px;
+            max-height: 110px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: radial-gradient(circle at 85% 50%, rgba(255, 152, 0, 0.12) 0%, transparent 65%), linear-gradient(115deg, #101217 0%, #161a22 55%, #0e1116 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            box-sizing: border-box;
+            padding: 0 16px 0 20px;
+            transition: border-color 0.3s ease;
+        }
+        .fallback-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.015) 10px,
+                rgba(255, 255, 255, 0.015) 12px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+        .fallback-banner-decor-corner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 28px;
+            height: 3px;
+            background: var(--accent-orange);
+            z-index: 2;
+        }
+        .fallback-banner-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+            padding-right: 12px;
+        }
+        .fallback-banner-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+        }
+        .fallback-banner-tag-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 6px var(--accent-orange);
+        }
+        .fallback-banner-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.25;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fallback-banner-sub {
+            font-size: 10px;
+            font-family: monospace;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .fallback-banner-stars {
+            color: var(--rarity-6);
+            letter-spacing: 1px;
+        }
+        .fallback-banner-visual {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 105px;
+            flex-shrink: 0;
+        }
+        .fallback-banner-glow {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 152, 0, 0.28) 0%, rgba(255, 152, 0, 0.08) 50%, transparent 75%);
+            filter: blur(8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .fallback-banner-weapon-img {
+            position: relative;
+            z-index: 1;
+            max-height: 85px;
+            max-width: 95px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(255, 152, 0, 0.35));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .fallback-banner:hover .fallback-banner-weapon-img {
+            transform: scale(1.08) rotate(-2deg);
+        }
+
         .banner-stats-row { display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 10px; margin-bottom: 10px; }
         .banner-stats { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin: 0; padding: 0;}
 
@@ -1066,7 +1199,7 @@
             }
             if (prefix === 'weap') return `${EF_ASSETS_BASE}/arsenals/${itemId}.webp`;
         }
-        return `https://endfield.wiki.gg/images/${encodeURIComponent((fallbackEnName || "").replace(/ /g, '_'))}_icon.png`;
+        return '';
     }
 
     function handleIconError(img, prefix, itemId, fallbackEnName) {
@@ -1075,62 +1208,164 @@
             img.src = img.src.replace('https://raw.githubusercontent.com/ram-prices/ef-assets/main/', 'https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main/');
             return;
         }
-        if (img.src.includes('ram-prices/ef-assets')) {
-            if (itemId) {
-                if (prefix === 'char') {
-                    img.src = `https://www.akedata.top/public/images/character/charremoteicon/icon_${itemId}.png`;
-                    return;
-                }
-                if (prefix === 'weap') {
-                    img.src = `https://www.akedata.top/public/images/weapon/iconbig/${itemId}.png`;
-                    return;
-                }
-            }
-            if (fallbackEnName) {
-                img.src = `https://endfield.wiki.gg/images/${encodeURIComponent(fallbackEnName.replace(/ /g, '_'))}_icon.png`;
-                return;
-            }
-        }
         img.onerror = null;
         img.style.display = 'none';
+    }
+
+    function getBannerWeaponInfo(poolId, bannerName, bInfo, data) {
+        if (!bInfo) bInfo = getBannerInfo(poolId, bannerName);
+        
+        let weaponId = "";
+        let weaponName = "";
+        
+        // 1. Check rateUpIds in bInfo
+        if (bInfo && bInfo.rateUpIds && bInfo.rateUpIds.length > 0) {
+            let wId = bInfo.rateUpIds.find(id => typeof id === 'string' && id.startsWith('wpn_')) || bInfo.rateUpIds[0];
+            if (wId && typeof wId === 'string') {
+                weaponId = wId;
+            }
+        }
+        
+        // 2. Check rateUpName in bInfo
+        if (bInfo && (bInfo.rateUpName || bInfo.rateupName)) {
+            let names = bInfo.rateUpName || bInfo.rateupName;
+            if (Array.isArray(names) && names.length > 0) {
+                weaponName = names[0];
+            } else if (typeof names === 'string') {
+                weaponName = names;
+            }
+        }
+        
+        // 3. Constant issue specific fallback mappings if rateUpIds were missing
+        if (!weaponId && poolId) {
+            let p = poolId.toLowerCase();
+            if (p.includes('constant_1')) { weaponId = 'wpn_claym_0013'; weaponName = weaponName || 'Khravengger'; }
+            else if (p.includes('constant_2')) { weaponId = 'wpn_funnel_0013'; weaponName = weaponName || 'Dreams of the Starry Beach'; }
+            else if (p.includes('constant_3')) { weaponId = 'wpn_sword_0016'; weaponName = weaponName || 'Never Rest'; }
+            else if (p.includes('constant_4')) { weaponId = 'wpn_lance_0012'; weaponName = weaponName || 'Mountain Bearer'; }
+            else if (p.includes('constant_5')) { weaponId = 'wpn_claym_0007'; weaponName = weaponName || 'Thunderberge'; }
+        }
+        
+        // 4. Check data.allPulls for 6★ weapon or any weapon pulled in that banner
+        if (data && data.allPulls && data.allPulls.length > 0) {
+            if (!weaponId) {
+                let pull6 = data.allPulls.find(p => p.rarity === "6" && p.itemId && p.itemId.startsWith('wpn_'));
+                let pullAnyWeap = data.allPulls.find(p => p.itemId && p.itemId.startsWith('wpn_'));
+                let targetPull = pull6 || pullAnyWeap;
+                if (targetPull) {
+                    weaponId = targetPull.itemId;
+                    if (!weaponName) weaponName = targetPull.name || targetPull.enName;
+                }
+            }
+        }
+        
+        // 5. If weaponId is found but weaponName is missing, resolve it
+        if (weaponId && !weaponName) {
+            weaponName = uniqueWeaps.get(weaponId) || parseIdToName(weaponId);
+        }
+        
+        return { weaponId, weaponName };
+    }
+
+    function createFallbackBannerHtml(bannerId, poolId, bannerName, prefix, bInfo, data) {
+        let { weaponId, weaponName } = getBannerWeaponInfo(poolId, bannerName, bInfo, data);
+        let displayName = weaponName || bannerName || "Arsenal Requisition";
+        let weaponImgUrl = weaponId ? getItemIconUrl('weap', weaponId, displayName) : '';
+        
+        let poolTitle = (bannerName || "Arsenal Requisition").toUpperCase();
+        let tag = poolTitle.includes("CONSTANT") ? "CONSTANT ISSUE · ARSENAL" : poolTitle;
+        let subText = "6★ ARSENAL";
+        
+        let imgTag = weaponImgUrl ? `
+            <div class="fallback-banner-visual">
+                <div class="fallback-banner-glow"></div>
+                <img src="${weaponImgUrl}" class="fallback-banner-weapon-img" alt="${(displayName || '').replace(/"/g, '&quot;')}" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleIconError(this, 'weap', '${weaponId || ''}', '${(displayName || '').replace(/'/g, "\\'")}')">
+            </div>
+        ` : `
+            <div class="fallback-banner-visual">
+                <div class="fallback-banner-glow"></div>
+                <div style="font-family: monospace; font-size: 24px; color: var(--accent-orange); opacity: 0.6;">✦</div>
+            </div>
+        `;
+
+        // Apply a warm ambient backlight right away if needed
+        setTimeout(() => {
+            let bEl = document.getElementById(bannerId);
+            if (bEl && !bEl.classList.contains('has-tint')) {
+                bEl.style.setProperty('--banner-ambient', 'rgba(255, 152, 0, 0.16)');
+                bEl.classList.add('has-tint');
+            }
+        }, 50);
+
+        return `
+            <div class="fallback-banner" id="fallback-${bannerId}">
+                <div class="fallback-banner-decor-corner"></div>
+                <div class="fallback-banner-content">
+                    <div class="fallback-banner-tag"><span class="fallback-banner-tag-dot"></span>${tag}</div>
+                    <div class="fallback-banner-name" title="${(displayName || '').replace(/"/g, '&quot;')}">${displayName}</div>
+                    <div class="fallback-banner-sub"><span class="fallback-banner-stars">★★★★★★</span> ${subText}</div>
+                </div>
+                ${imgTag}
+            </div>
+        `;
     }
 
     function getBannerImageUrl(poolId, fallbackName, prefix) {
         if (poolId) {
             let cleanId = poolId.toLowerCase().trim();
+            // Constant issue banners do not have banner art assets in the repository
+            if (cleanId.includes('constant_')) {
+                return null;
+            }
             let filename = cleanId.replace(/^weaponbox_/, 'weponbox_');
             if (filename === 'joint_1_0_1' || (filename.startsWith('joint_') && filename !== 'joint_1_2_2')) {
                 filename = 'joint_1_2_2';
             }
             return `${EF_ASSETS_BASE}/banners/${filename}.webp`;
         }
-        let bName = fallbackName || "";
-        if (prefix === 'char') {
-            return `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png/1024px-${encodeURIComponent(bName.replace(/ /g, '_'))}_banner.png`;
-        } else {
-            let wName = bName.replace(/ /g, '_');
-            let issueName = wName.toLowerCase().includes('issue') ? wName : wName + '_Issue';
-            return `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(issueName.replace(/_Issue/g, '_issue'))}.png/1024px-${encodeURIComponent(issueName.replace(/_Issue/g, '_issue'))}.png`;
-        }
+        return null;
     }
 
-    function handleBannerImgError(img, poolId, bName, prefix) {
+    function handleBannerImgError(img, poolId, bName, prefix, bannerId) {
         if (!img) return;
         if (img.src.includes('raw.githubusercontent.com/ram-prices/ef-assets/main/banners/')) {
             img.src = img.src.replace('https://raw.githubusercontent.com/ram-prices/ef-assets/main/banners/', 'https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main/banners/');
             return;
         }
-        if (img.src.includes('ram-prices/ef-assets')) {
-            let fallbackUrl = prefix === 'char'
-                ? `https://endfield.wiki.gg/images/thumb/${encodeURIComponent((bName || '').replace(/ /g, '_'))}_banner.png/1024px-${encodeURIComponent((bName || '').replace(/ /g, '_'))}_banner.png`
-                : `https://endfield.wiki.gg/images/thumb/${encodeURIComponent(((bName || '').replace(/ /g, '_').toLowerCase().includes('issue') ? (bName || '').replace(/ /g, '_') : (bName || '').replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png/1024px-${encodeURIComponent(((bName || '').replace(/ /g, '_').toLowerCase().includes('issue') ? (bName || '').replace(/ /g, '_') : (bName || '').replace(/ /g, '_') + '_Issue').replace(/_Issue/g, '_issue'))}.png`;
-            img.src = fallbackUrl;
-            return;
+
+        // Determine if this banner should display a fallback banner with weapon image
+        let bInfo = getBannerInfo(poolId, bName);
+        let isWeaponBanner = prefix === 'weap' || (bInfo && bInfo.type === 'Weapon') || (poolId && (poolId.startsWith('weponbox_') || poolId.startsWith('weaponbox_')));
+        
+        let targetBannerId = bannerId || img.closest('.banner-box')?.id || '';
+
+        if (isWeaponBanner && targetBannerId) {
+            let fallbackHtml = createFallbackBannerHtml(targetBannerId, poolId, bName, prefix, bInfo);
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = fallbackHtml.trim();
+            let fallbackNode = tempDiv.firstElementChild;
+            if (fallbackNode && img.parentNode) {
+                img.parentNode.replaceChild(fallbackNode, img);
+                return;
+            }
         }
+
         if (img.hasAttribute('crossorigin')) {
             img.removeAttribute('crossorigin');
             img.src = img.src;
             return;
+        }
+
+        // Final fallback: try converting to fallback banner if applicable
+        if (targetBannerId) {
+            let fallbackHtml = createFallbackBannerHtml(targetBannerId, poolId, bName, prefix, bInfo);
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = fallbackHtml.trim();
+            let fallbackNode = tempDiv.firstElementChild;
+            if (fallbackNode && img.parentNode) {
+                img.parentNode.replaceChild(fallbackNode, img);
+                return;
+            }
         }
         img.style.display = 'none';
     }
@@ -2297,6 +2532,13 @@
             let bUrl = getBannerImageUrl(data.poolId, bName, prefix);
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
 
+            let bannerMediaHTML = '';
+            if (bUrl) {
+                bannerMediaHTML = `<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}', '${bannerId}')">`;
+            } else {
+                bannerMediaHTML = createFallbackBannerHtml(bannerId, data.poolId, bName, prefix, bInfo, data);
+            }
+
             let hasRateUp = (bInfo?.rateUpIds && bInfo.rateUpIds.length > 0) || (bInfo?.rateUpName && bInfo.rateUpName.length > 0) || (bInfo?.rateupName && bInfo.rateupName.length > 0);
             if (hasRateUp) {
                 let isJointCat = data.category.startsWith("Joint Headhunting");
@@ -2314,7 +2556,7 @@
                 ruBtn = `<button class="filter-btn" data-filter="RU" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
             }
 
-            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}')">${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" data-filter="6" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" data-filter="5" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" data-filter="4" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
+            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}${bannerMediaHTML}${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" data-filter="6" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" data-filter="5" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" data-filter="4" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;
