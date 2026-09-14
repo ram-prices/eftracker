@@ -30,23 +30,29 @@
             return patchMap.get(patchKey);
         }
 
-        function findPatchBanner(patch, poolId, bName) {
-            let cleanPool = (poolId || '').toString().toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
-            let normTarget = (bName || '').toLowerCase()
+        function cleanPoolId(id) {
+            return (id || '').toString().toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+        }
+
+        function fuzzyBannerKey(name) {
+            return (name || '').toLowerCase()
                 .replace(/\s+(issue|headhunting|banner|operation)$/i, '')
                 .replace(/[^a-z0-9]/g, '');
+        }
+
+        function findPatchBanner(patch, poolId, bName) {
+            let cleanPool = cleanPoolId(poolId);
+            let normTarget = fuzzyBannerKey(bName);
 
             for (let entry of patch.banners.values()) {
-                let entryCleanPool = (entry.poolId || '').toString().toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+                let entryCleanPool = cleanPoolId(entry.poolId);
                 if (cleanPool && entryCleanPool && cleanPool !== 'special' && cleanPool !== 'weapon' && cleanPool !== 'unknown') {
                     if (cleanPool === entryCleanPool) return entry;
                 }
                 if (entry.bannerName && bName && entry.bannerName.toLowerCase().trim() === bName.toLowerCase().trim()) {
                     return entry;
                 }
-                let entryNorm = (entry.bannerName || '').toLowerCase()
-                    .replace(/\s+(issue|headhunting|banner|operation)$/i, '')
-                    .replace(/[^a-z0-9]/g, '');
+                let entryNorm = fuzzyBannerKey(entry.bannerName);
                 if (normTarget && entryNorm && (normTarget === entryNorm || normTarget.includes(entryNorm) || entryNorm.includes(normTarget))) {
                     return entry;
                 }
@@ -201,11 +207,11 @@
                 b.bannerName = normalizeBannerName(b.bannerName);
 
                 let matchIdx = uniqueList.findIndex(existing => {
-                    let pA = (existing.poolId || '').toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
-                    let pB = (b.poolId || '').toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
+                    let pA = cleanPoolId(existing.poolId);
+                    let pB = cleanPoolId(b.poolId);
                     if (pA && pB && pA !== 'special' && pA !== 'weapon' && pA !== 'unknown' && pA === pB) return true;
-                    let nA = (existing.bannerName || '').toLowerCase().replace(/\s+(issue|headhunting|banner|operation)$/i, '').replace(/[^a-z0-9]/g, '');
-                    let nB = (b.bannerName || '').toLowerCase().replace(/\s+(issue|headhunting|banner|operation)$/i, '').replace(/[^a-z0-9]/g, '');
+                    let nA = fuzzyBannerKey(existing.bannerName);
+                    let nB = fuzzyBannerKey(b.bannerName);
                     return (nA && nB && (nA === nB || nA.includes(nB) || nB.includes(nA)));
                 });
 
