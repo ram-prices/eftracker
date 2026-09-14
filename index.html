@@ -1258,10 +1258,14 @@
     } catch (e) {
         BANNER_DB = {};
     }
-    // Normalize weapon banner names to prevent duplicate stubs
-    if (BANNER_DB['weponbox_1_2_1']) {
-        BANNER_DB['weponbox_1_2_1'].name = "Drifting Raft Issue";
-        BANNER_DB['weponbox_1_2_1'].displayEn = "Drifting Raft Issue";
+
+    // The game API has historically reported this banner's poolName as the
+    // bare "Drifting Raft" (older/other exports) as well as the current
+    // "Drifting Raft Issue" — normalize to the latter so it groups/displays
+    // consistently with every other weapon banner's "<Name> Issue" naming.
+    function normalizeBannerName(name) {
+        if (name === 'Drifting Raft') return 'Drifting Raft Issue';
+        return name;
     }
 
     function getBannerInfo(poolId, bannerName = '') {
@@ -1314,12 +1318,6 @@
                         break;
                     }
                 }
-            }
-            if (!info) {
-                if (bLower.includes('winter hunt') || bLower.includes('typhoe') || bLower.includes('提丰')) { info = BANNER_DB['special_1_5_1']; infoKey = 'special_1_5_1'; }
-                else if (bLower.includes('dawnstar') || bLower.includes('liino')) { info = BANNER_DB['special_1_4_2']; infoKey = 'special_1_4_2'; }
-                else if (bLower.includes('rift vigile') || bLower.includes('lizhiyan')) { info = BANNER_DB['special_1_4_1']; infoKey = 'special_1_4_1'; }
-                else if (bLower.includes('deep cold')) { info = BANNER_DB['weponbox_1_5_1']; infoKey = 'weponbox_1_5_1'; }
             }
         }
 
@@ -1428,10 +1426,6 @@
 
                     let bName = val.name || BANNER_DB[k]?.name || val.displayEn || "";
                     let bDisplay = val.displayEn || val.name || BANNER_DB[k]?.displayEn || "";
-                    if (k === 'weponbox_1_2_1' || bName === 'Drifting Raft' || bDisplay === 'Drifting Raft') {
-                        bName = 'Drifting Raft Issue';
-                        bDisplay = 'Drifting Raft Issue';
-                    }
 
                     BANNER_DB[k] = {
                         ...(BANNER_DB[k] || {}),
@@ -1618,16 +1612,11 @@
             let curParts = (itemId || '').toLowerCase().split('_');
             let curCore = curParts[curParts.length - 1];
             
-            if (rCore && curCore && (rCore === curCore || (rCore.startsWith('typho') && curCore.startsWith('typho')))) return true;
-            
+            if (rCore && curCore && rCore === curCore) return true;
+
             let parsedRName = clean(parseIdToName(rId));
             if (curName && (curName.includes(parsedRName) || parsedRName.includes(curName))) return true;
             if (curEnName && (curEnName.includes(parsedRName) || parsedRName.includes(curEnName))) return true;
-            
-            if ((cleanRId.includes('typhoe') || parsedRName.includes('typho')) &&
-                (curId.includes('typho') || curName.includes('typho') || curEnName.includes('typho') || curName.includes('提丰'))) {
-                return true;
-            }
         }
         return false;
     }
@@ -2718,8 +2707,7 @@
             if (isHuntingDossier(pull)) return;
             let poolTypeRaw = (pull.poolType || pull.gachaType || pull.poolId || "Special").toString().toLowerCase();
             let poolId = pull.poolId || pull.gachaPoolId || pull.pool_id || poolTypeRaw;
-            let bannerName = pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId;
-            if (bannerName === 'Drifting Raft') bannerName = 'Drifting Raft Issue';
+            let bannerName = normalizeBannerName(pull.poolName || pull.gachaPoolName || pull.weaponPoolName || pull.activityName || poolId);
             let isJoint = false;
             let category = "Chartered Headhunting";
 
@@ -3089,11 +3077,8 @@
             let pInfo = getBannerPatchInfo(dbKey, dbVal.name || dbVal.displayEn || '', dbVal);
             if (pInfo && !pInfo.isPermanent) {
                 let patch = getOrCreatePatch(pInfo.patchKey, pInfo.patchTitle, pInfo.major, pInfo.minor, false);
-                let bName = dbVal.name || dbVal.displayEn || dbKey;
+                let bName = normalizeBannerName(dbVal.name || dbVal.displayEn || dbKey);
                 let isWeap = dbKey.toLowerCase().startsWith('weponbox') || dbKey.toLowerCase().startsWith('weaponbox');
-                if (isWeap && bName.toLowerCase().trim() === 'drifting raft') {
-                    bName = 'Drifting Raft Issue';
-                }
                 let existing = findPatchBanner(patch, dbKey, bName);
                 if (!existing) {
                     patch.banners.set(dbKey, {
@@ -3170,7 +3155,7 @@
 
         // 3. Aggregate Weapon Banners from weapBannerBoxes
         for (let [bName, bBox] of Object.entries(weapBannerBoxes)) {
-            if (bName === 'Drifting Raft') bName = 'Drifting Raft Issue';
+            bName = normalizeBannerName(bName);
             let pInfo = getBannerPatchInfo(bBox.poolId, bName, getBannerInfo(bBox.poolId, bName));
             let patch = getOrCreatePatch(pInfo.patchKey, pInfo.patchTitle, pInfo.major, pInfo.minor, pInfo.isPermanent);
 
@@ -3230,7 +3215,7 @@
         patchMap.forEach(patch => {
             let uniqueList = [];
             for (let b of patch.banners.values()) {
-                if (b.bannerName === 'Drifting Raft') b.bannerName = 'Drifting Raft Issue';
+                b.bannerName = normalizeBannerName(b.bannerName);
 
                 let matchIdx = uniqueList.findIndex(existing => {
                     let pA = (existing.poolId || '').toLowerCase().trim().replace(/^weaponbox_/, 'weponbox_');
