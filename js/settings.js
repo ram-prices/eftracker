@@ -59,10 +59,7 @@
     }
 
     function resetImages() {
-        const config = getEfConfig();
-        delete config.customAvatar;
-        delete config.customBanner;
-        localStorage.setItem('efConfig', JSON.stringify(config));
+        deleteEfConfigKeys('customAvatar', 'customBanner');
         location.reload();
     }
 
@@ -332,9 +329,7 @@
     function clearSavedData() {
         if (confirm("Are you sure you want to clear your saved pull history from this browser?")) {
             localStorage.removeItem('efTrackerData');
-            const config = getEfConfig();
-            delete config.trackerUser;
-            localStorage.setItem('efConfig', JSON.stringify(config));
+            deleteEfConfigKeys('trackerUser');
             location.reload();
         }
     }

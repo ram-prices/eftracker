@@ -341,10 +341,9 @@
             }
         });
 
-        if (prefix === 'char') {
-            // Token pushing is now handled inline during pull processing
-        }
-        
+        if (prefix === 'char') charBannerBoxes = bannerBoxes;
+        else weapBannerBoxes = bannerBoxes;
+
         renderDashboard(categoryStats, bannerBoxes, bannerTimeline, prefix);
     }
 

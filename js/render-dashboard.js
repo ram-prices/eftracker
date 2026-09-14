@@ -281,8 +281,6 @@
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;
-        if (prefix === 'char') charBannerBoxes = bannerBoxes;
-        else weapBannerBoxes = bannerBoxes;
         sortedTimeline.forEach((_, i) => { let l = document.getElementById(`list-banner-${prefix}-${i}`); if (l) updateBlockHeaders(l); });
         initScrollReveal();
     }

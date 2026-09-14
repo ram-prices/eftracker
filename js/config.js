@@ -31,6 +31,12 @@ function updateEfConfig(key, value) {
     localStorage.setItem('efConfig', JSON.stringify(config));
 }
 
+function deleteEfConfigKeys(...keys) {
+    const config = getEfConfig();
+    keys.forEach(key => delete config[key]);
+    localStorage.setItem('efConfig', JSON.stringify(config));
+}
+
 function migrateOldConfig() {
     const config = getEfConfig();
     let migrated = false;
