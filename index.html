@@ -223,18 +223,15 @@
 
         /* --- PATCH STATS STYLING --- */
         .patch-card {
-            background: var(--bg-panel);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 4px solid var(--accent-orange);
+            background-color: var(--bg-panel);
             padding: 24px;
             margin-bottom: 25px;
             position: relative;
             box-sizing: border-box;
-            transition: border-color 0.25s ease, transform 0.25s ease;
+            transition: background-color 0.25s ease;
         }
         .patch-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            border-left-color: var(--color-yellow);
+            background-color: #181818;
         }
         .patch-card-header {
             display: flex;
@@ -252,7 +249,7 @@
         .patch-title-text {
             font-size: 24px;
             font-family: 'Jost', sans-serif;
-            font-weight: 700;
+            font-weight: 500;
             color: #ffffff;
             letter-spacing: 0.05em;
             margin: 0;
@@ -260,10 +257,10 @@
         .patch-status-badge {
             font-size: 11px;
             font-family: monospace;
-            padding: 3px 8px;
+            padding: 4px 8px;
             background: rgba(255, 250, 0, 0.12);
             color: var(--color-yellow);
-            border: 1px solid rgba(255, 250, 0, 0.3);
+            border-left: 2px solid var(--color-yellow);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -279,8 +276,6 @@
             align-items: flex-end;
             padding: 6px 12px;
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 2px;
         }
         .patch-pull-badge.char {
             border-left: 3px solid var(--accent-orange);
@@ -326,7 +321,7 @@
         }
         .patch-metric-cell {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
             padding: 10px 14px;
         }
         .patch-metric-title {
