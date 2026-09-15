@@ -7,7 +7,7 @@
     function getTabIndex(t) { return SECTION_ORDER.indexOf(t); }
 
     function updateTabButtonStyles(activeTabId) {
-        ['char', 'weap', 'stats', 'settings', 'about'].forEach(t => {
+        ['char', 'weap', 'planner', 'stats', 'settings', 'about'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.classList.toggle('active-tab', t === activeTabId);
         });
@@ -103,6 +103,9 @@
             }
         } else if (tab === 'stats') {
             renderPatchStats();
+        } else if (tab === 'planner' && !plannerRendered) {
+            renderPlanner();
+            plannerRendered = true;
         }
 
         let ease = 'cubic-bezier(0.25, 1, 0.5, 1)';
