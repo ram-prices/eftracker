@@ -100,6 +100,22 @@
 
         if (isWeaponBanner && targetBannerId) {
             let fallbackHtml = createFallbackBannerHtml(targetBannerId, poolId, bName, prefix, bInfo);
+
+            // If the image is inside the hero layout (real-art banners), the
+            // title/rate-up badge live overlaid inside .banner-hero-content --
+            // pull them back out as plain siblings above the fallback banner
+            // (its own layout, no vignette/overlay) instead of leaving the
+            // vignette and absolute positioning wrapped around a fallback node.
+            let heroEl = img.closest('.banner-hero');
+            if (heroEl && heroEl.parentNode) {
+                let contentEl = heroEl.querySelector('.banner-hero-content');
+                let wrapper = document.createElement('div');
+                wrapper.innerHTML = (contentEl ? contentEl.innerHTML : '') + fallbackHtml;
+                while (wrapper.firstChild) heroEl.parentNode.insertBefore(wrapper.firstChild, heroEl);
+                heroEl.parentNode.removeChild(heroEl);
+                return;
+            }
+
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = fallbackHtml.trim();
             let fallbackNode = tempDiv.firstElementChild;
@@ -118,6 +134,17 @@
         // Final fallback: try converting to fallback banner if applicable
         if (targetBannerId) {
             let fallbackHtml = createFallbackBannerHtml(targetBannerId, poolId, bName, prefix, bInfo);
+
+            let heroEl = img.closest('.banner-hero');
+            if (heroEl && heroEl.parentNode) {
+                let contentEl = heroEl.querySelector('.banner-hero-content');
+                let wrapper = document.createElement('div');
+                wrapper.innerHTML = (contentEl ? contentEl.innerHTML : '') + fallbackHtml;
+                while (wrapper.firstChild) heroEl.parentNode.insertBefore(wrapper.firstChild, heroEl);
+                heroEl.parentNode.removeChild(heroEl);
+                return;
+            }
+
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = fallbackHtml.trim();
             let fallbackNode = tempDiv.firstElementChild;
@@ -253,13 +280,6 @@
             let bUrl = getBannerImageUrl(data.poolId, bName, prefix);
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
 
-            let bannerMediaHTML = '';
-            if (bUrl) {
-                bannerMediaHTML = `<div class="banner-img-wrap"><img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}', '${bannerId}')"></div>`;
-            } else {
-                bannerMediaHTML = createFallbackBannerHtml(bannerId, data.poolId, bName, prefix, bInfo, data);
-            }
-
             let hasRateUp = (bInfo?.rateUpIds && bInfo.rateUpIds.length > 0) || (bInfo?.rateUpName && bInfo.rateUpName.length > 0) || (bInfo?.rateupName && bInfo.rateupName.length > 0);
             if (hasRateUp) {
                 let isJointCat = data.category.startsWith("Joint Headhunting");
@@ -272,12 +292,19 @@
                     let ruId = bInfo.rateUpIds?.[0], fallback = parseIdToName(ruId);
                     ruText = ruNameFromDb || (prefix === 'char' ? uniqueChars : uniqueWeaps).get(ruId) || fallback || "Unknown Item";
                 }
-                
+
                 ruHTML = `<div class="banner-rate-up ${data.hasPulledRateUp ? 'won' : 'lost'}">RATE-UP: <span>${ruText}${data.hasPulledRateUp ? ' <span style="color: var(--color-green); margin-left: 4px;">&#10004;</span>' : ''}</span></div>`;
                 ruBtn = `<button class="filter-btn" data-filter="RU" onclick="toggleFilter('${bannerId}', 'RU')">RATE-UP</button>`;
             }
 
-            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box"><h3>${name}</h3>${ruHTML}${bannerMediaHTML}${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" data-filter="6" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" data-filter="5" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" data-filter="4" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
+            let headerHTML;
+            if (bUrl) {
+                headerHTML = `<div class="banner-hero"><img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}', '${bannerId}')"><div class="banner-hero-vignette"></div><div class="banner-hero-content"><h3>${name}</h3>${ruHTML}</div></div>`;
+            } else {
+                headerHTML = `<h3>${name}</h3>${ruHTML}${createFallbackBannerHtml(bannerId, data.poolId, bName, prefix, bInfo, data)}`;
+            }
+
+            htmlBuilder += `<div class="banner-box reveal-on-scroll" id="${bannerId}"><div class="banner-header-top-box">${headerHTML}${pityHTML}<div class="banner-stats-row"><div class="banner-stats">TOTAL_PULLS: ${data.totalPulls}</div><div class="banner-filters" id="filters-${bannerId}">${ruBtn}<button class="filter-btn active" data-filter="6" onclick="toggleFilter('${bannerId}', '6')">6★</button><button class="filter-btn" data-filter="5" onclick="toggleFilter('${bannerId}', '5')">5★</button><button class="filter-btn" data-filter="4" onclick="toggleFilter('${bannerId}', '4')">4★</button></div></div></div><div class="pull-list-container" id="list-${bannerId}"><ul class="pull-list">${pullsHTML}</ul><div class="empty-filter-msg" style="display: none; text-align: center; color: var(--text-dim); font-family: monospace; margin-top: 30px; font-size: 12px; font-style: italic;">NO PULLS TO DISPLAY</div></div><button class="banner-expand-area" onclick="toggleExpand('${bannerId}', this)">▼ EXPAND ▼</button></div>`;
         });
 
         document.getElementById(`${prefix}BannerGrid`).innerHTML = htmlBuilder;

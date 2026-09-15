@@ -615,9 +615,18 @@
 
         .banner-img { width: 100%; max-height: 110px; object-fit: cover; border: none; margin-bottom: 12px; display: block;}
 
-        .banner-img-wrap { position: relative; margin-bottom: 12px; }
-        .banner-img-wrap .banner-img { margin-bottom: 0; }
-        .banner-img-wrap::before {
+        /* Hero treatment: banner art bleeds to the card edges with the title/
+           rate-up badge overlaid over a bottom vignette, instead of sitting as
+           a separate block above a plain image. Only used when a banner has
+           real art -- the fallback-banner placeholder keeps its own layout. */
+        .banner-hero {
+            position: relative;
+            margin: -20px -20px 14px -20px;
+            height: 170px;
+            overflow: hidden;
+        }
+        .banner-hero .banner-img { width: 100%; height: 100%; max-height: none; object-fit: cover; margin: 0; display: block; }
+        .banner-hero::before {
             content: '';
             position: absolute;
             top: 0;
@@ -625,8 +634,23 @@
             width: 28px;
             height: 3px;
             background: var(--accent-orange);
-            z-index: 2;
+            z-index: 3;
         }
+        .banner-hero-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 38%, rgba(0,0,0,0.08) 70%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .banner-hero-content {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            z-index: 2;
+            padding: 14px 18px 12px 18px;
+        }
+        .banner-hero-content h3 { text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
+        .banner-hero-content .banner-rate-up { margin-bottom: 0; }
 
         /* Fallback Banner for Banners without an official banner image */
         .fallback-banner {
