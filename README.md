@@ -7,5 +7,14 @@ This site is not meant to compete and/or take away traffic from legitimately cod
 
 Again, this thing is 100% vibe-coded. It will look vibe-coded, smell vibe-coded, and taste vibe-coded. Thank you for reading and understanding.
 
+# Features
+- Pull history dashboard for Operators and Arsenals, with pity/luck tracking per banner
+- Patch Stats: pull investment and 6★ breakdown by game update
+- Pull Planner: "if I pull N more times, what's my chance of getting the rate-up?" for Chartered, Joint, and Arsenal banners, using your real current pity as a starting point (editable)
+- Banner data (names, rate-up characters/weapons, patch mapping) is pulled live from [ram-prices/ef-assets](https://github.com/ram-prices/ef-assets), not hardcoded here
+
+# Structure
+`index.html` + `js/*.js` (plain scripts, no build step, no framework). See `CLAUDE.md` if you're a coding agent picking this up — it covers the module layout and a couple of non-obvious gotchas in the pity math.
+
 # Bugs
 Yes.
