@@ -188,7 +188,7 @@
     }
 
     function createPityBox(cols) {
-        return `<div class="pity-box">${cols.join('<div class="pity-divider"></div>')}</div>`;
+        return `<div class="pity-box banner-pity-box">${cols.join('<div class="pity-divider"></div>')}</div>`;
     }
 
     function createStatCard(title, val, sub, badgeText, badgeCss, titleColor, valColorCss) {
