@@ -255,7 +255,7 @@
 
             let bannerMediaHTML = '';
             if (bUrl) {
-                bannerMediaHTML = `<img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}', '${bannerId}')">`;
+                bannerMediaHTML = `<div class="banner-img-wrap"><img src="${bUrl}" class="banner-img" loading="lazy" crossorigin="anonymous" onload="applyAmbientTint('${bannerId}', this)" onerror="handleBannerImgError(this, '${data.poolId || ''}', '${(bName || '').replace(/'/g, "\\'")}', '${prefix}', '${bannerId}')"></div>`;
             } else {
                 bannerMediaHTML = createFallbackBannerHtml(bannerId, data.poolId, bName, prefix, bInfo, data);
             }
