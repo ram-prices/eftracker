@@ -18,8 +18,9 @@
             --text-main: #e0e0e0;
             --text-dim: #888888;
             --border-tech: #333333;
-            --rarity-6: #ff9800;
-            --rarity-5: #FFD700; 
+            --rarity-6: #fe5a00;
+            --rarity-5: #ffbb03;
+            --rarity-4: #9452fa;
             --color-green: #4CAF50;
             --color-yellow: #fffa00;
             --color-red: #F44336;
@@ -808,10 +809,10 @@
 
         .pull-block-header { font-size: 10px; color: var(--text-dim); background: #1a1a1a; padding: 4px 10px; margin-top: 15px; border: none; font-family: monospace; display: inline-block; align-self: flex-start; }
 
-        .pull-item { display: flex; flex-direction: column; justify-content: center; padding: 8px 12px; border-left: 3px solid var(--rarity-6); background: linear-gradient(90deg, rgba(255, 152, 0, 0.18) 0%, rgba(255, 255, 255, 0.02) 60%); transition: background 0.2s ease; content-visibility: auto; contain-intrinsic-size: auto 44px; }
+        .pull-item { display: flex; flex-direction: column; justify-content: center; padding: 8px 12px; border-left: 3px solid var(--rarity-6); background: linear-gradient(90deg, color-mix(in srgb, var(--rarity-6) 18%, transparent) 0%, rgba(255, 255, 255, 0.02) 60%); transition: background 0.2s ease; content-visibility: auto; contain-intrinsic-size: auto 44px; }
         .pull-item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .rarity-5-item { border-left-color: var(--rarity-5); background: rgba(255,255,255,0.02); }
-        .rarity-4-item { border-left-color: #ba68c8; background: rgba(255,255,255,0.01); }
+        .rarity-4-item { border-left-color: var(--rarity-4); background: rgba(255,255,255,0.01); }
         .rarity-3-item { border-left-color: var(--accent-blue); background: rgba(255,255,255,0.01); }
         .rarity-2-item { border-left-color: #8bc34a; background: rgba(255,255,255,0.01); }
         .rarity-1-item { border-left-color: #9e9e9e; background: rgba(255,255,255,0.01); }
@@ -1027,12 +1028,12 @@
         }
         .summary-icon { width: 67.5px; height: 94.5px; background-color: #000; object-fit: cover; background-clip: content-box; display: block; }
         .summary-char-item .summary-icon { border-radius: 12px; }
-        .summary-icon-6 { 
-            border: 2px solid var(--color-orange);
-            background: #141414; 
+        .summary-icon-6 {
+            border: 2px solid var(--rarity-6);
+            background: #141414;
         }
         .summary-char-item .summary-icon-6 { border: none; }
-        .summary-icon-5 { border: 2px solid var(--color-yellow); background-color: #000; }
+        .summary-icon-5 { border: 2px solid var(--rarity-5); background-color: #000; }
         .summary-char-item .summary-icon-5 { border: none; }
 
         /* Pity Counter Dashboard Blocks */
