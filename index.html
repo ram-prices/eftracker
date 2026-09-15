@@ -7,12 +7,12 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- ENDFIELD OFFICIAL SITE AESTHETIC --- */
         :root {
-            --bg-deep: #0a0a0a;
-            --bg-panel: #141414;
+            --bg-deep: #191919;
+            --bg-panel: #232323;
             --accent-orange: #ff9800;
             --accent-blue: #2196F3;
             --text-main: #e0e0e0;
@@ -23,6 +23,7 @@
             --color-green: #4CAF50;
             --color-yellow: #fffa00;
             --color-red: #F44336;
+            --font-display: 'Rajdhani', 'Jost', sans-serif;
         }
 
         body { 
@@ -66,7 +67,7 @@
         }
         .profile-pill { display: flex; align-items: center; background: transparent; border: none; padding: 6px 0; gap: 15px; position: relative; }
         .profile-avatar { width: 80px; height: 80px; border-radius: 0; border: 2px solid #ffffff; background-color: #000000; padding: 2px; object-fit: cover; }
-        .profile-name { font-size: 26px; font-family: 'Jost', sans-serif; font-weight: 600; color: #ffffff; letter-spacing: 0.05em; margin-right: 5px; display: flex; align-items: center; gap: 15px; }
+        .profile-name { font-size: 26px; font-family: var(--font-display); font-weight: 700; color: #ffffff; letter-spacing: 0.05em; margin-right: 5px; display: flex; align-items: center; gap: 15px; }
         .profile-name[contenteditable="true"]:hover { text-decoration: underline; text-underline-offset: 4px; cursor: text; }
         .profile-name[contenteditable="true"]:focus { outline: none; background: rgba(255,255,255,0.1); border-radius: 4px; }
         .profile-name::before { content: '['; color: #999999; }
@@ -127,17 +128,34 @@
 }
 
         h2 { font-size: 20px; color: white; margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; }
-        h2.main-title { 
-            font-size: 36px; font-weight: 600; margin-top: 10px; 
+        h2.main-title {
+            font-family: var(--font-display); font-size: 40px; font-weight: 700; margin-top: 10px;
+            letter-spacing: 0.02em;
             opacity: 1;
         }
         .first-visit h2.main-title {
             animation: flickerIn 0.2s ease-out 0.6s both;
         }
 
-        .section-header { display: flex; flex-direction: column; align-items: flex-start; margin-top: 30px; margin-bottom: 30px; }
+        .section-header { display: flex; flex-direction: column; align-items: flex-start; margin-top: 30px; margin-bottom: 30px; position: relative; }
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: -25px; left: -40px;
+            width: 160px; height: 160px;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
         .section-header .arrow-box { margin: 0 0 2px 0; }
         .section-header h2.main-title { margin: 0; padding-left: 3px; }
+        .section-eyebrow {
+            display: flex; align-items: center; gap: 8px;
+            font-family: monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-dim); margin-bottom: 10px; padding-left: 3px;
+        }
+        .section-eyebrow-dot { width: 6px; height: 6px; background: var(--color-yellow); flex-shrink: 0; }
 
         .arrow-box { 
             width: 69px; height: 27px; background-color: #d4d4d4; border: 2px solid #1a1a1a; 
@@ -248,8 +266,8 @@
         }
         .patch-title-text {
             font-size: 24px;
-            font-family: 'Jost', sans-serif;
-            font-weight: 500;
+            font-family: var(--font-display);
+            font-weight: 600;
             color: #ffffff;
             letter-spacing: 0.05em;
             margin: 0;
@@ -1104,6 +1122,7 @@
         
         <div id="char-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // OPERATORS</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Operators</h2>
             </div>
@@ -1116,6 +1135,7 @@
 
         <div id="weap-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // ARSENALS</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Arsenals</h2>
             </div>
@@ -1128,6 +1148,7 @@
 
         <div id="planner-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // PULL PLANNER</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Pull Planner</h2>
             </div>
@@ -1136,6 +1157,7 @@
 
         <div id="stats-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // PATCH STATS</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Patch Stats</h2>
             </div>
@@ -1157,6 +1179,7 @@
 
         <div id="settings-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // SETTINGS</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">Settings</h2>
             </div>
@@ -1245,6 +1268,7 @@
 
         <div id="about-section" style="display: none;">
             <div class="section-header">
+                <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>EF TRACKER // ABOUT</div>
                 <div class="arrow-box"><svg viewBox="0 0 24 24" fill="#1a1a1a"><use href="#arrow-icon"/></svg></div>
                 <h2 class="main-title">About</h2>
             </div>
