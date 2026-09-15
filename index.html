@@ -1043,6 +1043,33 @@
         .pity-max { font-size: 10px; }
         .pity-label { font-size: 9px; text-transform: uppercase; margin-top: 4px; }
 
+        /* Banner-card pity readout: each stat becomes its own bounded chip
+           with a diagonal color wedge (inspired by the game's loading-screen
+           "1P PLAYER" panel) instead of three columns sharing one bar with
+           divider lines. The wedge reuses whatever color the value itself is
+           already using (green/orange/red by proximity to pity, greyed when
+           inactive) via --col-accent, so the "traffic light" meaning carries
+           over into the new look instead of becoming purely decorative.
+           (.pity-box/.pity-col stay the base classes -- Pull Planner reuses
+           .pity-box only, never .pity-col, so this is banner-card-only.) */
+        .banner-pity-box { padding: 0; background: transparent; border-radius: 0; gap: 8px; }
+        .banner-pity-box .pity-col {
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-panel);
+            padding: 12px 14px 10px 16px;
+        }
+        .banner-pity-box .pity-col::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 72%;
+            background: color-mix(in srgb, var(--col-accent, var(--accent-orange)) 22%, transparent);
+            clip-path: polygon(0 0, 100% 0, 52% 100%, 0 100%);
+            pointer-events: none;
+        }
+        .banner-pity-box .pity-val, .banner-pity-box .pity-label { position: relative; z-index: 1; }
+
         /* --- PULL PLANNER --- */
         .planner-box { height: auto; min-height: 0; max-width: 640px; }
         .planner-row { flex-wrap: wrap; align-items: flex-end; }

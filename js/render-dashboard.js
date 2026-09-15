@@ -181,14 +181,14 @@
 
     function createPityCol(val, max, label, valColor, labelColor, extraHtml = '') {
         return `
-            <div class="pity-col">
+            <div class="pity-col" style="--col-accent: ${valColor};">
                 <div class="pity-val" style="color: ${valColor};">${val} <span class="pity-max" style="color: ${labelColor};">/ ${max}</span></div>
                 <div class="pity-label" style="color: ${labelColor}; line-height: 1.2;">${label} ${extraHtml}</div>
             </div>`;
     }
 
     function createPityBox(cols) {
-        return `<div class="pity-box">${cols.join('<div class="pity-divider"></div>')}</div>`;
+        return `<div class="pity-box banner-pity-box">${cols.join('')}</div>`;
     }
 
     function createStatCard(title, val, sub, badgeText, badgeCss, titleColor, valColorCss) {
