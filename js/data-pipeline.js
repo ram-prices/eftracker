@@ -383,7 +383,7 @@
         isDataLoaded = true;
         
         // Show hidden tabs
-        ['char', 'weap', 'stats'].forEach(t => {
+        ['char', 'weap', 'planner', 'stats'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (btn) btn.style.display = 'flex';
         });

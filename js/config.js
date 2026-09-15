@@ -5,7 +5,7 @@ const EF_ASSETS_BASE = "https://raw.githubusercontent.com/ram-prices/ef-assets/m
 const EF_ASSETS_CDN = "https://cdn.jsdelivr.net/gh/ram-prices/ef-assets@main";
 
 const MAX_PULLS = 1500;
-const SECTION_ORDER = ['char', 'weap', 'stats', 'settings', 'about'];
+const SECTION_ORDER = ['char', 'weap', 'planner', 'stats', 'settings', 'about'];
 
 let visitedTabs = new Set();
 let isDataLoaded = false;
