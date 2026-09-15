@@ -605,7 +605,14 @@
         .banner-box.expanded { z-index: 5; }
         .banner-box.expanded .pull-list-container { overflow-y: auto; }
         .banner-header-top-box { flex-shrink: 0; }
-        .banner-box h3 { margin-top: 0; margin-bottom: 10px; color: #fff; font-size: 16px; text-transform: uppercase; font-weight: 200; }
+        .banner-box h3 {
+            margin-top: 0; margin-bottom: 18px; color: #fff; font-size: 18px; text-transform: uppercase;
+            font-family: var(--font-display); font-weight: 600; letter-spacing: 0.03em;
+            padding-bottom: 10px;
+            background: linear-gradient(90deg, #ff3d9a, var(--color-green) 50%, var(--color-yellow)) no-repeat left bottom / 70% 2px;
+        }
+        .banner-box h3::before { content: '['; color: var(--text-dim); font-weight: 400; margin-right: 4px; }
+        .banner-box h3::after { content: ']'; color: var(--text-dim); font-weight: 400; margin-left: 4px; }
 
         .banner-rate-up { font-size: 11px; font-family: monospace; margin-bottom: 12px; text-transform: uppercase; padding: 4px 8px; display: inline-flex; align-items: center; gap: 6px; }
         .banner-rate-up.won { color: var(--accent-orange); background: rgba(255, 152, 0, 0.2); border-left: 2px solid var(--accent-orange); }
@@ -614,6 +621,19 @@
         .banner-rate-up.lost span { color: #999; font-weight: normal; }
 
         .banner-img { width: 100%; max-height: 110px; object-fit: cover; border: none; margin-bottom: 12px; display: block;}
+
+        .banner-img-wrap { position: relative; margin-bottom: 12px; }
+        .banner-img-wrap .banner-img { margin-bottom: 0; }
+        .banner-img-wrap::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 28px;
+            height: 3px;
+            background: var(--accent-orange);
+            z-index: 2;
+        }
 
         /* Fallback Banner for Banners without an official banner image */
         .fallback-banner {
