@@ -1073,6 +1073,140 @@
             padding: 12px 14px 10px 16px;
         }
 
+        /* Pity Ruler (Chartered Headhunting banners only): one shared
+           axis instead of three separate boxes. Guarantee (then, once
+           won, Token) owns the axis origin and fills from 0; Pity floats
+           independently since it resets on ANY 6-star, not just the
+           rate-up, so its own window can start well after the axis
+           origin. Both fills always end at the same "now", because
+           they're driven by the same pull stream. Pity's target pin
+           points from BELOW the track (guarantee/token points from
+           above) so the two can never collide even when they land at
+           the same spot -- which happens whenever the guarantee's own
+           120-pull cap forces a 6-star, and therefore a pity reset,
+           before pity would naturally reach its own 80-pull cap. */
+        /* Same translucent panel the old .pity-box used, so the ruler
+           reads as occupying the same "slot" in the card. */
+        .pity-ruler { margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 4px; }
+        .pity-ruler-readout {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .pity-ruler-readout .unit { color: var(--text-dim); font-weight: normal; font-size: 9px; margin-left: 3px; text-transform: uppercase; }
+        .ruler-body { display: flex; align-items: stretch; height: 98px; }
+        .ruler-window { flex: 1; min-width: 0; }
+        /* The track/pins live in this inner, inset wrapper rather than
+           directly in .ruler-window -- a pin label centered at the 0%/100%
+           edge needs room to overhang without getting clipped by
+           .banner-box's own overflow:hidden, and margin (unlike padding)
+           actually shrinks the containing block absolute children resolve
+           their left:X% against. */
+        .ruler-axis { position: relative; height: 100%; margin: 0 32px; }
+
+        /* Completed 240-pull token cycles collapse into this flat chip
+           instead of re-stretching the axis forever. Same visual family
+           as .banner-rate-up (left accent + translucent fill, no border) --
+           no dashes/stripes. Hover or tap widens it to show the total. */
+        .history-nub {
+            position: relative;
+            flex: 0 0 36px;
+            margin-right: 14px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.025);
+            border-left: 2px solid var(--accent-blue);
+            cursor: pointer;
+            transition: flex-basis 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease;
+            overflow: hidden;
+            outline: none;
+        }
+        .history-nub:hover, .history-nub:focus-visible, .history-nub.expanded {
+            flex-basis: 190px;
+            background: rgba(255, 255, 255, 0.045);
+        }
+        .history-nub-collapsed {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+        .history-nub-collapsed svg { width: 12px; height: 12px; opacity: 0.85; }
+        .history-nub-collapsed span { font-family: monospace; font-size: 9px; color: var(--text-dim); }
+        .history-nub:hover .history-nub-collapsed, .history-nub.expanded .history-nub-collapsed { opacity: 0; }
+        .history-nub-detail {
+            position: absolute; inset: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+        .history-nub:hover .history-nub-detail, .history-nub.expanded .history-nub-detail { opacity: 1; }
+        .history-nub-detail-label { font-family: monospace; font-size: 9.5px; color: var(--text-dim); line-height: 1.4; white-space: normal; }
+
+        .ruler-track {
+            position: absolute;
+            left: 0; right: 0; top: 44px;
+            height: 9px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+        .ruler-fill-owner { position: absolute; top: 1px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
+        .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
+        .ruler-now-cap {
+            position: absolute; top: 42px;
+            width: 2px; height: 13px;
+            border-radius: 1px;
+            background: #fff;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+            transform: translateX(-1px);
+        }
+
+        .ruler-pin-above {
+            position: absolute;
+            top: 44px;
+            transform: translate(-50%, -100%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ruler-pin-above .ruler-pin-point { border-top: 6px solid currentColor; margin-top: -1px; }
+        .ruler-pin-below {
+            position: absolute;
+            top: 53px;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ruler-pin-below .ruler-pin-point { border-bottom: 6px solid currentColor; margin-bottom: -1px; order: -1; }
+        .ruler-pin-below .ruler-pin-label { margin-top: 3px; margin-bottom: 0; }
+        .ruler-pin-label {
+            font-family: monospace;
+            font-size: 9px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+        .ruler-pin-circle {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-panel);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .ruler-pin-circle svg { width: 11px; height: 11px; }
+        .ruler-pin-point { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; }
+        .ruler-pin-above.done .ruler-pin-circle { background: var(--bg-deep) !important; border-color: var(--border-tech); }
+        .ruler-pin-above.done .ruler-pin-label { color: var(--text-dim) !important; }
+        .ruler-pin-above.done .ruler-pin-point { color: var(--border-tech) !important; }
+        .ruler-pin-forced .ruler-pin-label { color: var(--accent-orange) !important; }
+        .ruler-pin-forced .ruler-pin-circle { border-style: dashed; border-color: currentColor; background: transparent !important; }
+        .ruler-pin-forced .ruler-pin-circle svg { opacity: 0.6; }
+
         /* --- PULL PLANNER --- */
         .planner-box { height: auto; min-height: 0; max-width: 640px; }
         .planner-row { flex-wrap: wrap; align-items: flex-end; }

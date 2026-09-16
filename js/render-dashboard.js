@@ -194,6 +194,97 @@
         return `<div class="pity-box banner-pity-box">${cols.join('')}</div>`;
     }
 
+    const PITY_RULER_ICONS = {
+        star: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17l-6.3 3.8 1.7-6.9L2 9.2l7.1-.6z"/></svg>',
+        badge: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 12c2.7 0 8 1.3 8 4v2H4v-2c0-2.7 5.3-4 8-4zm0-2a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>',
+        check: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>',
+        ticket: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M21 10V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 1 0 4v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-4z"/></svg>'
+    };
+
+    // Pity Ruler for Chartered Headhunting banners: one shared axis for
+    // Guarantee (then Token, once the guarantee is won) and a floating
+    // Pity lane, instead of three separate boxes. See the CSS comment
+    // above ".pity-ruler" in index.html for the full rationale.
+    function createPityRulerChartered(data, isActive) {
+        const grey = '#888888', dim = 'var(--text-dim)';
+        const pityVal = data.endPity || 0;
+        const clampedRateUp = Math.min(120, data.endRateUpPity || 0);
+        const tokenRaw = data.endTokenPulls || 0;
+        const tokenCycles = Math.floor(tokenRaw / 240);
+        const tokenNow = tokenRaw % 240;
+        const guaranteeDone = !!data.endHasPulledRateUp;
+
+        const axisMax = guaranteeDone ? 240 : 120;
+        const ownerNow = guaranteeDone ? tokenNow : clampedRateUp;
+        const ownerLabel = guaranteeDone ? 'Token' : 'Guarantee';
+        const ownerTarget = guaranteeDone ? 240 : 120;
+        const ownerIcon = guaranteeDone ? PITY_RULER_ICONS.ticket : PITY_RULER_ICONS.badge;
+        const ownerColor = !isActive ? grey : (guaranteeDone ? 'var(--accent-blue)' : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)')));
+        const ownerPct = axisMax > 0 ? Math.max(0, Math.min(100, (ownerNow / axisMax) * 100)) : 0;
+
+        const pityColor = !isActive ? grey : (pityVal >= 64 ? 'var(--color-red)' : (pityVal >= 40 ? 'var(--accent-orange)' : 'var(--color-green)'));
+        const pityReset = Math.max(0, ownerNow - pityVal);
+        const pityTargetRaw = pityReset + 80;
+        // Pity can never actually count past 80 -- but if the guarantee's
+        // own 120-pull cap will force a 6-star (and therefore a pity
+        // reset) before pity would naturally get there, showing that raw
+        // target (which could read >80) would be a number that can never
+        // really happen. Show "Forced" instead, pinned to the guarantee's
+        // own target position -- the pull it's actually guaranteed to be
+        // cut short at.
+        const forced = !guaranteeDone && pityTargetRaw > 120;
+        const pityTargetPct = forced ? 100 : Math.max(0, Math.min(100, (pityTargetRaw / axisMax) * 100));
+        const pityFillLeftPct = axisMax > 0 ? Math.max(0, Math.min(100, (pityReset / axisMax) * 100)) : 0;
+        const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
+        const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
+
+        let historyNubHtml = '';
+        if (guaranteeDone && tokenCycles > 0) {
+            const completedPulls = tokenCycles * 240;
+            const sixStarsCompleted = (data.allPulls || []).filter(p => p.pullNum <= completedPulls && p.rarity === '6').length;
+            historyNubHtml = `
+                <div class="history-nub" tabindex="0" role="button" aria-label="Expand ${tokenCycles} completed token cycle${tokenCycles > 1 ? 's' : ''}" onclick="this.classList.toggle('expanded')">
+                    <div class="history-nub-collapsed">${PITY_RULER_ICONS.ticket.replace('fill="#fff"', `fill="${isActive ? 'var(--accent-blue)' : grey}"`)}<span>&times;${tokenCycles}</span></div>
+                    <div class="history-nub-detail"><div class="history-nub-detail-label">${tokenCycles} cycle${tokenCycles > 1 ? 's' : ''} complete &middot; ${completedPulls} pulls &middot; ${sixStarsCompleted}&times;6★ &middot; ${tokenCycles} token${tokenCycles > 1 ? 's' : ''} earned</div></div>
+                </div>`;
+        }
+
+        return `
+            <div class="pity-ruler">
+                <div class="pity-ruler-readout">
+                    <span style="color: ${ownerColor};">${ownerNow}<span class="unit">${guaranteeDone ? 'token' : 'guar'}</span></span>
+                    <span style="color: ${pityColor};">${pityVal}<span class="unit">pity</span></span>
+                </div>
+                <div class="ruler-body">
+                    ${historyNubHtml}
+                    <div class="ruler-window"><div class="ruler-axis">
+                        <div class="ruler-track">
+                            <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
+                            <div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>
+                        </div>
+                        <div class="ruler-now-cap" style="left: ${ownerPct}%;"></div>
+
+                        <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pityTargetPct}%; color: ${pityColor};">
+                            <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
+                            <div class="ruler-pin-point"></div>
+                            <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
+                        </div>
+                        ${guaranteeDone ? `
+                        <div class="ruler-pin-above done" style="left: ${(120 / axisMax) * 100}%; color: ${dim};">
+                            <div class="ruler-pin-label">Guarantee &middot; done</div>
+                            <div class="ruler-pin-circle">${PITY_RULER_ICONS.check}</div>
+                            <div class="ruler-pin-point"></div>
+                        </div>` : ''}
+                        <div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
+                            <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
+                            <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
+                            <div class="ruler-pin-point"></div>
+                        </div>
+                    </div></div>
+                </div>
+            </div>`;
+    }
+
     function createStatCard(title, val, sub, badgeText, badgeCss, titleColor, valColorCss) {
         return `
             <div class="stat-card reveal-on-scroll">
@@ -218,14 +309,7 @@
 
             if (prefix === 'weap' || (prefix === 'char' && data.category === "Chartered Headhunting") || isActive) {
                 if (prefix === 'char' && data.category === "Chartered Headhunting") {
-                    let color = data.endPity >= 64 ? "var(--color-red)" : (data.endPity >= 40 ? "var(--accent-orange)" : "var(--color-green)");
-                    let clampedRateUp = Math.min(120, data.endRateUpPity || 0);
-                    let ruColor = clampedRateUp >= 100 ? "var(--color-red)" : (clampedRateUp >= 70 ? "var(--accent-orange)" : "var(--color-green)");
-                    pityHTML = createPityBox([
-                        createPityCol(data.endPity || 0, 80, isActive ? "PITY" : "PITY (FINAL)", isActive ? color : "#888888", isActive ? "var(--text-dim)" : "#888888"),
-                        createPityCol(clampedRateUp, 120, "GUARANTEE", data.endHasPulledRateUp ? "#666666" : (isActive ? ruColor : "#888888"), data.endHasPulledRateUp ? "#666666" : (isActive ? "var(--text-dim)" : "#888888")),
-                        createPityCol((data.endTokenPulls || 0) % 240, 240, "TOKEN", isActive ? "var(--accent-blue)" : "#888888", isActive ? "var(--text-dim)" : "#888888", `<span style="color: ${isActive ? 'var(--accent-blue)' : '#888888'}; font-weight: bold;">${Math.floor((data.endTokenPulls || 0) / 240)}</span>`)
-                    ]);
+                    pityHTML = createPityRulerChartered(data, isActive);
                 } else if (prefix === 'weap') {
                     let tB = Math.ceil(data.totalPulls / 10), gVal = data.hasPulledRateUp ? data.rateUpBlock : (tB % 8 === 0 && tB > 0 ? 8 : tB % 8) || 0;
                     let pVal = tB >= 10 ? ((tB - 10) % 8 || (tB > 10 ? 8 : 0)) : tB, earn = tB >= 10 ? 1 + Math.floor((tB - 10) / 8) : 0;
