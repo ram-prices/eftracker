@@ -201,11 +201,32 @@
         ticket: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M21 10V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 1 0 4v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-4z"/></svg>'
     };
 
+    // A pin whose circle shows a real portrait (an item actually obtained)
+    // instead of a generic glyph, with a small checkmark badge overlaid to
+    // mark it as achieved rather than projected.
+    function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, labelHtml, extraClass = '') {
+        const safeName = (Array.isArray(enName) ? enName[0] : enName) || '';
+        const img = portraitUrl
+            ? `<img src="${portraitUrl}" loading="lazy" onerror="handleIconError(this, 'char', '${itemId || ''}', '${safeName.replace(/'/g, "\\'")}')">`
+            : PITY_RULER_ICONS.check;
+        const check = portraitUrl ? `<div class="ruler-pin-check">${PITY_RULER_ICONS.check.replace('var(--text-dim)', '#fff')}</div>` : '';
+        const label = labelHtml ? `<div class="ruler-pin-label">${labelHtml}</div>` : '';
+        return `
+            <div class="ruler-pin-${side} done ${extraClass}" style="left: ${leftPct}%; color: var(--text-dim);">
+                ${label}
+                <div class="ruler-pin-portrait">
+                    <div class="ruler-pin-circle">${img}</div>
+                    ${check}
+                </div>
+                <div class="ruler-pin-point"></div>
+            </div>`;
+    }
+
     // Pity Ruler for Chartered Headhunting banners: one shared axis for
     // Guarantee (then Token, once the guarantee is won) and a floating
     // Pity lane, instead of three separate boxes. See the CSS comment
     // above ".pity-ruler" in index.html for the full rationale.
-    function createPityRulerChartered(data, isActive) {
+    function createPityRulerChartered(data, isActive, bInfo) {
         const grey = '#888888', dim = 'var(--text-dim)';
         const pityVal = data.endPity || 0;
         const clampedRateUp = Math.min(120, data.endRateUpPity || 0);
@@ -221,6 +242,13 @@
         const ownerIcon = guaranteeDone ? PITY_RULER_ICONS.ticket : PITY_RULER_ICONS.badge;
         const ownerColor = !isActive ? grey : (guaranteeDone ? 'var(--accent-blue)' : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)')));
         const ownerPct = axisMax > 0 ? Math.max(0, Math.min(100, (ownerNow / axisMax) * 100)) : 0;
+        // The pull index (relative to this axis window's own origin) where
+        // the rate-up was actually won -- endRateUpPity stops incrementing
+        // the instant hasPulledRateUp flips true, so it's frozen at exactly
+        // that pull, not always at the 120-pull cap.
+        const rateUpWonPct = axisMax > 0 ? Math.max(0, Math.min(100, (clampedRateUp / axisMax) * 100)) : 0;
+        const rateUpId = bInfo?.rateUpIds?.[0];
+        const rateUpPortraitUrl = rateUpId ? getItemIconUrl('char', rateUpId) : '';
 
         const pityColor = !isActive ? grey : (pityVal >= 64 ? 'var(--color-red)' : (pityVal >= 40 ? 'var(--accent-orange)' : 'var(--color-green)'));
         const pityReset = Math.max(0, ownerNow - pityVal);
@@ -237,6 +265,16 @@
         const pityFillLeftPct = axisMax > 0 ? Math.max(0, Math.min(100, (pityReset / axisMax) * 100)) : 0;
         const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
         const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
+
+        // Every non-rate-up 6-star within the current axis window gets its
+        // own portrait pin on the pity/below side, at the exact pull where
+        // it landed -- a record of what pity actually resolved into, not
+        // just a blank floating bar.
+        const windowStart = guaranteeDone ? tokenCycles * 240 : 0;
+        const pityHistoryPinsHtml = (data.allPulls || [])
+            .filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
+            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, ''))
+            .join('');
 
         let historyNubHtml = '';
         if (guaranteeDone && tokenCycles > 0) {
@@ -269,12 +307,8 @@
                             <div class="ruler-pin-point"></div>
                             <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
                         </div>
-                        ${guaranteeDone ? `
-                        <div class="ruler-pin-above done" style="left: ${(120 / axisMax) * 100}%; color: ${dim};">
-                            <div class="ruler-pin-label">Guarantee &middot; done</div>
-                            <div class="ruler-pin-circle">${PITY_RULER_ICONS.check}</div>
-                            <div class="ruler-pin-point"></div>
-                        </div>` : ''}
+                        ${pityHistoryPinsHtml}
+                        ${guaranteeDone ? pityRulerPortraitPin('above', rateUpWonPct, rateUpPortraitUrl, rateUpId, bInfo?.rateUpName || bInfo?.rateupName, 'Guarantee &middot; done') : ''}
                         <div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
                             <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
                             <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
@@ -304,12 +338,13 @@
         let lastBannerByCategory = bannerTimeline.reduce((acc, name) => ({ ...acc, [bannerBoxes[name].category]: name }), {});
 
         sortedTimeline.forEach((name, index) => {
-            const data = bannerBoxes[name], cStats = categoryStats[data.category]; 
+            const data = bannerBoxes[name], cStats = categoryStats[data.category];
             let isActive = (lastBannerByCategory[data.category] === name), pityHTML = '';
+            let bInfo = getBannerInfo(data.poolId, name);
 
             if (prefix === 'weap' || (prefix === 'char' && data.category === "Chartered Headhunting") || isActive) {
                 if (prefix === 'char' && data.category === "Chartered Headhunting") {
-                    pityHTML = createPityRulerChartered(data, isActive);
+                    pityHTML = createPityRulerChartered(data, isActive, bInfo);
                 } else if (prefix === 'weap') {
                     let tB = Math.ceil(data.totalPulls / 10), gVal = data.hasPulledRateUp ? data.rateUpBlock : (tB % 8 === 0 && tB > 0 ? 8 : tB % 8) || 0;
                     let pVal = tB >= 10 ? ((tB - 10) % 8 || (tB > 10 ? 8 : 0)) : tB, earn = tB >= 10 ? 1 + Math.floor((tB - 10) / 8) : 0;
@@ -362,7 +397,6 @@
                 return `${blockHeader}<li class="pull-item rarity-${pull.rarity}-item ${pull.isRateUpItem ? 'is-rate-up-item' : ''}" ${clickAction}><div class="pull-item-top" style="gap: 12px;"><span class="pull-name"><img src="${getItemIconUrl(prefix, pull.itemId, pull.enName)}" class="char-icon" loading="lazy" onerror="handleIconError(this, '${prefix}', '${pull.itemId || ''}', '${(pull.enName || '').replace(/'/g, "\\'")}')"><div style="display: flex; align-items: center; flex: 1; min-width: 0;"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pull.name}</span><span class="banner-pull-num">#${pull.pullNum}</span>${rateUpTag || newTag ? `<div style="display: flex; gap: 6px; margin-left: 8px; flex-shrink: 0;">${rateUpTag}${newTag}</div>` : ''}</div></span>${badgeHTML}</div><div class="extra-drawer">${timeStr ? `<div class="timestamp-content">${timeStr}</div>` : ''}${luckHTML}</div></li>`;
             }).join('');
 
-            let bInfo = getBannerInfo(data.poolId, name);
             let bName = bInfo?.displayEn || bInfo?.name || name;
             let bUrl = getBannerImageUrl(data.poolId, bName, prefix);
             let bannerId = `banner-${prefix}-${index}`, ruHTML = '', ruBtn = '';
