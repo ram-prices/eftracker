@@ -1043,12 +1043,15 @@
 
         /* Pity Counter Dashboard Blocks */
         .pity-box { display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: none; border-radius: 4px; }
-        .pity-col { flex: 1; display: flex; flex-direction: column; justify-content: center; container-type: inline-size; min-width: 0; }
+        .pity-col { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
         .pity-divider { width: 1px; background: var(--border-tech); }
-        /* clamp() + cqw scales the number down as its own column narrows
-           (rather than a fixed breakpoint), so it can never wrap/overflow
-           regardless of how many digits val/max end up being. */
-        .pity-val { font-size: clamp(15px, 20cqw, 26px); font-weight: bold; font-family: monospace; line-height: 1; white-space: nowrap; }
+        /* Fixed size, not container-relative: a card with only 1-2 pity
+           columns (e.g. Basic Headhunting, New Horizons) gives each column
+           much more width than a 3-column card at the same viewport size --
+           sizing off the column's own width made the same number render at
+           very different sizes card-to-card. white-space:nowrap + the
+           mobile override below is what actually prevents wrapping. */
+        .pity-val { font-size: 22px; font-weight: bold; font-family: monospace; line-height: 1; white-space: nowrap; }
         .pity-max { font-size: 0.5em; }
         .pity-label { font-size: 8px; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; }
         .pity-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
