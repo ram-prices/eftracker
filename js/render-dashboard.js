@@ -209,11 +209,18 @@
         const img = portraitUrl
             ? `<img src="${portraitUrl}" loading="lazy" onerror="handleIconError(this, 'char', '${itemId || ''}', '${safeName.replace(/'/g, "\\'")}')">`
             : PITY_RULER_ICONS.check;
+        const label = `<div class="ruler-pin-label">${pullNum}</div>`;
+        const circle = `<div class="ruler-pin-circle">${img}</div>`;
+        const point = `<div class="ruler-pin-point"></div>`;
+        // "above" pins point down at the line and read label→circle→point
+        // top to bottom; "below" pins point up at the line, so the label
+        // needs to fall on the far/outer side too -- circle→point→label in
+        // source order, relying on .ruler-pin-below .ruler-pin-point's
+        // order:-1 to still put the point first visually, touching the line.
+        const children = side === 'below' ? circle + point + label : label + circle + point;
         return `
             <div class="ruler-pin-${side} done ${extraClass}" style="left: ${leftPct}%; color: var(--text-dim);">
-                <div class="ruler-pin-label">${pullNum}</div>
-                <div class="ruler-pin-circle">${img}</div>
-                <div class="ruler-pin-point"></div>
+                ${children}
             </div>`;
     }
 
