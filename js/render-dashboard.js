@@ -180,10 +180,13 @@
     }
 
     function createPityCol(val, max, label, valColor, labelColor, extraHtml = '') {
+        const numVal = Number(val), numMax = Number(max);
+        const pct = (numMax > 0 && !isNaN(numVal)) ? Math.max(0, Math.min(100, (numVal / numMax) * 100)) : 0;
         return `
             <div class="pity-col">
                 <div class="pity-val" style="color: ${valColor};">${val}<span class="pity-max" style="color: ${labelColor};">/${max}</span></div>
-                <div class="pity-label" style="color: ${labelColor}; line-height: 1.2;">${label} ${extraHtml}</div>
+                <div class="pity-label" style="color: ${labelColor}; line-height: 1.2;"><span class="pity-dot" style="background: ${valColor};"></span>${label} ${extraHtml}</div>
+                <div class="pity-fill-track"><div class="pity-fill-bar" style="width: ${pct}%; background: ${valColor};"></div></div>
             </div>`;
     }
 
