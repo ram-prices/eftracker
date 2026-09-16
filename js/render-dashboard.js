@@ -202,22 +202,17 @@
     };
 
     // A pin whose circle shows a real portrait (an item actually obtained)
-    // instead of a generic glyph, with a small checkmark badge overlaid to
-    // mark it as achieved rather than projected.
-    function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, labelHtml, extraClass = '') {
+    // instead of a generic glyph, labeled with the pull number it landed on
+    // -- on the pin's outer side, same as every other pin's label.
+    function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, pullNum, extraClass = '') {
         const safeName = (Array.isArray(enName) ? enName[0] : enName) || '';
         const img = portraitUrl
             ? `<img src="${portraitUrl}" loading="lazy" onerror="handleIconError(this, 'char', '${itemId || ''}', '${safeName.replace(/'/g, "\\'")}')">`
             : PITY_RULER_ICONS.check;
-        const check = portraitUrl ? `<div class="ruler-pin-check">${PITY_RULER_ICONS.check.replace('var(--text-dim)', '#fff')}</div>` : '';
-        const label = labelHtml ? `<div class="ruler-pin-label">${labelHtml}</div>` : '';
         return `
             <div class="ruler-pin-${side} done ${extraClass}" style="left: ${leftPct}%; color: var(--text-dim);">
-                ${label}
-                <div class="ruler-pin-portrait">
-                    <div class="ruler-pin-circle">${img}</div>
-                    ${check}
-                </div>
+                <div class="ruler-pin-label">${pullNum}</div>
+                <div class="ruler-pin-circle">${img}</div>
                 <div class="ruler-pin-point"></div>
             </div>`;
     }
@@ -273,7 +268,7 @@
         const windowStart = guaranteeDone ? tokenCycles * 240 : 0;
         const pityHistoryPinsHtml = (data.allPulls || [])
             .filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
-            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, ''))
+            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
             .join('');
 
         let historyNubHtml = '';
@@ -308,7 +303,7 @@
                             <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
                         </div>
                         ${pityHistoryPinsHtml}
-                        ${guaranteeDone ? pityRulerPortraitPin('above', rateUpWonPct, rateUpPortraitUrl, rateUpId, bInfo?.rateUpName || bInfo?.rateupName, 'Guarantee &middot; done') : ''}
+                        ${guaranteeDone ? pityRulerPortraitPin('above', rateUpWonPct, rateUpPortraitUrl, rateUpId, bInfo?.rateUpName || bInfo?.rateupName, clampedRateUp) : ''}
                         <div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
                             <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
                             <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>

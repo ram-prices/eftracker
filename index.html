@@ -1205,20 +1205,6 @@
         .ruler-pin-above.done .ruler-pin-circle, .ruler-pin-below.done .ruler-pin-circle { background: var(--bg-deep) !important; border-color: var(--border-tech); }
         .ruler-pin-above.done .ruler-pin-label { color: var(--text-dim) !important; }
         .ruler-pin-above.done .ruler-pin-point, .ruler-pin-below.done .ruler-pin-point { color: var(--border-tech) !important; }
-        /* Portrait pin: a real obtained item's art instead of a glyph, with
-           a small checkmark badge overhanging the circle's edge -- the
-           badge lives outside .ruler-pin-circle's own overflow:hidden so it
-           doesn't get clipped by the same rule that crops the portrait. */
-        .ruler-pin-portrait { position: relative; }
-        .ruler-pin-check {
-            position: absolute; right: -2px; bottom: -2px;
-            width: 11px; height: 11px;
-            border-radius: 50%;
-            background: var(--color-green);
-            border: 2px solid var(--bg-panel);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .ruler-pin-check svg { width: 6px; height: 6px; }
         .ruler-pin-forced .ruler-pin-label { color: var(--accent-orange) !important; }
         .ruler-pin-forced .ruler-pin-circle { border-style: dashed; border-color: currentColor; background: transparent !important; }
         .ruler-pin-forced .ruler-pin-circle svg { opacity: 0.6; }
