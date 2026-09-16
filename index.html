@@ -792,6 +792,11 @@
         .filter-btn { background: rgba(255,255,255,0.05); border: none; color: var(--text-dim); padding: 4px 10px; font-size: 11px; font-family: monospace; cursor: pointer; border-radius: 3px; transition: all 0.2s; font-weight: bold; }
         .filter-btn:hover { background: rgba(255,255,255,0.1); }
         .filter-btn.active { background: rgba(255, 152, 0, 0.15); border-color: var(--accent-orange); color: var(--accent-orange); }
+        /* Rarity filter buttons (6★/5★/4★ on banner cards) tint to their own
+           rarity color instead of the generic accent-orange when active. */
+        .filter-btn.active[data-filter="6"] { background: color-mix(in srgb, var(--rarity-6) 15%, transparent); border-color: var(--rarity-6); color: var(--rarity-6); }
+        .filter-btn.active[data-filter="5"] { background: color-mix(in srgb, var(--rarity-5) 15%, transparent); border-color: var(--rarity-5); color: var(--rarity-5); }
+        .filter-btn.active[data-filter="4"] { background: color-mix(in srgb, var(--rarity-4) 15%, transparent); border-color: var(--rarity-4); color: var(--rarity-4); }
         .filter-btn.data-loaded { border-color: var(--color-green); color: var(--color-green); }
 
         .banner-expand-area { margin: 10px -20px -20px -20px; padding: 10px 0; background: transparent; border: none; color: #444; font-size: 10px; font-family: monospace; cursor: pointer; text-transform: uppercase; letter-spacing: 0.2em; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; }
@@ -1038,10 +1043,13 @@
 
         /* Pity Counter Dashboard Blocks */
         .pity-box { display: flex; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: none; border-radius: 4px; }
-        .pity-col { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .pity-col { flex: 1; display: flex; flex-direction: column; justify-content: center; container-type: inline-size; min-width: 0; }
         .pity-divider { width: 1px; background: var(--border-tech); }
-        .pity-val { font-size: 20px; font-weight: bold; font-family: monospace; line-height: 1; }
-        .pity-max { font-size: 10px; }
+        /* clamp() + cqw scales the number down as its own column narrows
+           (rather than a fixed breakpoint), so it can never wrap/overflow
+           regardless of how many digits val/max end up being. */
+        .pity-val { font-size: clamp(13px, 17cqw, 20px); font-weight: bold; font-family: monospace; line-height: 1; white-space: nowrap; }
+        .pity-max { font-size: 0.55em; }
         .pity-label { font-size: 9px; text-transform: uppercase; margin-top: 4px; }
 
         /* Banner-card pity readout: each stat is its own bounded chip
