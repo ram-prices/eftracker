@@ -1049,11 +1049,12 @@
            columns (e.g. Basic Headhunting, New Horizons) gives each column
            much more width than a 3-column card at the same viewport size --
            sizing off the column's own width made the same number render at
-           very different sizes card-to-card. white-space:nowrap + the
-           mobile override below is what actually prevents wrapping. */
+           very different sizes card-to-card. white-space:nowrap is what
+           actually prevents wrapping; verified it still fits down to a
+           375px viewport at this fixed size. */
         .pity-val { font-size: 22px; font-weight: bold; font-family: monospace; line-height: 1; white-space: nowrap; }
-        .pity-max { font-size: 0.5em; }
-        .pity-label { font-size: 8px; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; }
+        .pity-max { font-size: 0.6em; }
+        .pity-label { font-size: 11px; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; }
         .pity-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
         .pity-fill-track { margin-top: 8px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; }
         .pity-fill-bar { height: 100%; border-radius: 2px; transition: width 0.3s ease; }
@@ -1109,11 +1110,20 @@
             }
             .section-header { margin-top: 10px; }
         }
+        /* Verified via measured wrap threshold, not the general tablet
+           breakpoint above: the longest pity label ("SEL 0 R-UP 0") wraps
+           onto 2 lines at the desktop label size somewhere between 400px
+           and 440px viewport width (3-column box). 460px gives margin
+           without shrinking the label at this environment's normal ~660px
+           pane width, where it's meant to stay at the larger size. */
+        @media (max-width: 460px) {
+            .pity-label { font-size: 9px; }
+        }
         @media (max-width: 768px) {
             .tabs { gap: 15px; flex-wrap: wrap; justify-content: center;}
             .tab-btn { width: 50px; height: 50px; }
             .tab-btn svg { width: 24px; height: 24px; }
-            
+
             /* Performance improvements for mobile */
             .banner-box::before {
                 filter: none;
