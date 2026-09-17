@@ -211,12 +211,12 @@
     // instead of a generic glyph, labeled with the pull number it landed on
     // -- on the pin's outer side, same as every other pin's label.
     // `truePct` is where the pull actually happened; `leftPct` is where the
-    // pin is actually drawn, which the declutter pass below may have pushed
-    // rightward to avoid overlapping a neighbor (never leftward, so
-    // leftPct >= truePct always). When they differ, the triangle tip itself
-    // tilts back toward the true spot instead of pointing straight at the
-    // line, rather than drawing a separate connector -- the pin's own
-    // pointer just leans in the direction of the pull it represents.
+    // pin is actually drawn, which the declutter pass below may have moved
+    // either side of it to sit around a crowded cluster's average. When
+    // they differ, the triangle tip itself tilts back toward the true spot
+    // instead of pointing straight at the line, rather than drawing a
+    // separate connector -- the pin's own pointer just leans in the
+    // direction of the pull it represents.
     function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, pullNum, truePct = leftPct, extraClass = '') {
         const safeName = (Array.isArray(enName) ? enName[0] : enName) || '';
         const img = portraitUrl
@@ -224,13 +224,18 @@
             : PITY_RULER_ICONS.check;
         const label = `<div class="ruler-pin-label">${pullNum}</div>`;
         const circle = `<div class="ruler-pin-circle">${img}</div>`;
-        // Tilted counter-clockwise (below pins) or clockwise (above pins)
-        // by the same magnitude swings the tip leftward either way, since
-        // the pivot (transform-origin, set in CSS) sits at the base where
-        // the triangle meets the circle, on the opposite side from the tip.
-        const tiltDeg = Math.min((leftPct - truePct) * PIN_TILT_DEG_PER_PCT, PIN_TILT_MAX_DEG);
-        const tiltSign = side === 'below' ? -1 : 1;
-        const pointStyle = tiltDeg > 0.05 ? ` style="transform: rotate(${(tiltSign * tiltDeg).toFixed(1)}deg);"` : '';
+        // delta > 0 means the true pull is to the right of where the pin
+        // got drawn (it was nudged left to make room), delta < 0 the
+        // opposite. Rotating a "below" pin's tip left needs a negative
+        // angle and an "above" pin's tip left needs a positive one (they
+        // point opposite directions), verified against the real rendered
+        // triangle shapes rather than assumed -- so the same-sign delta
+        // maps directly to the angle for "below" pins and flips sign for
+        // "above" pins.
+        const delta = truePct - leftPct;
+        const rawTilt = delta * PIN_TILT_DEG_PER_PCT * (side === 'below' ? 1 : -1);
+        const tiltDeg = Math.max(-PIN_TILT_MAX_DEG, Math.min(PIN_TILT_MAX_DEG, rawTilt));
+        const pointStyle = Math.abs(tiltDeg) > 0.05 ? ` style="transform: rotate(${tiltDeg.toFixed(1)}deg);"` : '';
         const point = `<div class="ruler-pin-point"${pointStyle}></div>`;
         // "above" pins point down at the line and read label→circle→point
         // top to bottom; "below" pins point up at the line, so the label
@@ -257,14 +262,36 @@
     // roomier than strictly necessary as a result, which is harmless.
     const PIN_MIN_GAP_PCT = 10;
 
-    // Greedily spreads out pins that would otherwise land within
-    // PIN_MIN_GAP_PCT of each other, pushing each later one just far enough
-    // right of its predecessor. Input must already be sorted ascending
-    // (pull number order, which is also ascending pct order here).
+    // Groups pins that land within PIN_MIN_GAP_PCT of a neighbor into
+    // clusters (transitively -- a chain of near neighbors all join one
+    // cluster even if the two ends aren't close to each other directly),
+    // then centers each cluster on the average of its members' true
+    // positions and spaces them out exactly minGap apart around that
+    // average, rather than anchoring on the first member and cascading the
+    // rest rightward. E.g. pulls at 98 and 102 (avg 100, minGap 10) end up
+    // at 95 and 105 -- both as close to their true spot as the minimum
+    // spacing allows, instead of the first staying put and the second
+    // getting shoved a full 10 away. Input must already be sorted
+    // ascending (pull number order, which is also ascending pct order
+    // here); a pathological run of many clusters packed right against each
+    // other could in principle still leave two cluster edges closer than
+    // minGap, since each cluster is centered independently in one pass.
     function declutterPct(pcts, minGap = PIN_MIN_GAP_PCT) {
-        const out = pcts.slice();
-        for (let i = 1; i < out.length; i++) {
-            if (out[i] - out[i - 1] < minGap) out[i] = out[i - 1] + minGap;
+        const n = pcts.length;
+        const out = new Array(n);
+        let start = 0;
+        for (let i = 1; i <= n; i++) {
+            if (i === n || pcts[i] - pcts[i - 1] >= minGap) {
+                const size = i - start;
+                if (size === 1) {
+                    out[start] = pcts[start];
+                } else {
+                    const avg = pcts.slice(start, i).reduce((a, b) => a + b, 0) / size;
+                    const first = avg - (minGap * (size - 1)) / 2;
+                    for (let j = 0; j < size; j++) out[start + j] = first + j * minGap;
+                }
+                start = i;
+            }
         }
         return out;
     }
