@@ -219,9 +219,22 @@
         // order:-1 to still put the point first visually, touching the line.
         const children = side === 'below' ? circle + point + label : label + circle + point;
         return `
-            <div class="ruler-pin-${side} done ${extraClass}" style="left: ${leftPct}%; color: var(--text-dim);">
+            <div class="ruler-pin-${side} done ${extraClass}" style="left: ${pinEdgeClamp(leftPct)}; color: var(--text-dim);">
                 ${children}
             </div>`;
+    }
+
+    // A pin's `left` needs to stay far enough from 0%/100% that its own
+    // circle+label don't get clipped by .banner-box's overflow:hidden --
+    // clamp() keeps that clearance in real pixels regardless of how wide
+    // the segment actually renders, rather than insetting the whole axis
+    // (which previously put the track's background and its fill children
+    // in different coordinate spaces and made the fills overshoot).
+    // `edgePx` only needs to be wider for the one pin with a long label
+    // ("Guarantee · 120" / "Token · 240"); every other pin on this ruler
+    // shows just a pull number and fits inside the narrower default.
+    function pinEdgeClamp(pct, edgePx = 16) {
+        return `clamp(${edgePx}px, ${pct}%, calc(100% - ${edgePx}px))`;
     }
 
     // Renders one segment's track+fills+pins -- shared by the single 0-120
@@ -262,7 +275,7 @@
             const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
             pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
             pityPinHtml = `
-                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pityTargetPct}%; color: ${pityColor};">
+                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct)}; color: ${pityColor};">
                     <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
                     <div class="ruler-pin-point"></div>
                     <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
@@ -271,12 +284,12 @@
         }
 
         const ownerPinHtml = ownerPinMode === 'done'
-            ? `<div class="ruler-pin-above done" style="left: 100%; color: var(--text-dim);">
+            ? `<div class="ruler-pin-above done" style="left: ${pinEdgeClamp(100)}; color: var(--text-dim);">
                     <div class="ruler-pin-label">${ownerTarget}</div>
                     <div class="ruler-pin-circle">${PITY_RULER_ICONS.check}</div>
                     <div class="ruler-pin-point"></div>
                 </div>`
-            : `<div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
+            : `<div class="ruler-pin-above" style="left: ${pinEdgeClamp(100, 42)}; color: ${ownerColor};">
                     <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
                     <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
                     <div class="ruler-pin-point"></div>
@@ -284,9 +297,10 @@
 
         return `
             <div class="ruler-axis">
-                <div class="ruler-track"></div>
-                <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
-                ${pityFillHtml}
+                <div class="ruler-track">
+                    <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
+                    ${pityFillHtml}
+                </div>
                 ${nowCapHtml}
                 ${pityPinHtml}
                 ${pityHistoryPinsHtml}

@@ -1138,50 +1138,27 @@
             text-align: center;
             margin-bottom: 4px;
         }
-        /* The track/pins live in this inner wrapper rather than directly in
-           .ruler-segment, insetted so a pin label centered at 0%/100% has
-           room to render without .banner-box's own overflow:hidden
-           clipping it. Every segment gets a small inset (14px covers the
-           22px pin circle) because every segment except the live one ends
-           in its own "done" owner pin sitting exactly at that 100% mark --
-           and since scroll-snap aligns a segment's own edges to the
-           viewport, that pin has nothing to overhang into once snapped,
-           unlike the interior TRACK LINE itself, which still has a real
-           neighboring segment right there. The strip's true outer edges
-           (first segment's left, last segment's right) get the original
-           wider 32px instead, for the "Guarantee/Token/Pity · <n>" labels
-           only those ends ever show. Margin (unlike padding) is what
-           actually shrinks the containing block absolute children resolve
-           their left:X% against -- .ruler-track below undoes it with a
-           matching negative offset so the line itself still reaches the
-           segment's true edges and stays connected across cycles. */
-        .ruler-axis { position: relative; flex: 1; margin: 0 14px; }
-        .ruler-segment:first-child .ruler-axis { margin-left: 32px; }
-        .ruler-segment:last-child .ruler-axis { margin-right: 32px; }
+        /* The track/pins/fills all live directly in this wrapper, sharing
+           one coordinate space with no inset -- so the track (a plain
+           background bar spanning 0-100% of it) is flush with its
+           neighbor at every segment boundary and reads as one continuous
+           line, and fills/now-cap/pins all agree on where "100%" actually
+           is. Pin clipping against .banner-box's own overflow:hidden is
+           handled per-pin instead (see .ruler-pin-label's clamp()-based
+           left further down) rather than by insetting this whole box,
+           which previously forced fills into a different coordinate space
+           than the track that contained them and made them overshoot. */
+        .ruler-axis { position: relative; flex: 1; }
 
-        /* Background bar only -- widened to connect across segments the
-           same way as before, but it no longer contains the fill bars (see
-           .ruler-fill-owner/.ruler-fill-pity below) since a percentage
-           width/left on a child of THIS box would resolve against its
-           widened size, not the true 0-axisMax pull range, and overshoot
-           past where the axis's own pins (and .ruler-now-cap) actually
-           are. */
         .ruler-track {
             position: absolute;
-            left: -14px; right: -14px; top: 44px;
+            left: 0; right: 0; top: 44px;
             height: 9px;
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.06);
         }
-        .ruler-segment:first-child .ruler-track { left: -32px; }
-        .ruler-segment:last-child .ruler-track { right: -32px; }
-        /* Direct children of .ruler-axis (not .ruler-track) so their own
-           left/width percentages resolve against the axis's true width --
-           the same coordinate space every pin on it already uses -- rather
-           than the track's widened one. top values are the track's own
-           top (44px) plus its former internal offset (1px/bottom-1px). */
-        .ruler-fill-owner { position: absolute; top: 45px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
-        .ruler-fill-pity { position: absolute; top: 49px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
+        .ruler-fill-owner { position: absolute; top: 1px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
+        .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
         .ruler-now-cap {
             position: absolute; top: 42px;
             width: 2px; height: 13px;
