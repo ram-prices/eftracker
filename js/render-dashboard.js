@@ -224,15 +224,19 @@
             </div>`;
     }
 
-    // Measured via getBoundingClientRect against real rendered labels, not
-    // estimated: "Token · 720" (the longest seen) is ~57px wide, so its
-    // own half-width alone needs ~29px of clearance. The real gap wasn't
-    // that math -- it's that "Pity · 80"/"Pity · Forced" use this same
-    // wide label style and were mistakenly left on the narrow 16px
-    // default entirely in an earlier round, clipping every time that pin
-    // landed near an edge. Sized with real headroom above the ~29px
-    // minimum since label width varies slightly with the actual number.
-    const WIDE_PIN_EDGE_PX = 58;
+    // Measured via getBoundingClientRect against real rendered labels.
+    // These labels stack their two parts onto separate lines (e.g.
+    // "Guarantee" over "120"), so the pin's width is set by its widest
+    // single line, not the two parts combined -- "Guarantee" is the
+    // longest at ~47px, needing ~24px of clearance for its own
+    // half-width. Sized with headroom above that minimum since label
+    // width varies slightly with the actual number. Kept narrower than
+    // it once was (58px, back when both parts shared one unstacked line)
+    // specifically so the owner pin doesn't get dragged so far inward
+    // that it visually collides with a pity pin landing nearby on the
+    // same axis -- redeeming a token and pity resetting are unrelated,
+    // and clamping both similarly close together implied otherwise.
+    const WIDE_PIN_EDGE_PX = 28;
 
     // A pin's `left` needs to stay far enough from 0%/100% that its own
     // circle+label don't get clipped by .banner-box's overflow:hidden --
