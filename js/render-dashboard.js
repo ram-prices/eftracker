@@ -271,8 +271,18 @@
 
         let pityFillHtml = '', pityPinHtml = '', nowCapHtml = '';
         if (showPityLive) {
-            const pityReset = Math.max(0, ownerNow - pityVal);
-            const pityTargetRaw = pityReset + 80;
+            // pityVal (pulls since the last 6-star) runs continuously and
+            // isn't reset by hitting a 240-pull token cycle boundary --
+            // redeeming a token for the rate-up character is a separate
+            // mechanic from pity. So the last reset can predate this
+            // segment's own window (pityResetRaw negative); the target must
+            // still be computed from the true reset point rather than
+            // clamping it to this window's start first, or the projected
+            // pin would land 80 pulls after a fake reset-at-0 and read too
+            // late. Only the fill's visible left edge gets clamped, since
+            // there's no way to draw a bar starting before this axis.
+            const pityResetRaw = ownerNow - pityVal;
+            const pityTargetRaw = pityResetRaw + 80;
             // Pity can never actually count past 80 -- but on the 0-120
             // guarantee axis specifically, its own 120-pull cap can force a
             // 6-star (and therefore a pity reset) before pity would
@@ -281,9 +291,9 @@
             // 6-star, so this can only ever trigger on that first axis.
             const forced = axisMax === 120 && pityTargetRaw > 120;
             const pityTargetPct = forced ? 100 : clamp((pityTargetRaw / axisMax) * 100);
-            const pityFillLeftPct = clamp((pityReset / axisMax) * 100);
+            const pityFillLeftPct = clamp((Math.max(0, pityResetRaw) / axisMax) * 100);
             const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
-            const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
+            const pityLabelText = forced ? 'Forced<br>Pity' : '80<br>Pity';
             pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
             pityPinHtml = `
                 <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct, WIDE_PIN_EDGE_PX)}; color: ${pityColor};">
@@ -301,7 +311,7 @@
                     <div class="ruler-pin-point"></div>
                 </div>`
             : `<div class="ruler-pin-above" style="left: ${pinEdgeClamp(100, WIDE_PIN_EDGE_PX)}; color: ${ownerColor};">
-                    <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
+                    <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel}<br>${ownerTarget}</div>
                     <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
                     <div class="ruler-pin-point"></div>
                 </div>`;
