@@ -1171,6 +1171,10 @@
            branch: it now spans the 80-pull window itself instead of just
            "progress so far"), not its visual weight. */
         .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
+        /* The portion of the pity window past "now" (the white cap) is a
+           projection, not progress -- pity can't actually be there yet --
+           so it's washed out to read as "still ahead" rather than "done". */
+        .ruler-fill-pity-ahead { opacity: 0.35; }
         .ruler-now-cap {
             position: absolute; top: 42px;
             width: 2px; height: 13px;

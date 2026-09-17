@@ -389,8 +389,17 @@
             const bandRightRaw = Math.min(axisMax, pityTargetRaw);
             const pityBandLeftPct = axisMax > 0 ? (bandLeftRaw / axisMax) * 100 : 0;
             const pityBandRightPct = axisMax > 0 ? (bandRightRaw / axisMax) * 100 : 0;
-            const pityBandWidthPct = Math.max(0, pityBandRightPct - pityBandLeftPct);
-            pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityBandLeftPct}%; width: ${pityBandWidthPct}%; background: ${pityColor};"></div>`;
+            // Split the window at "now" (the white cap) into what's already
+            // elapsed vs. what's still ahead -- pity can never actually be
+            // in the future, so the far side is washed out (lower opacity,
+            // see .ruler-fill-pity-ahead) to read as projection rather than
+            // progress. "now" always falls inside [bandLeft, bandRight]:
+            // pity is always < 80, so the target is always ahead of it.
+            const pityElapsedWidthPct = Math.max(0, ownerPct - pityBandLeftPct);
+            const pityAheadWidthPct = Math.max(0, pityBandRightPct - ownerPct);
+            pityFillHtml = `
+                <div class="ruler-fill-pity" style="left: ${pityBandLeftPct}%; width: ${pityElapsedWidthPct}%; background: ${pityColor};"></div>
+                <div class="ruler-fill-pity ruler-fill-pity-ahead" style="left: ${ownerPct}%; width: ${pityAheadWidthPct}%; background: ${pityColor};"></div>`;
             nowCapHtml = `<div class="ruler-now-cap" style="left: ${ownerPct}%;"></div>`;
         }
 
