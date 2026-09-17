@@ -204,7 +204,13 @@
     // A pin whose circle shows a real portrait (an item actually obtained)
     // instead of a generic glyph, labeled with the pull number it landed on
     // -- on the pin's outer side, same as every other pin's label.
-    function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, pullNum, extraClass = '') {
+    // `truePct` is where the pull actually happened; `leftPct` is where the
+    // pin is actually drawn, which the declutter pass below may have pushed
+    // rightward to avoid overlapping a neighbor. When they differ, a small
+    // connector + tick mark (both at the same fixed Y the pin's own point
+    // already touches) point back at the true spot, the same way a map
+    // callout's leader line ties a shifted label back to its real location.
+    function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, pullNum, truePct = leftPct, extraClass = '') {
         const safeName = (Array.isArray(enName) ? enName[0] : enName) || '';
         const img = portraitUrl
             ? `<img src="${portraitUrl}" loading="lazy" onerror="handleIconError(this, 'char', '${itemId || ''}', '${safeName.replace(/'/g, "\\'")}')">`
@@ -218,10 +224,53 @@
         // source order, relying on .ruler-pin-below .ruler-pin-point's
         // order:-1 to still put the point first visually, touching the line.
         const children = side === 'below' ? circle + point + label : label + circle + point;
+        const tipY = side === 'below' ? 53 : 44;
+        const nudged = Math.abs(leftPct - truePct) > 0.01;
+        const connectorHtml = nudged
+            ? `<div class="ruler-pin-connector" style="left: ${Math.min(leftPct, truePct)}%; width: ${Math.abs(leftPct - truePct)}%; top: ${tipY}px;"></div>
+               <div class="ruler-pin-true-tick" style="left: ${truePct}%; top: ${tipY}px;"></div>`
+            : '';
         return `
+            ${connectorHtml}
             <div class="ruler-pin-${side} done ${extraClass}" style="left: ${pinEdgeClamp(leftPct)}; color: var(--text-dim);">
                 ${children}
             </div>`;
+    }
+
+    // Minimum center-to-center spacing (in axis %) enforced between
+    // same-side portrait pins so pulls landing close together (e.g. two
+    // 6-stars back-to-back) don't visually merge into one blob. A fixed
+    // percentage rather than a measured pixel gap, like every other
+    // position on this ruler -- keeps the whole feature static/resize-safe
+    // with no JS layout pass, at the cost of being an approximation. Sized
+    // against the narrowest real case measured (a single segment of a
+    // horizontally-scrolled, multi-cycle ruler on a 375px mobile viewport,
+    // ~260px wide): the 22px pin circles need ~26px of real separation to
+    // clear each other, and 26/260 ~= 10%. Wide desktop cards end up
+    // roomier than strictly necessary as a result, which is harmless.
+    const PIN_MIN_GAP_PCT = 10;
+
+    // Greedily spreads out pins that would otherwise land within
+    // PIN_MIN_GAP_PCT of each other, pushing each later one just far enough
+    // right of its predecessor. Input must already be sorted ascending
+    // (pull number order, which is also ascending pct order here).
+    function declutterPct(pcts, minGap = PIN_MIN_GAP_PCT) {
+        const out = pcts.slice();
+        for (let i = 1; i < out.length; i++) {
+            if (out[i] - out[i - 1] < minGap) out[i] = out[i - 1] + minGap;
+        }
+        return out;
+    }
+
+    // Renders one side's group of portrait pins, decluttering their
+    // positions first so the pointer/connector logic above has both the
+    // true and (possibly nudged) drawn position for each pull.
+    function renderPortraitPinGroup(side, pulls, windowStart, axisMax) {
+        const truePcts = pulls.map(p => ((p.pullNum - windowStart) / axisMax) * 100);
+        const nudgedPcts = declutterPct(truePcts);
+        return pulls
+            .map((p, i) => pityRulerPortraitPin(side, nudgedPcts[i], getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum, truePcts[i]))
+            .join('');
     }
 
     // Measured via getBoundingClientRect against real rendered labels.
@@ -264,14 +313,10 @@
         const { windowStart, axisMax, ownerNow, ownerColor, ownerLabel, ownerTarget, ownerIcon, ownerPinMode, pityColor, pityVal, showPityLive, allPulls } = opts;
         const ownerPct = axisMax > 0 ? clamp((ownerNow / axisMax) * 100) : 0;
 
-        const pityHistoryPinsHtml = (allPulls || [])
-            .filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
-            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
-            .join('');
-        const rateUpHistoryPinsHtml = (allPulls || [])
-            .filter(p => p.rarity === '6' && p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
-            .map(p => pityRulerPortraitPin('above', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
-            .join('');
+        const pityPulls = (allPulls || []).filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow);
+        const rateUpPulls = (allPulls || []).filter(p => p.rarity === '6' && p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow);
+        const pityHistoryPinsHtml = renderPortraitPinGroup('below', pityPulls, windowStart, axisMax);
+        const rateUpHistoryPinsHtml = renderPortraitPinGroup('above', rateUpPulls, windowStart, axisMax);
 
         let pityFillHtml = '', pityPinHtml = '', nowCapHtml = '';
         if (showPityLive) {

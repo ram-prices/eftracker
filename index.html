@@ -1204,6 +1204,10 @@
         .ruler-pin-circle svg { width: 11px; height: 11px; flex-shrink: 0; }
         .ruler-pin-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .ruler-pin-point { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; }
+        /* Leader line + tick connecting a decluttered pin back to the true
+           pull it represents -- see pityRulerPortraitPin's declutter pass. */
+        .ruler-pin-connector { position: absolute; height: 1px; background: var(--text-dim); opacity: 0.6; }
+        .ruler-pin-true-tick { position: absolute; width: 2px; height: 7px; background: var(--text-dim); opacity: 0.6; border-radius: 1px; transform: translate(-50%, -50%); }
         .ruler-pin-above.done .ruler-pin-circle, .ruler-pin-below.done .ruler-pin-circle { background: var(--bg-deep) !important; border-color: var(--border-tech); }
         .ruler-pin-above.done .ruler-pin-label { color: var(--text-dim) !important; }
         .ruler-pin-above.done .ruler-pin-point, .ruler-pin-below.done .ruler-pin-point { color: var(--border-tech) !important; }
