@@ -1159,18 +1159,29 @@
         .ruler-segment:first-child .ruler-axis { margin-left: 32px; }
         .ruler-segment:last-child .ruler-axis { margin-right: 32px; }
 
+        /* Background bar only -- widened to connect across segments the
+           same way as before, but it no longer contains the fill bars (see
+           .ruler-fill-owner/.ruler-fill-pity below) since a percentage
+           width/left on a child of THIS box would resolve against its
+           widened size, not the true 0-axisMax pull range, and overshoot
+           past where the axis's own pins (and .ruler-now-cap) actually
+           are. */
         .ruler-track {
             position: absolute;
             left: -14px; right: -14px; top: 44px;
             height: 9px;
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.06);
-            overflow: hidden;
         }
         .ruler-segment:first-child .ruler-track { left: -32px; }
         .ruler-segment:last-child .ruler-track { right: -32px; }
-        .ruler-fill-owner { position: absolute; top: 1px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
-        .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
+        /* Direct children of .ruler-axis (not .ruler-track) so their own
+           left/width percentages resolve against the axis's true width --
+           the same coordinate space every pin on it already uses -- rather
+           than the track's widened one. top values are the track's own
+           top (44px) plus its former internal offset (1px/bottom-1px). */
+        .ruler-fill-owner { position: absolute; top: 45px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
+        .ruler-fill-pity { position: absolute; top: 49px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
         .ruler-now-cap {
             position: absolute; top: 42px;
             width: 2px; height: 13px;

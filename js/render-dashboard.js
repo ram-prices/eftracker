@@ -284,10 +284,9 @@
 
         return `
             <div class="ruler-axis">
-                <div class="ruler-track">
-                    <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
-                    ${pityFillHtml}
-                </div>
+                <div class="ruler-track"></div>
+                <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
+                ${pityFillHtml}
                 ${nowCapHtml}
                 ${pityPinHtml}
                 ${pityHistoryPinsHtml}
