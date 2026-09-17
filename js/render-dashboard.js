@@ -195,7 +195,6 @@
     }
 
     const PITY_RULER_ICONS = {
-        star: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17l-6.3 3.8 1.7-6.9L2 9.2l7.1-.6z"/></svg>',
         badge: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 12c2.7 0 8 1.3 8 4v2H4v-2c0-2.7 5.3-4 8-4zm0-2a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>',
         check: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>',
         ticket: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M21 10V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 1 0 4v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-4z"/></svg>'
@@ -365,47 +364,33 @@
         const pityHistoryPinsHtml = renderPortraitPinGroup('below', pityPulls, windowStart, axisMax);
         const rateUpHistoryPinsHtml = renderPortraitPinGroup('above', rateUpPulls, windowStart, axisMax);
 
-        let pityFillHtml = '', pityPinHtml = '', nowCapHtml = '';
+        let pityFillHtml = '', nowCapHtml = '';
         if (showPityLive) {
             // pityVal (pulls since the last 6-star) runs continuously and
             // isn't reset by hitting a 240-pull token cycle boundary --
             // redeeming a token for the rate-up character is a separate
             // mechanic from pity. So the last reset can predate this
-            // segment's own window (pityResetRaw negative); the target must
-            // still be computed from the true reset point rather than
-            // clamping it to this window's start first, or the projected
-            // pin would land 80 pulls after a fake reset-at-0 and read too
-            // late. Only the fill's visible left edge gets clamped, since
-            // there's no way to draw a bar starting before this axis.
+            // segment's own window (pityResetRaw negative); the window's
+            // true bounds are computed from that real reset point rather
+            // than clamping it to this axis's start first, or the band
+            // would start 80 pulls after a fake reset-at-0 and read wrong.
             const pityResetRaw = ownerNow - pityVal;
             const pityTargetRaw = pityResetRaw + 80;
-            // The true target can fall beyond this segment's own visible
-            // range for two different reasons. On the 0-120 guarantee axis
-            // specifically, its 120-pull cap can force a 6-star (and
-            // therefore a pity reset) before pity would naturally get
-            // there -- that's still worth showing, clamped to the edge,
-            // since it's a real rule about *this* axis. On a 240-pull
-            // token axis, there's no such rule -- it just means the pull
-            // that reaches 80 pity hasn't happened yet and belongs to a
-            // future cycle this ruler doesn't render, so there's nothing
-            // real to draw and the pin is skipped rather than clamped to
-            // the same spot as the cycle's own end-of-axis pin (which
-            // would wrongly suggest the two are related -- redeeming a
-            // token doesn't reset pity).
-            const pityOverflow = pityTargetRaw > axisMax;
-            const forced = axisMax === 120 && pityOverflow;
-            const showPityPin = !pityOverflow || forced;
-            const pityTargetPct = forced ? 100 : clamp((pityTargetRaw / axisMax) * 100);
-            const pityFillLeftPct = clamp((Math.max(0, pityResetRaw) / axisMax) * 100);
-            const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
-            const pityLabelText = forced ? 'Forced<br>Pity' : '80<br>Pity';
-            pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
-            pityPinHtml = showPityPin ? `
-                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct, WIDE_PIN_EDGE_PX)}; color: ${pityColor};">
-                    <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
-                    <div class="ruler-pin-point"></div>
-                    <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
-                </div>` : '';
+            // The line itself -- rather than a separate target pin -- now
+            // shows the full 80-pull window: its length directly shows the
+            // size of that window, and the existing white "now" cap shows
+            // how far into it the player actually is. Clipping both ends
+            // to this axis handles every edge case that used to need
+            // special-casing (a pin overflowing a future cycle, or being
+            // forced early by the 0-120 guarantee's own cap) for free --
+            // the line just visually runs up to whichever edge is actually
+            // in view, with nothing extra to draw or hide.
+            const bandLeftRaw = Math.max(0, pityResetRaw);
+            const bandRightRaw = Math.min(axisMax, pityTargetRaw);
+            const pityBandLeftPct = axisMax > 0 ? (bandLeftRaw / axisMax) * 100 : 0;
+            const pityBandRightPct = axisMax > 0 ? (bandRightRaw / axisMax) * 100 : 0;
+            const pityBandWidthPct = Math.max(0, pityBandRightPct - pityBandLeftPct);
+            pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityBandLeftPct}%; width: ${pityBandWidthPct}%; background: ${pityColor};"></div>`;
             nowCapHtml = `<div class="ruler-now-cap" style="left: ${ownerPct}%;"></div>`;
         }
 
@@ -424,11 +409,10 @@
         return `
             <div class="ruler-axis">
                 <div class="ruler-track">
-                    <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
                     ${pityFillHtml}
+                    <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
                 </div>
                 ${nowCapHtml}
-                ${pityPinHtml}
                 ${pityHistoryPinsHtml}
                 ${rateUpHistoryPinsHtml}
                 ${ownerPinHtml}

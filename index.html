@@ -1166,6 +1166,10 @@
             background: rgba(255, 255, 255, 0.06);
         }
         .ruler-fill-owner { position: absolute; top: 1px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
+        /* Same thin-bar treatment as .ruler-fill-owner -- only its length/
+           position logic changed (see renderRulerAxis's showPityLive
+           branch: it now spans the 80-pull window itself instead of just
+           "progress so far"), not its visual weight. */
         .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
         .ruler-now-cap {
             position: absolute; top: 42px;
@@ -1220,9 +1224,6 @@
         .ruler-pin-above.done .ruler-pin-circle, .ruler-pin-below.done .ruler-pin-circle { background: var(--bg-deep) !important; border-color: var(--border-tech); }
         .ruler-pin-above.done .ruler-pin-label { color: var(--text-dim) !important; }
         .ruler-pin-above.done .ruler-pin-point, .ruler-pin-below.done .ruler-pin-point { color: var(--border-tech) !important; }
-        .ruler-pin-forced .ruler-pin-label { color: var(--accent-orange) !important; }
-        .ruler-pin-forced .ruler-pin-circle { border-style: dashed; border-color: currentColor; background: transparent !important; }
-        .ruler-pin-forced .ruler-pin-circle svg { opacity: 0.6; }
 
         /* --- PULL PLANNER --- */
         .planner-box { height: auto; min-height: 0; max-width: 640px; }
