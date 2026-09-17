@@ -265,10 +265,15 @@
     // with no JS layout pass, at the cost of being an approximation. Sized
     // against the narrowest real case measured (a single segment of a
     // horizontally-scrolled, multi-cycle ruler on a 375px mobile viewport,
-    // ~260px wide): the 22px pin circles need ~26px of real separation to
-    // clear each other, and 26/260 ~= 10%. Wide desktop cards end up
-    // roomier than strictly necessary as a result, which is harmless.
-    const PIN_MIN_GAP_PCT = 10;
+    // ~260px wide): sized to the circles' 22px inner width rather than
+    // their 26px full size with border, so at the narrowest real case two
+    // crowded pins actually overlap by a few px instead of merely
+    // touching -- reading as "these happened right on top of each other"
+    // is the whole point, so a little visual overlap communicates that
+    // better than leaving daylight between them. 22/260 ~= 8.5%. Wide
+    // desktop cards end up roomier than strictly necessary as a result,
+    // which is harmless.
+    const PIN_MIN_GAP_PCT = 8.5;
 
     // Groups pins that land within PIN_MIN_GAP_PCT of a neighbor into
     // clusters (transitively -- a chain of near neighbors all join one
