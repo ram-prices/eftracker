@@ -1116,7 +1116,15 @@
             overflow-y: hidden;
             direction: rtl;
             scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-tech) transparent;
         }
+        /* Matches .pull-list-container's scrollbar treatment instead of
+           the browser's default (thick, unstyled) horizontal bar. */
+        .ruler-scroll::-webkit-scrollbar { height: 4px; }
+        .ruler-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 2px; }
+        .ruler-scroll::-webkit-scrollbar-thumb { background: var(--border-tech); border-radius: 2px; }
+        .ruler-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
         .ruler-segments { display: flex; direction: ltr; height: 100%; }
         /* flex-basis is set inline per segment (100 / segment count, against
            .ruler-segments' own N*100% width) so each one renders at exactly
