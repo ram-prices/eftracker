@@ -1138,13 +1138,19 @@
             text-align: center;
             margin-bottom: 4px;
         }
-        /* The track/pins live in this inner, inset wrapper rather than
-           directly in .ruler-segment -- a pin label centered at the 0%/100%
-           edge needs room to overhang without getting clipped by
-           .banner-box's own overflow:hidden, and margin (unlike padding)
-           actually shrinks the containing block absolute children resolve
-           their left:X% against. */
-        .ruler-axis { position: relative; flex: 1; margin: 0 32px; }
+        /* The track/pins live in this inner wrapper rather than directly in
+           .ruler-segment. No inset by default, so the track lines up flush
+           with its neighbors at every interior cycle boundary and reads as
+           one continuous timeline while scrolling between segments -- only
+           the strip's true outer edges (first segment's left, last
+           segment's right) need room for a pin label centered at 0%/100%
+           to overhang without .banner-box's own overflow:hidden clipping
+           it, since there's no neighboring segment there to overhang into.
+           Margin (unlike padding) is what actually shrinks the containing
+           block absolute children resolve their left:X% against. */
+        .ruler-axis { position: relative; flex: 1; }
+        .ruler-segment:first-child .ruler-axis { margin-left: 32px; }
+        .ruler-segment:last-child .ruler-axis { margin-right: 32px; }
 
         .ruler-track {
             position: absolute;
