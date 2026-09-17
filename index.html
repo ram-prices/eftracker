@@ -1139,27 +1139,36 @@
             margin-bottom: 4px;
         }
         /* The track/pins live in this inner wrapper rather than directly in
-           .ruler-segment. No inset by default, so the track lines up flush
-           with its neighbors at every interior cycle boundary and reads as
-           one continuous timeline while scrolling between segments -- only
-           the strip's true outer edges (first segment's left, last
-           segment's right) need room for a pin label centered at 0%/100%
-           to overhang without .banner-box's own overflow:hidden clipping
-           it, since there's no neighboring segment there to overhang into.
-           Margin (unlike padding) is what actually shrinks the containing
-           block absolute children resolve their left:X% against. */
-        .ruler-axis { position: relative; flex: 1; }
+           .ruler-segment, insetted so a pin label centered at 0%/100% has
+           room to render without .banner-box's own overflow:hidden
+           clipping it. Every segment gets a small inset (14px covers the
+           22px pin circle) because every segment except the live one ends
+           in its own "done" owner pin sitting exactly at that 100% mark --
+           and since scroll-snap aligns a segment's own edges to the
+           viewport, that pin has nothing to overhang into once snapped,
+           unlike the interior TRACK LINE itself, which still has a real
+           neighboring segment right there. The strip's true outer edges
+           (first segment's left, last segment's right) get the original
+           wider 32px instead, for the "Guarantee/Token/Pity · <n>" labels
+           only those ends ever show. Margin (unlike padding) is what
+           actually shrinks the containing block absolute children resolve
+           their left:X% against -- .ruler-track below undoes it with a
+           matching negative offset so the line itself still reaches the
+           segment's true edges and stays connected across cycles. */
+        .ruler-axis { position: relative; flex: 1; margin: 0 14px; }
         .ruler-segment:first-child .ruler-axis { margin-left: 32px; }
         .ruler-segment:last-child .ruler-axis { margin-right: 32px; }
 
         .ruler-track {
             position: absolute;
-            left: 0; right: 0; top: 44px;
+            left: -14px; right: -14px; top: 44px;
             height: 9px;
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.06);
             overflow: hidden;
         }
+        .ruler-segment:first-child .ruler-track { left: -32px; }
+        .ruler-segment:last-child .ruler-track { right: -32px; }
         .ruler-fill-owner { position: absolute; top: 1px; height: 3px; left: 0; border-radius: 2px; transition: width 0.3s ease; }
         .ruler-fill-pity { position: absolute; bottom: 1px; height: 3px; border-radius: 2px; transition: left 0.3s ease, width 0.3s ease; }
         .ruler-now-cap {
