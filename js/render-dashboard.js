@@ -228,7 +228,7 @@
     // Guarantee (then Token, once the guarantee is won) and a floating
     // Pity lane, instead of three separate boxes. See the CSS comment
     // above ".pity-ruler" in index.html for the full rationale.
-    function createPityRulerChartered(data, isActive, bInfo) {
+    function createPityRulerChartered(data, isActive) {
         const grey = '#888888', dim = 'var(--text-dim)';
         const pityVal = data.endPity || 0;
         const clampedRateUp = Math.min(120, data.endRateUpPity || 0);
@@ -244,13 +244,6 @@
         const ownerIcon = guaranteeDone ? PITY_RULER_ICONS.ticket : PITY_RULER_ICONS.badge;
         const ownerColor = !isActive ? grey : (guaranteeDone ? 'var(--accent-blue)' : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)')));
         const ownerPct = axisMax > 0 ? Math.max(0, Math.min(100, (ownerNow / axisMax) * 100)) : 0;
-        // The pull index (relative to this axis window's own origin) where
-        // the rate-up was actually won -- endRateUpPity stops incrementing
-        // the instant hasPulledRateUp flips true, so it's frozen at exactly
-        // that pull, not always at the 120-pull cap.
-        const rateUpWonPct = axisMax > 0 ? Math.max(0, Math.min(100, (clampedRateUp / axisMax) * 100)) : 0;
-        const rateUpId = bInfo?.rateUpIds?.[0];
-        const rateUpPortraitUrl = rateUpId ? getItemIconUrl('char', rateUpId) : '';
 
         const pityColor = !isActive ? grey : (pityVal >= 64 ? 'var(--color-red)' : (pityVal >= 40 ? 'var(--accent-orange)' : 'var(--color-green)'));
         const pityReset = Math.max(0, ownerNow - pityVal);
@@ -278,14 +271,27 @@
             .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
             .join('');
 
+        // Likewise, every rate-up copy within the current window gets its
+        // own pin at its own pull -- not just a single pin frozen on the
+        // very first win (which also stops making sense once the window
+        // has moved past it). A copy won in an older, already-compressed
+        // cycle isn't shown here; it's folded into that cycle's own
+        // history-nub summary instead, same as any other past 6-star.
+        const rateUpHistoryPinsHtml = guaranteeDone ? (data.allPulls || [])
+            .filter(p => p.rarity === '6' && p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
+            .map(p => pityRulerPortraitPin('above', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
+            .join('') : '';
+
         let historyNubHtml = '';
         if (guaranteeDone && tokenCycles > 0) {
             const completedPulls = tokenCycles * 240;
-            const sixStarsCompleted = (data.allPulls || []).filter(p => p.pullNum <= completedPulls && p.rarity === '6').length;
+            const completedSixStars = (data.allPulls || []).filter(p => p.pullNum <= completedPulls && p.rarity === '6');
+            const sixStarsCompleted = completedSixStars.length;
+            const rateUpsCompleted = completedSixStars.filter(p => p.isRateUpItem).length;
             historyNubHtml = `
                 <div class="history-nub" tabindex="0" role="button" aria-label="Expand ${tokenCycles} completed token cycle${tokenCycles > 1 ? 's' : ''}" onclick="this.classList.toggle('expanded')">
                     <div class="history-nub-collapsed">${PITY_RULER_ICONS.ticket.replace('fill="#fff"', `fill="${isActive ? 'var(--accent-blue)' : grey}"`)}<span>&times;${tokenCycles}</span></div>
-                    <div class="history-nub-detail"><div class="history-nub-detail-label">${tokenCycles} cycle${tokenCycles > 1 ? 's' : ''} complete &middot; ${completedPulls} pulls &middot; ${sixStarsCompleted}&times;6★ &middot; ${tokenCycles} token${tokenCycles > 1 ? 's' : ''} earned</div></div>
+                    <div class="history-nub-detail"><div class="history-nub-detail-label">${tokenCycles} cycle${tokenCycles > 1 ? 's' : ''} complete &middot; ${completedPulls} pulls &middot; ${sixStarsCompleted}&times;6★${rateUpsCompleted > 0 ? ` (${rateUpsCompleted} rate-up)` : ''} &middot; ${tokenCycles} token${tokenCycles > 1 ? 's' : ''} earned</div></div>
                 </div>`;
         }
 
@@ -310,7 +316,7 @@
                             <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
                         </div>
                         ${pityHistoryPinsHtml}
-                        ${guaranteeDone ? pityRulerPortraitPin('above', rateUpWonPct, rateUpPortraitUrl, rateUpId, bInfo?.rateUpName || bInfo?.rateupName, clampedRateUp) : ''}
+                        ${rateUpHistoryPinsHtml}
                         <div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
                             <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
                             <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
@@ -346,7 +352,7 @@
 
             if (prefix === 'weap' || (prefix === 'char' && data.category === "Chartered Headhunting") || isActive) {
                 if (prefix === 'char' && data.category === "Chartered Headhunting") {
-                    pityHTML = createPityRulerChartered(data, isActive, bInfo);
+                    pityHTML = createPityRulerChartered(data, isActive);
                 } else if (prefix === 'weap') {
                     let tB = Math.ceil(data.totalPulls / 10), gVal = data.hasPulledRateUp ? data.rateUpBlock : (tB % 8 === 0 && tB > 0 ? 8 : tB % 8) || 0;
                     let pVal = tB >= 10 ? ((tB - 10) % 8 || (tB > 10 ? 8 : 0)) : tB, earn = tB >= 10 ? 1 + Math.floor((tB - 10) / 8) : 0;
