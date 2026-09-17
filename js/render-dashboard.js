@@ -224,15 +224,26 @@
             </div>`;
     }
 
+    // Measured via getBoundingClientRect against real rendered labels, not
+    // estimated: "Token · 720" (the longest seen) is ~57px wide, so its
+    // own half-width alone needs ~29px of clearance. The real gap wasn't
+    // that math -- it's that "Pity · 80"/"Pity · Forced" use this same
+    // wide label style and were mistakenly left on the narrow 16px
+    // default entirely in an earlier round, clipping every time that pin
+    // landed near an edge. Sized with real headroom above the ~29px
+    // minimum since label width varies slightly with the actual number.
+    const WIDE_PIN_EDGE_PX = 58;
+
     // A pin's `left` needs to stay far enough from 0%/100% that its own
     // circle+label don't get clipped by .banner-box's overflow:hidden --
     // clamp() keeps that clearance in real pixels regardless of how wide
     // the segment actually renders, rather than insetting the whole axis
     // (which previously put the track's background and its fill children
     // in different coordinate spaces and made the fills overshoot).
-    // `edgePx` only needs to be wider for the one pin with a long label
-    // ("Guarantee · 120" / "Token · 240"); every other pin on this ruler
-    // shows just a pull number and fits inside the narrower default.
+    // `edgePx` only needs to be wider (WIDE_PIN_EDGE_PX) for the two pins
+    // with a long label ("Guarantee/Token · <n>", "Pity · 80"/"Forced");
+    // every other pin on this ruler shows just a pull number and fits
+    // inside the narrower default.
     function pinEdgeClamp(pct, edgePx = 16) {
         return `clamp(${edgePx}px, ${pct}%, calc(100% - ${edgePx}px))`;
     }
@@ -275,7 +286,7 @@
             const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
             pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
             pityPinHtml = `
-                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct)}; color: ${pityColor};">
+                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct, WIDE_PIN_EDGE_PX)}; color: ${pityColor};">
                     <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
                     <div class="ruler-pin-point"></div>
                     <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
@@ -289,7 +300,7 @@
                     <div class="ruler-pin-circle">${PITY_RULER_ICONS.check}</div>
                     <div class="ruler-pin-point"></div>
                 </div>`
-            : `<div class="ruler-pin-above" style="left: ${pinEdgeClamp(100, 42)}; color: ${ownerColor};">
+            : `<div class="ruler-pin-above" style="left: ${pinEdgeClamp(100, WIDE_PIN_EDGE_PX)}; color: ${ownerColor};">
                     <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
                     <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
                     <div class="ruler-pin-point"></div>
