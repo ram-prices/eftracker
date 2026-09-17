@@ -1098,55 +1098,53 @@
             white-space: nowrap;
         }
         .pity-ruler-readout .unit { color: var(--text-dim); font-weight: normal; font-size: 9px; margin-left: 3px; text-transform: uppercase; }
-        .ruler-body { display: flex; align-items: stretch; height: 98px; }
-        .ruler-window { flex: 1; min-width: 0; }
+        .ruler-body { position: relative; height: 98px; }
+        /* Multi-cycle cards show a label above each segment's track --
+           taller so .ruler-axis still gets its full 98px underneath it
+           instead of the label eating into that space. */
+        .ruler-body.ruler-body-multi { height: 114px; }
+        /* Past 240 pulls the axis is measured in cycles -- rather than
+           compressing everything before "now" into a summary chip, each
+           cycle renders as its own full segment and the whole strip
+           scrolls horizontally, one cycle per "page" (scroll-snap).
+           direction:rtl on the scroller + direction:ltr on its child is a
+           CSS-only way to default the initial scroll position to the END
+           (the current cycle) without any onload JS. */
+        .ruler-scroll {
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            direction: rtl;
+            scroll-snap-type: x mandatory;
+        }
+        .ruler-segments { display: flex; direction: ltr; height: 100%; }
+        /* flex-basis is set inline per segment (100 / segment count, against
+           .ruler-segments' own N*100% width) so each one renders at exactly
+           one scroller-width regardless of how many cycles there are. */
+        .ruler-segment {
+            flex-shrink: 0;
+            min-width: 0;
+            height: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+        }
+        .ruler-segment-label {
+            font-family: monospace;
+            font-size: 9px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 4px;
+        }
         /* The track/pins live in this inner, inset wrapper rather than
-           directly in .ruler-window -- a pin label centered at the 0%/100%
+           directly in .ruler-segment -- a pin label centered at the 0%/100%
            edge needs room to overhang without getting clipped by
            .banner-box's own overflow:hidden, and margin (unlike padding)
            actually shrinks the containing block absolute children resolve
            their left:X% against. */
-        .ruler-axis { position: relative; height: 100%; margin: 0 32px; }
-
-        /* Completed 240-pull token cycles collapse into this flat chip
-           instead of re-stretching the axis forever. Same visual family
-           as .banner-rate-up (left accent + translucent fill, no border) --
-           no dashes/stripes. Hover or tap widens it to show the total. */
-        .history-nub {
-            position: relative;
-            flex: 0 0 36px;
-            margin-right: 14px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.025);
-            border-left: 2px solid var(--accent-blue);
-            cursor: pointer;
-            transition: flex-basis 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease;
-            overflow: hidden;
-            outline: none;
-        }
-        .history-nub:hover, .history-nub:focus-visible, .history-nub.expanded {
-            flex-basis: 190px;
-            background: rgba(255, 255, 255, 0.045);
-        }
-        .history-nub-collapsed {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px;
-            transition: opacity 0.2s;
-        }
-        .history-nub-collapsed svg { width: 12px; height: 12px; opacity: 0.85; }
-        .history-nub-collapsed span { font-family: monospace; font-size: 9px; color: var(--text-dim); }
-        .history-nub:hover .history-nub-collapsed, .history-nub.expanded .history-nub-collapsed { opacity: 0; }
-        .history-nub-detail {
-            position: absolute; inset: 0;
-            opacity: 0;
-            transition: opacity 0.3s;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-        }
-        .history-nub:hover .history-nub-detail, .history-nub.expanded .history-nub-detail { opacity: 1; }
-        .history-nub-detail-label { font-family: monospace; font-size: 9.5px; color: var(--text-dim); line-height: 1.4; white-space: normal; }
+        .ruler-axis { position: relative; flex: 1; margin: 0 32px; }
 
         .ruler-track {
             position: absolute;

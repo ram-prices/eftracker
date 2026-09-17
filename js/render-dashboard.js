@@ -224,105 +224,143 @@
             </div>`;
     }
 
+    // Renders one segment's track+fills+pins -- shared by the single 0-120
+    // guarantee window and, once the guarantee is won, by each individual
+    // 240-pull token cycle (see createPityRulerChartered below). Only the
+    // segment that's actually still in progress gets pity's own live fill/
+    // target pin; a completed segment shows what happened in it (history
+    // pins, its own achieved owner-pin) but not a "current projection",
+    // since pity's forward target is only meaningful for the live moment.
+    function renderRulerAxis(opts) {
+        const clamp = v => Math.max(0, Math.min(100, v));
+        const { windowStart, axisMax, ownerNow, ownerColor, ownerLabel, ownerTarget, ownerIcon, ownerPinMode, pityColor, pityVal, showPityLive, allPulls } = opts;
+        const ownerPct = axisMax > 0 ? clamp((ownerNow / axisMax) * 100) : 0;
+
+        const pityHistoryPinsHtml = (allPulls || [])
+            .filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
+            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
+            .join('');
+        const rateUpHistoryPinsHtml = (allPulls || [])
+            .filter(p => p.rarity === '6' && p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
+            .map(p => pityRulerPortraitPin('above', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
+            .join('');
+
+        let pityFillHtml = '', pityPinHtml = '', nowCapHtml = '';
+        if (showPityLive) {
+            const pityReset = Math.max(0, ownerNow - pityVal);
+            const pityTargetRaw = pityReset + 80;
+            // Pity can never actually count past 80 -- but on the 0-120
+            // guarantee axis specifically, its own 120-pull cap can force a
+            // 6-star (and therefore a pity reset) before pity would
+            // naturally get there. Once the guarantee's won and a 240-pull
+            // token axis owns the segment instead, nothing forces an early
+            // 6-star, so this can only ever trigger on that first axis.
+            const forced = axisMax === 120 && pityTargetRaw > 120;
+            const pityTargetPct = forced ? 100 : clamp((pityTargetRaw / axisMax) * 100);
+            const pityFillLeftPct = clamp((pityReset / axisMax) * 100);
+            const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
+            const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
+            pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
+            pityPinHtml = `
+                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pityTargetPct}%; color: ${pityColor};">
+                    <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
+                    <div class="ruler-pin-point"></div>
+                    <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
+                </div>`;
+            nowCapHtml = `<div class="ruler-now-cap" style="left: ${ownerPct}%;"></div>`;
+        }
+
+        const ownerPinHtml = ownerPinMode === 'done'
+            ? `<div class="ruler-pin-above done" style="left: 100%; color: var(--text-dim);">
+                    <div class="ruler-pin-label">${ownerTarget}</div>
+                    <div class="ruler-pin-circle">${PITY_RULER_ICONS.check}</div>
+                    <div class="ruler-pin-point"></div>
+                </div>`
+            : `<div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
+                    <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
+                    <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
+                    <div class="ruler-pin-point"></div>
+                </div>`;
+
+        return `
+            <div class="ruler-axis">
+                <div class="ruler-track">
+                    <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
+                    ${pityFillHtml}
+                </div>
+                ${nowCapHtml}
+                ${pityPinHtml}
+                ${pityHistoryPinsHtml}
+                ${rateUpHistoryPinsHtml}
+                ${ownerPinHtml}
+            </div>`;
+    }
+
     // Pity Ruler for Chartered Headhunting banners: one shared axis for
     // Guarantee (then Token, once the guarantee is won) and a floating
     // Pity lane, instead of three separate boxes. See the CSS comment
     // above ".pity-ruler" in index.html for the full rationale.
+    //
+    // Once the guarantee is won the axis is measured in 240-pull token
+    // cycles, and a heavy player can rack up several of those on one
+    // banner -- rather than compressing everything before "now" into a
+    // summary, each cycle gets rendered as its own full-detail segment and
+    // the whole strip becomes horizontally scrollable, defaulting to the
+    // current (rightmost) segment.
     function createPityRulerChartered(data, isActive) {
-        const grey = '#888888', dim = 'var(--text-dim)';
+        const grey = '#888888';
         const pityVal = data.endPity || 0;
         const clampedRateUp = Math.min(120, data.endRateUpPity || 0);
         const tokenRaw = data.endTokenPulls || 0;
         const tokenCycles = Math.floor(tokenRaw / 240);
         const tokenNow = tokenRaw % 240;
         const guaranteeDone = !!data.endHasPulledRateUp;
-
-        const axisMax = guaranteeDone ? 240 : 120;
-        const ownerNow = guaranteeDone ? tokenNow : clampedRateUp;
-        const ownerLabel = guaranteeDone ? 'Token' : 'Guarantee';
-        const ownerTarget = guaranteeDone ? 240 : 120;
-        const ownerIcon = guaranteeDone ? PITY_RULER_ICONS.ticket : PITY_RULER_ICONS.badge;
-        const ownerColor = !isActive ? grey : (guaranteeDone ? 'var(--accent-blue)' : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)')));
-        const ownerPct = axisMax > 0 ? Math.max(0, Math.min(100, (ownerNow / axisMax) * 100)) : 0;
-
         const pityColor = !isActive ? grey : (pityVal >= 64 ? 'var(--color-red)' : (pityVal >= 40 ? 'var(--accent-orange)' : 'var(--color-green)'));
-        const pityReset = Math.max(0, ownerNow - pityVal);
-        const pityTargetRaw = pityReset + 80;
-        // Pity can never actually count past 80 -- but if the guarantee's
-        // own 120-pull cap will force a 6-star (and therefore a pity
-        // reset) before pity would naturally get there, showing that raw
-        // target (which could read >80) would be a number that can never
-        // really happen. Show "Forced" instead, pinned to the guarantee's
-        // own target position -- the pull it's actually guaranteed to be
-        // cut short at.
-        const forced = !guaranteeDone && pityTargetRaw > 120;
-        const pityTargetPct = forced ? 100 : Math.max(0, Math.min(100, (pityTargetRaw / axisMax) * 100));
-        const pityFillLeftPct = axisMax > 0 ? Math.max(0, Math.min(100, (pityReset / axisMax) * 100)) : 0;
-        const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
-        const pityLabelText = forced ? 'Pity &middot; Forced' : 'Pity &middot; 80';
 
-        // Every non-rate-up 6-star within the current axis window gets its
-        // own portrait pin on the pity/below side, at the exact pull where
-        // it landed -- a record of what pity actually resolved into, not
-        // just a blank floating bar.
-        const windowStart = guaranteeDone ? tokenCycles * 240 : 0;
-        const pityHistoryPinsHtml = (data.allPulls || [])
-            .filter(p => p.rarity === '6' && !p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
-            .map(p => pityRulerPortraitPin('below', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
-            .join('');
-
-        // Likewise, every rate-up copy within the current window gets its
-        // own pin at its own pull -- not just a single pin frozen on the
-        // very first win (which also stops making sense once the window
-        // has moved past it). A copy won in an older, already-compressed
-        // cycle isn't shown here; it's folded into that cycle's own
-        // history-nub summary instead, same as any other past 6-star.
-        const rateUpHistoryPinsHtml = guaranteeDone ? (data.allPulls || [])
-            .filter(p => p.rarity === '6' && p.isRateUpItem && p.pullNum > windowStart && p.pullNum <= windowStart + ownerNow)
-            .map(p => pityRulerPortraitPin('above', ((p.pullNum - windowStart) / axisMax) * 100, getItemIconUrl('char', p.itemId, p.enName), p.itemId, p.enName, p.pullNum))
-            .join('') : '';
-
-        let historyNubHtml = '';
-        if (guaranteeDone && tokenCycles > 0) {
-            const completedPulls = tokenCycles * 240;
-            const completedSixStars = (data.allPulls || []).filter(p => p.pullNum <= completedPulls && p.rarity === '6');
-            const sixStarsCompleted = completedSixStars.length;
-            const rateUpsCompleted = completedSixStars.filter(p => p.isRateUpItem).length;
-            historyNubHtml = `
-                <div class="history-nub" tabindex="0" role="button" aria-label="Expand ${tokenCycles} completed token cycle${tokenCycles > 1 ? 's' : ''}" onclick="this.classList.toggle('expanded')">
-                    <div class="history-nub-collapsed">${PITY_RULER_ICONS.ticket.replace('fill="#fff"', `fill="${isActive ? 'var(--accent-blue)' : grey}"`)}<span>&times;${tokenCycles}</span></div>
-                    <div class="history-nub-detail"><div class="history-nub-detail-label">${tokenCycles} cycle${tokenCycles > 1 ? 's' : ''} complete &middot; ${completedPulls} pulls &middot; ${sixStarsCompleted}&times;6★${rateUpsCompleted > 0 ? ` (${rateUpsCompleted} rate-up)` : ''} &middot; ${tokenCycles} token${tokenCycles > 1 ? 's' : ''} earned</div></div>
-                </div>`;
+        let segmentsHtml, isScrollable;
+        if (!guaranteeDone) {
+            const ownerColor = !isActive ? grey : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)'));
+            segmentsHtml = `<div class="ruler-segment">${renderRulerAxis({
+                windowStart: 0, axisMax: 120, ownerNow: clampedRateUp, ownerColor,
+                ownerLabel: 'Guarantee', ownerTarget: 120, ownerIcon: PITY_RULER_ICONS.badge, ownerPinMode: 'active',
+                pityColor, pityVal, showPityLive: true, allPulls: data.allPulls
+            })}</div>`;
+            isScrollable = false;
+        } else {
+            const segs = [];
+            const segFlexBasis = 100 / (tokenCycles + 1);
+            for (let i = 0; i <= tokenCycles; i++) {
+                const isCurrent = i === tokenCycles;
+                const windowStart = i * 240;
+                const ownerNow = isCurrent ? tokenNow : 240;
+                const ownerColor = isCurrent && isActive ? 'var(--accent-blue)' : grey;
+                segs.push(`
+                    <div class="ruler-segment" style="flex-basis: ${segFlexBasis}%;">
+                        ${tokenCycles > 0 ? `<div class="ruler-segment-label">Cycle ${i + 1} of ${tokenCycles + 1}</div>` : ''}
+                        ${renderRulerAxis({
+                            windowStart, axisMax: 240, ownerNow, ownerColor,
+                            ownerLabel: 'Token', ownerTarget: windowStart + 240, ownerIcon: PITY_RULER_ICONS.ticket,
+                            ownerPinMode: isCurrent ? 'active' : 'done',
+                            pityColor, pityVal, showPityLive: isCurrent, allPulls: data.allPulls
+                        })}
+                    </div>`);
+            }
+            segmentsHtml = segs.join('');
+            isScrollable = tokenCycles > 0;
         }
+
+        const readoutNow = guaranteeDone ? tokenNow : clampedRateUp;
+        const readoutColor = !isActive ? grey : (guaranteeDone ? 'var(--accent-blue)' : (clampedRateUp >= 100 ? 'var(--color-red)' : (clampedRateUp >= 70 ? 'var(--accent-orange)' : 'var(--color-green)')));
 
         return `
             <div class="pity-ruler">
                 <div class="pity-ruler-readout">
-                    <span style="color: ${ownerColor};">${ownerNow}<span class="unit">${guaranteeDone ? 'token' : 'guar'}</span></span>
+                    <span style="color: ${readoutColor};">${readoutNow}<span class="unit">${guaranteeDone ? 'token' : 'guar'}</span></span>
                     <span style="color: ${pityColor};">${pityVal}<span class="unit">pity</span></span>
                 </div>
-                <div class="ruler-body">
-                    ${historyNubHtml}
-                    <div class="ruler-window"><div class="ruler-axis">
-                        <div class="ruler-track">
-                            <div class="ruler-fill-owner" style="width: ${ownerPct}%; background: ${ownerColor};"></div>
-                            <div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>
-                        </div>
-                        <div class="ruler-now-cap" style="left: ${ownerPct}%;"></div>
-
-                        <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pityTargetPct}%; color: ${pityColor};">
-                            <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
-                            <div class="ruler-pin-point"></div>
-                            <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
-                        </div>
-                        ${pityHistoryPinsHtml}
-                        ${rateUpHistoryPinsHtml}
-                        <div class="ruler-pin-above" style="left: 100%; color: ${ownerColor};">
-                            <div class="ruler-pin-label" style="color: ${ownerColor};">${ownerLabel} &middot; ${ownerTarget}</div>
-                            <div class="ruler-pin-circle" style="background: ${ownerColor};">${ownerIcon}</div>
-                            <div class="ruler-pin-point"></div>
-                        </div>
-                    </div></div>
+                <div class="ruler-body${isScrollable ? ' ruler-body-multi' : ''}">${isScrollable
+                    ? `<div class="ruler-scroll"><div class="ruler-segments" style="width: ${(tokenCycles + 1) * 100}%;">${segmentsHtml}</div></div>`
+                    : segmentsHtml}
                 </div>
             </div>`;
     }
