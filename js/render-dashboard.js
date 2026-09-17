@@ -206,6 +206,14 @@
     // cascaded pushes deep) doesn't spin its pointer past readability.
     const PIN_TILT_DEG_PER_PCT = 3;
     const PIN_TILT_MAX_DEG = 55;
+    // A pair right at the edge of the crowding threshold only needs a tiny
+    // nudge to clear each other, which -- run through PIN_TILT_DEG_PER_PCT
+    // -- comes out as only a couple degrees of tilt: too subtle to read as
+    // "these two are sharing the lean," so one side ends up looking
+    // basically straight even though both moved the same amount in
+    // opposite directions. This floors the magnitude for any pin that got
+    // nudged at all, so both members of a pair always visibly lean apart.
+    const PIN_TILT_MIN_DEG = 10;
 
     // A pin whose circle shows a real portrait (an item actually obtained)
     // instead of a generic glyph, labeled with the pull number it landed on
@@ -233,9 +241,9 @@
         // maps directly to the angle for "below" pins and flips sign for
         // "above" pins.
         const delta = truePct - leftPct;
-        const rawTilt = delta * PIN_TILT_DEG_PER_PCT * (side === 'below' ? 1 : -1);
-        const tiltDeg = Math.max(-PIN_TILT_MAX_DEG, Math.min(PIN_TILT_MAX_DEG, rawTilt));
-        const pointStyle = Math.abs(tiltDeg) > 0.05 ? ` style="transform: rotate(${tiltDeg.toFixed(1)}deg);"` : '';
+        const magnitude = Math.abs(delta) > 0.05 ? Math.max(PIN_TILT_MIN_DEG, Math.min(Math.abs(delta) * PIN_TILT_DEG_PER_PCT, PIN_TILT_MAX_DEG)) : 0;
+        const tiltDeg = Math.sign(delta) * magnitude * (side === 'below' ? 1 : -1);
+        const pointStyle = magnitude > 0 ? ` style="transform: rotate(${tiltDeg.toFixed(1)}deg);"` : '';
         const point = `<div class="ruler-pin-point"${pointStyle}></div>`;
         // "above" pins point down at the line and read label→circle→point
         // top to bottom; "below" pins point up at the line, so the label
