@@ -201,15 +201,22 @@
         ticket: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M21 10V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 1 0 4v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 1 0-4z"/></svg>'
     };
 
+    // How far the triangle tip tilts per percentage-point a pin was nudged
+    // off its true spot, and the tilt's cap so a heavily-nudged pin (several
+    // cascaded pushes deep) doesn't spin its pointer past readability.
+    const PIN_TILT_DEG_PER_PCT = 3;
+    const PIN_TILT_MAX_DEG = 55;
+
     // A pin whose circle shows a real portrait (an item actually obtained)
     // instead of a generic glyph, labeled with the pull number it landed on
     // -- on the pin's outer side, same as every other pin's label.
     // `truePct` is where the pull actually happened; `leftPct` is where the
     // pin is actually drawn, which the declutter pass below may have pushed
-    // rightward to avoid overlapping a neighbor. When they differ, a small
-    // connector + tick mark (both at the same fixed Y the pin's own point
-    // already touches) point back at the true spot, the same way a map
-    // callout's leader line ties a shifted label back to its real location.
+    // rightward to avoid overlapping a neighbor (never leftward, so
+    // leftPct >= truePct always). When they differ, the triangle tip itself
+    // tilts back toward the true spot instead of pointing straight at the
+    // line, rather than drawing a separate connector -- the pin's own
+    // pointer just leans in the direction of the pull it represents.
     function pityRulerPortraitPin(side, leftPct, portraitUrl, itemId, enName, pullNum, truePct = leftPct, extraClass = '') {
         const safeName = (Array.isArray(enName) ? enName[0] : enName) || '';
         const img = portraitUrl
@@ -217,21 +224,21 @@
             : PITY_RULER_ICONS.check;
         const label = `<div class="ruler-pin-label">${pullNum}</div>`;
         const circle = `<div class="ruler-pin-circle">${img}</div>`;
-        const point = `<div class="ruler-pin-point"></div>`;
+        // Tilted counter-clockwise (below pins) or clockwise (above pins)
+        // by the same magnitude swings the tip leftward either way, since
+        // the pivot (transform-origin, set in CSS) sits at the base where
+        // the triangle meets the circle, on the opposite side from the tip.
+        const tiltDeg = Math.min((leftPct - truePct) * PIN_TILT_DEG_PER_PCT, PIN_TILT_MAX_DEG);
+        const tiltSign = side === 'below' ? -1 : 1;
+        const pointStyle = tiltDeg > 0.05 ? ` style="transform: rotate(${(tiltSign * tiltDeg).toFixed(1)}deg);"` : '';
+        const point = `<div class="ruler-pin-point"${pointStyle}></div>`;
         // "above" pins point down at the line and read label→circle→point
         // top to bottom; "below" pins point up at the line, so the label
         // needs to fall on the far/outer side too -- circle→point→label in
         // source order, relying on .ruler-pin-below .ruler-pin-point's
         // order:-1 to still put the point first visually, touching the line.
         const children = side === 'below' ? circle + point + label : label + circle + point;
-        const tipY = side === 'below' ? 53 : 44;
-        const nudged = Math.abs(leftPct - truePct) > 0.01;
-        const connectorHtml = nudged
-            ? `<div class="ruler-pin-connector" style="left: ${Math.min(leftPct, truePct)}%; width: ${Math.abs(leftPct - truePct)}%; top: ${tipY}px;"></div>
-               <div class="ruler-pin-true-tick" style="left: ${truePct}%; top: ${tipY}px;"></div>`
-            : '';
         return `
-            ${connectorHtml}
             <div class="ruler-pin-${side} done ${extraClass}" style="left: ${pinEdgeClamp(leftPct)}; color: var(--text-dim);">
                 ${children}
             </div>`;
