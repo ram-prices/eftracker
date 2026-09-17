@@ -1207,10 +1207,6 @@
         .ruler-pin-above.done .ruler-pin-circle, .ruler-pin-below.done .ruler-pin-circle { background: var(--bg-deep) !important; border-color: var(--border-tech); }
         .ruler-pin-above.done .ruler-pin-label { color: var(--text-dim) !important; }
         .ruler-pin-above.done .ruler-pin-point, .ruler-pin-below.done .ruler-pin-point { color: var(--border-tech) !important; }
-        /* Also applied to the pity pin whenever its projected target
-           overflows past the current segment's own axis (not just the
-           120-guarantee hard-forced case) -- dashed/transparent reads as
-           "projected, not a firm mark on this axis" either way. */
         .ruler-pin-forced .ruler-pin-label { color: var(--accent-orange) !important; }
         .ruler-pin-forced .ruler-pin-circle { border-style: dashed; border-color: currentColor; background: transparent !important; }
         .ruler-pin-forced .ruler-pin-circle svg { opacity: 0.6; }
