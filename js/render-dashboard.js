@@ -283,21 +283,29 @@
             // there's no way to draw a bar starting before this axis.
             const pityResetRaw = ownerNow - pityVal;
             const pityTargetRaw = pityResetRaw + 80;
-            // Pity can never actually count past 80 -- but on the 0-120
-            // guarantee axis specifically, its own 120-pull cap can force a
-            // 6-star (and therefore a pity reset) before pity would
-            // naturally get there. Once the guarantee's won and a 240-pull
-            // token axis owns the segment instead, nothing forces an early
-            // 6-star, so this can only ever trigger on that first axis.
-            const forced = axisMax === 120 && pityTargetRaw > 120;
-            const pityTargetPct = forced ? 100 : clamp((pityTargetRaw / axisMax) * 100);
+            // The true target can fall beyond this segment's own visible
+            // range for two different reasons: on the 0-120 guarantee axis
+            // specifically, its 120-pull cap can force a 6-star (and
+            // therefore a pity reset) before pity would naturally get
+            // there; on a 240-pull token axis, there's no such rule -- it
+            // just means the pull that reaches 80 pity hasn't happened yet
+            // and belongs to a future cycle this ruler doesn't render.
+            // Both get clamped to this axis's right edge since there's
+            // nowhere else to draw them, but are styled as an overflow
+            // projection (dashed, not solid) so they don't read as
+            // coinciding with the cycle's own end-of-axis pin at that same
+            // spot -- redeeming a token doesn't reset pity, so the two
+            // reaching that edge together would otherwise look related.
+            const pityOverflow = pityTargetRaw > axisMax;
+            const forced = axisMax === 120 && pityOverflow;
+            const pityTargetPct = pityOverflow ? 100 : clamp((pityTargetRaw / axisMax) * 100);
             const pityFillLeftPct = clamp((Math.max(0, pityResetRaw) / axisMax) * 100);
             const pityFillWidthPct = Math.max(0, ownerPct - pityFillLeftPct);
             const pityLabelText = forced ? 'Forced<br>Pity' : '80<br>Pity';
             pityFillHtml = `<div class="ruler-fill-pity" style="left: ${pityFillLeftPct}%; width: ${pityFillWidthPct}%; background: ${pityColor};"></div>`;
             pityPinHtml = `
-                <div class="ruler-pin-below ${forced ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct, WIDE_PIN_EDGE_PX)}; color: ${pityColor};">
-                    <div class="ruler-pin-circle" style="background: ${forced ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
+                <div class="ruler-pin-below ${pityOverflow ? 'ruler-pin-forced' : ''}" style="left: ${pinEdgeClamp(pityTargetPct, WIDE_PIN_EDGE_PX)}; color: ${pityColor};">
+                    <div class="ruler-pin-circle" style="background: ${pityOverflow ? 'transparent' : pityColor};">${PITY_RULER_ICONS.star}</div>
                     <div class="ruler-pin-point"></div>
                     <div class="ruler-pin-label" style="${forced ? '' : `color: ${pityColor};`}">${pityLabelText}</div>
                 </div>`;
